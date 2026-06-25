@@ -22,8 +22,12 @@ The production environment consists of the following components:
 #### 1. Database (Supabase)
 1. Sign up on [Supabase](https://supabase.com/).
 2. Create a new project named `ai-threat-detection`.
-3. Locate the Connection String under **Project Settings > Database > Connection string > Transaction / Session URI**.
-4. Use this URI for `postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_ID].supabase.co:5432/postgres` in the Backend settings.
+3. Locate the Connection String under **Project Settings > Database > Connection string > Pools / Pooler**.
+4. Select **Session** or **Transaction** mode.
+5. **IMPORTANT:** Copy the Pooler connection string. Do **NOT** use the Direct Connection string, because Supabase direct connection strings default to IPv6, which is **not supported by Render's outbound network (IPv4-only)**. This will lead to a `Network is unreachable` error.
+6. The pooler connection string will look something like this:
+   `postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres`
+7. Use this URI in the Backend settings. **Ensure you remove the square brackets `[` and `]` from around your password.** For example, use `postgres.xxxx:yourpassword@...` instead of `postgres.xxxx:[yourpassword]@...`.
 
 #### 2. Backend (Render or Alternatives)
 Render is a great platform, but its free tier **spins down after 15 minutes of inactivity**, causing a 50-second delay on the next request.
@@ -44,7 +48,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 2. Create a new **Web Service** and connect the repository.
 3. Choose the **Docker runtime** (it will auto-detect `backend/Dockerfile` if context is set to `backend`).
 4. Set the following Environment Variables in Render:
-   *   `DATABASE_URL`: `postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_ID].supabase.co:5432/postgres` (your Supabase string)
+   *   `DATABASE_URL`: `postgresql://postgres.[YOUR_PROJECT_ID]:[YOUR_PASSWORD]@aws-0-[region].pooler.supabase.com:6543/postgres` (your Supabase Pooler string)
    *   `SECRET_KEY`: `<YOUR_SECRET_KEY>`
    *   `ALGORITHM`: `HS256`
    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
