@@ -11,6 +11,7 @@ from app.database.session import get_db, SessionLocal
 from app.models.role import Role
 from app.repositories.user_repository import UserRepository
 from app.routers.auth import router as auth_router
+from app.routers.datasets import router as datasets_router
 
 from app.middleware.request_id_middleware import RequestIDMiddleware
 from app.core.exceptions import AppException
@@ -83,6 +84,7 @@ app.add_exception_handler(Exception, unhandled_exception_handler)
 
 # Include Routers
 app.include_router(auth_router, prefix=settings.API_V1_STR)
+app.include_router(datasets_router, prefix=f"{settings.API_V1_STR}/datasets")
 
 @app.get("/health", tags=["Health Check"])
 def health_check():
