@@ -71,6 +71,22 @@ class AuthService:
         # Persist refresh token session in database
         self.user_repo.create_refresh_token(token=refresh, user_id=user.id, expires_at=expires_at)
         
+        # Log user_login event to Event Store
+        from app.services.event_store_service import EventStoreService
+        try:
+            EventStoreService.record_event(
+                db=self.user_repo.db,
+                event_type="user_login",
+                payload={
+                    "email": user.email,
+                    "role": user.role.name
+                },
+                user_id=user.id
+            )
+        except Exception as e:
+            # We don't want event logging failures to block successful logins
+            pass
+        
         return Token(access_token=access, refresh_token=refresh)
 
     def refresh_token(self, refresh_token: str) -> Token:

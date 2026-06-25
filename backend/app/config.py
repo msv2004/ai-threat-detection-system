@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/threat_detection"
 
+    # Logging
+    LOG_FORMAT: str = "CONSOLE"
+
+
     # Config to load from .env file
     # Handles running from the root folder or the backend folder
     model_config = SettingsConfigDict(

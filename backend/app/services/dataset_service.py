@@ -64,6 +64,23 @@ class DatasetService:
         )
         created_dataset = self.repository.create(dataset)
 
+        # Log dataset_upload event
+        from app.services.event_store_service import EventStoreService
+        try:
+            EventStoreService.record_event(
+                db=self.repository.db,
+                event_type="dataset_upload",
+                payload={
+                    "dataset_id": str(created_dataset.id),
+                    "filename": created_dataset.filename,
+                    "size_bytes": created_dataset.size_bytes,
+                    "status": created_dataset.status
+                },
+                user_id=user_id
+            )
+        except Exception:
+            pass
+
         # 5. Queue Background Task
         background_tasks.add_task(
             process_dataset_background_task,

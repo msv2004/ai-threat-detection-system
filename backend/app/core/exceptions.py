@@ -23,3 +23,7 @@ class ForbiddenError(AppException):
 class ValidationError(AppException):
     def __init__(self, message: str = "Validation error", details: Optional[Dict[str, Any]] = None):
         super().__init__(status_code=422, message=message, details=details)
+
+class BadRequestError(AppException):
+    def __init__(self, message: str = "Bad Request", details: Optional[Dict[str, Any]] = None):
+        super().__init__(status_code=400, message=message, details=details)

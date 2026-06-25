@@ -24,7 +24,7 @@ def test_register_duplicate():
         json={"email": "test@example.com", "password": "anotherpassword"}
     )
     assert response.status_code == 400
-    assert response.json()["detail"] == "Email is already registered."
+    assert response.json()["error"] == "Email is already registered."
 
 def test_login_success():
     client.post(
@@ -51,7 +51,7 @@ def test_login_invalid_password():
         data={"username": "test@example.com", "password": "wrongpassword"}
     )
     assert response.status_code == 401
-    assert response.json()["detail"] == "Incorrect email or password."
+    assert response.json()["error"] == "Incorrect email or password."
 
 def test_get_me():
     client.post(
