@@ -42,7 +42,7 @@ Thumbs.db
 htmlcov/
 
 # Machine Learning
-models/
+/models/
 checkpoints/
 *.h5
 *.pt
