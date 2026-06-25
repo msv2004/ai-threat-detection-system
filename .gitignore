@@ -1,0 +1,61 @@
+# ==========================
+# Python
+# ==========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Environment Variables
+.env
+.env.*
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# Build Files
+build/
+dist/
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Python Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Machine Learning
+models/
+checkpoints/
+*.h5
+*.pt
+*.pth
+*.joblib
+*.pkl
+
+# Node.js
+node_modules/
+
+# Coverage
+coverage/
+
+# Temporary Files
+*.tmp
+*.temp
