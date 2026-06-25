@@ -1,6 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from sqlalchemy import text
 from app.config import settings
+from app.database.session import get_db
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -26,3 +29,23 @@ def health_check():
         "project": settings.PROJECT_NAME,
         "version": "1.0.0"
     }
+
+@app.get("/health/database", tags=["Health Check"])
+def health_database(db: Session = Depends(get_db)):
+    """
+    Health check endpoint to verify database connectivity.
+    """
+    try:
+        # Execute simple query to test connection (pings the database)
+        db.execute(text("SELECT 1"))
+        return {
+            "status": "healthy",
+            "database": "connected"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "database": "disconnected",
+            "error": str(e)
+        }
+
