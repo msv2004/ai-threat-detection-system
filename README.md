@@ -192,39 +192,50 @@ Alert Generation
 
 ---
 
-# 📂 Planned Project Structure
+# 📂 Project Structure
 
 ```text
 AI Threat Detection System/
-
 │
-
-├── frontend/
-
-├── backend/
-
-├── ai/
-
-├── database/
-
-├── datasets/
-
-├── models/
-
-├── reports/
-
-├── screenshots/
-
-├── docs/
-
-├── tests/
-
-├── .github/
-
-├── README.md
-
-└── LICENSE
+├── .github/              # GitHub Actions CI/CD workflows
+├── backend/              # FastAPI Application & Alembic Migrations
+├── frontend/             # React (Vite) Security Dashboard & vercel.json
+├── nginx/                # Nginx proxy reverse configuration
+├── docker-compose.yml    # Root Docker container orchestration
+├── .dockerignore         # Root docker ignore settings
+├── .env.example          # Sample environment variables config
+├── DEPLOYMENT.md         # Production Deployment & Operations Guide
+├── README.md             # Project Overview & Quick Start
+└── LICENSE               # MIT License
 ```
+
+---
+
+# 🐳 Quick Start (Docker Compose)
+
+You can run the entire application stack (Frontend, Backend, Database, and Nginx reverse proxy) locally using Docker:
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/msv2004/ai-threat-detection-system.git
+   cd ai-threat-detection-system
+   ```
+
+2. **Configure Environment Variables:**
+   Copy the example env file and update any secrets:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. **Start the containers:**
+   ```bash
+   docker compose up --build -d
+   ```
+
+4. **Access the application:**
+   * **Frontend Dashboard**: Open `http://localhost` (served via Nginx proxy).
+   * **FastAPI Docs (Swagger)**: Open `http://localhost/api/v1/docs`.
+   * **Health/Metrics**: Check health at `http://localhost/api/v1/health` or metrics at `http://localhost/api/v1/health/metrics`.
 
 ---
 
@@ -557,15 +568,16 @@ AI • Cybersecurity • Full-Stack Development
 
 # ⭐ Project Status
 
-🚧 **Actively Under Development**
+🚀 **Production-Ready & Containerized**
 
 Current Phase:
 
-> Architecture & Project Planning
+> Phase 4 / Milestone 15 Complete (Production Containerization, Structured Logging, Health Metrics, CI/CD Actions, and Cloud Deployment)
 
 Next Milestone:
 
-> Backend Development & Authentication Module
+> Phase 5 (Live Packet Capture via Scapy, Real-time WebSocket Alerting, and Email Notifications)
+
 
 ---
 
