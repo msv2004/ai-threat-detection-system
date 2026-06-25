@@ -23,19 +23,33 @@ The production environment consists of the following components:
 1. Sign up on [Supabase](https://supabase.com/).
 2. Create a new project named `ai-threat-detection`.
 3. Locate the Connection String under **Project Settings > Database > Connection string > Transaction / Session URI**.
-4. Use this URI for `postgresql://postgres:[AithreatDetectio]@db.zmoqbamqdnjtepevgrol.supabase.co:5432/postgres` in the Backend settings.
+4. Use this URI for `postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_ID].supabase.co:5432/postgres` in the Backend settings.
 
-#### 2. Backend (Render)
+#### 2. Backend (Render or Alternatives)
+Render is a great platform, but its free tier **spins down after 15 minutes of inactivity**, causing a 50-second delay on the next request.
+*   **Workaround:** You can use a free service like [UptimeRobot](https://uptimerobot.com) to ping your Render URL every 12 minutes to keep it awake.
+*   **Alternative Free Services:**
+    *   **Koyeb:** Excellent free tier for Docker containers. Does not spin down.
+    *   **Railway.app:** Offers a trial credit system (good for testing but not permanently free).
+    *   **Fly.io:** Has a generous free tier for running small Docker containers (requires adding a credit card).
+
+**How to generate a `SECRET_KEY`:**
+A `SECRET_KEY` is a random string used to secure your JWT tokens. You can generate one easily using Python in your terminal:
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**Deployment Steps (example using Render):**
 1. Sign up on [Render](https://render.com/).
 2. Create a new **Web Service** and connect the repository.
 3. Choose the **Docker runtime** (it will auto-detect `backend/Dockerfile` if context is set to `backend`).
 4. Set the following Environment Variables in Render:
-   *   `DATABASE_URL`: `postgresql://postgres:[AithreatDetectio]@db.zmoqbamqdnjtepevgrol.supabase.co:5432/postgres` (your Supabase string)
-   *   `SECRET_KEY`: `4fd285d268ef99029ef9ba40b375607d840b8b85f866138f1a0068567c2d7486`
+   *   `DATABASE_URL`: `postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_ID].supabase.co:5432/postgres` (your Supabase string)
+   *   `SECRET_KEY`: `<PASTE_YOUR_GENERATED_SECRET_KEY_HERE>`
    *   `ALGORITHM`: `HS256`
    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
    *   `LOG_FORMAT`: `JSON`
-5. Deploy. Render automatically provisions an HTTPS endpoint (e.g. `https://ai-threat-backend.onrender.com`).
+5. Deploy. The platform will automatically provision an HTTPS endpoint (e.g. `https://ai-threat-backend.onrender.com`).
 
 #### 3. Frontend (Vercel)
 1. Sign up on [Vercel](https://vercel.com/).
@@ -43,7 +57,10 @@ The production environment consists of the following components:
 3. Set the build commands:
    *   Build Command: `npm run build`
    *   Output Directory: `dist`
-4. Deploy. Vercel provisions a global HTTPS endpoint (e.g. `https://ai-threat-soc-msv.vercel.app`).
+4. **CRITICAL:** Set the `VITE_API_URL` environment variable in Vercel to point to your deployed backend URL.
+   *   `VITE_API_URL`: `https://ai-threat-backend.onrender.com` (replace with your actual backend URL).
+5. Deploy. Vercel provisions a global HTTPS endpoint (e.g. `https://ai-threat-soc-msv.vercel.app`).
+6. **Logging In:** Upon visiting your Vercel URL, you will see a login screen. Ensure your backend is running and the database is connected. You can register a new user from the UI to gain access.
 
 ---
 
