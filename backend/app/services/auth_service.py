@@ -83,7 +83,7 @@ class AuthService:
                 },
                 user_id=user.id
             )
-        except Exception as e:
+        except Exception:
             # We don't want event logging failures to block successful logins
             pass
         

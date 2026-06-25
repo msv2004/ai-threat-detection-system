@@ -1,11 +1,9 @@
 import os
 import joblib
 import pandas as pd
-import numpy as np
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 from uuid import UUID
-from sqlalchemy.orm import Session
 
 from app.repositories.prediction_repository import PredictionRepository
 from app.models.training import TrainedModel
@@ -49,7 +47,7 @@ class PredictionService:
 
     def get_active_model(self, user_id: int) -> TrainedModel:
         model = self.repo.db.query(TrainedModel)\
-            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag == True)\
+            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag)\
             .first()
         if not model:
             raise BadRequestError("No active model found. Please activate a model in the registry first.")
@@ -73,7 +71,7 @@ class PredictionService:
         numeric_cols = preprocessor_state.get("numeric_cols", [])
         feature_names = preprocessor_state.get("feature_names", [])
         encoding_strategy = preprocessor_state.get("encoding_strategy", "one-hot")
-        scaling_strategy = preprocessor_state.get("scaling_strategy", "standard")
+        preprocessor_state.get("scaling_strategy", "standard")
         target_column = preprocessor_state.get("target_column")
 
         # Drop target column if it exists in the raw dataframe

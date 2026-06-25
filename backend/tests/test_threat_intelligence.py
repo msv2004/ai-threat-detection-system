@@ -1,8 +1,6 @@
 import pytest
 import asyncio
 from uuid import uuid4
-from fastapi.testclient import TestClient
-from app.main import app
 from app.models.prediction import Threat, ThreatIntelligence
 from app.core.events import event_bus
 from app.services.threat_intelligence_service import threat_intelligence_service
@@ -60,7 +58,6 @@ def test_user(db_session):
 @pytest.fixture
 def test_dataset(db_session, test_user):
     from app.models.dataset import Dataset
-    from uuid import uuid4
     dataset = Dataset(
         filename="test_dataset.csv",
         dataset_type="network_traffic",
@@ -78,7 +75,6 @@ def test_dataset(db_session, test_user):
 async def test_threat_intelligence_enrichment(db_session, test_user, test_dataset):
     # Patch SessionLocal to use the test session
     from app.services import threat_intelligence_service as tis
-    import app.services.threat_intelligence_service
     
     # Create a dummy threat first
     from app.models.prediction import PredictionHistory

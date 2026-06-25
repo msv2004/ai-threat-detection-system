@@ -1,16 +1,15 @@
 import os
 import time
-import json
 import traceback
 import pandas as pd
 import numpy as np
 from uuid import UUID
-from datetime import datetime, timezone
+from typing import Optional
 
 from app.database.session import SessionLocal
 from app.repositories.prediction_repository import PredictionRepository
 from app.services.prediction_service import PredictionService, model_cache
-from app.models.prediction import PredictionHistory, Threat, PredictionJob
+from app.models.prediction import PredictionHistory, Threat
 from app.models.training import TrainedModel
 from app.models.dataset import Dataset
 from app.core.logger import logger

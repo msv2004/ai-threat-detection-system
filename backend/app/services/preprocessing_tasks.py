@@ -6,7 +6,6 @@ from app.repositories.preprocessing_repository import PreprocessingRepository
 from app.core.preprocessor import DatasetPreprocessor
 from app.schemas.preprocessing import PreprocessingConfig
 from app.core.logger import logger
-import traceback
 
 def run_preprocessing_job(job_id: UUID, dataset_id: UUID, config_dict: dict, file_path: str, user_id: int):
     """
@@ -16,7 +15,7 @@ def run_preprocessing_job(job_id: UUID, dataset_id: UUID, config_dict: dict, fil
     db = SessionLocal()
     try:
         repo = PreprocessingRepository(db)
-        dataset_repo = DatasetRepository(db)
+        DatasetRepository(db)
 
         # Update status to running
         repo.update_job_status(job_id, "running")

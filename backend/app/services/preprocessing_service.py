@@ -1,6 +1,6 @@
 from fastapi import BackgroundTasks
 from uuid import UUID
-from typing import List, Optional
+from typing import List
 from app.repositories.preprocessing_repository import PreprocessingRepository
 from app.repositories.dataset_repository import DatasetRepository
 from app.schemas.preprocessing import PreprocessingConfig

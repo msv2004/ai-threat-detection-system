@@ -1,5 +1,5 @@
 import asyncio
-from typing import Callable, Dict, List, Any
+from typing import Callable, Dict, List
 from app.core.logger import logger
 
 class EventBus:

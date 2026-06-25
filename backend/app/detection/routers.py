@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
 from uuid import UUID
 
 from app.database.session import get_db
@@ -9,7 +8,7 @@ from app.services.prediction_service import PredictionService
 from app.repositories.prediction_repository import PredictionRepository
 from app.services.event_store_service import EventStoreService
 
-from app.detection.schemas import DetectionStartRequest, DetectionSessionResponse, DetectionStatisticsResponse
+from app.detection.schemas import DetectionStartRequest, DetectionSessionResponse
 from app.detection.services import DetectionService
 
 router = APIRouter()

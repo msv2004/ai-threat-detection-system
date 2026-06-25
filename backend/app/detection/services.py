@@ -1,6 +1,4 @@
 import asyncio
-import time
-from uuid import UUID
 from sqlalchemy.orm import Session
 from fastapi import BackgroundTasks
 
@@ -16,7 +14,7 @@ from app.services.prediction_service import PredictionService, model_cache
 from app.services.event_store_service import EventStoreService
 from app.schemas.prediction import PredictionRequest
 from app.websocket.manager import websocket_manager
-from app.core.exceptions import NotFoundError, BadRequestError
+from app.core.exceptions import BadRequestError
 
 class DetectionService:
     def __init__(self, db: Session, prediction_service: PredictionService, event_store: EventStoreService):
@@ -182,7 +180,7 @@ class DetectionService:
 
     async def _maintenance_loop(self, user_id: int):
         """Runs in background while session is active to push stats and clean flows."""
-        loop = asyncio.get_event_loop()
+        asyncio.get_event_loop()
         while self.current_session and self.current_session.stop_time is None:
             # 1. Check for flow timeouts
             if self.flow_builder:

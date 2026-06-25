@@ -3,7 +3,7 @@ import numpy as np
 import os
 from typing import Dict, Any, Tuple
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder
 from app.schemas.preprocessing import PreprocessingConfig
 
 class DatasetPreprocessor:

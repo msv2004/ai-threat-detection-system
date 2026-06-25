@@ -1,11 +1,8 @@
 import pytest
-import os
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.database.session import get_db
-from app.models.detection import DetectionSession
 from app.capture.detection_session import ActiveSession
 from app.flow.flow_builder import FlowBuilder
 from app.flow.feature_extractor import FeatureExtractor

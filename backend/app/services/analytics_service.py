@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func
 from datetime import datetime, timedelta, timezone
-from uuid import UUID
 from typing import List, Dict, Any, Optional
 
 from app.models.prediction import PredictionHistory, Threat
@@ -36,7 +35,7 @@ class AnalyticsService:
 
         # Active Model Info
         active_model = self.db.query(TrainedModel)\
-            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag == True).first()
+            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag).first()
 
         active_model_info = None
         if active_model:
@@ -208,7 +207,7 @@ class AnalyticsService:
 
         # Active Model Metrics
         active_model = self.db.query(TrainedModel)\
-            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag == True).first()
+            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag).first()
             
         active_metrics = None
         if active_model:
@@ -257,7 +256,7 @@ class AnalyticsService:
 
     def get_model_monitoring(self, user_id: int) -> Dict[str, Any]:
         active_model = self.db.query(TrainedModel)\
-            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag == True).first()
+            .filter(TrainedModel.user_id == user_id, TrainedModel.active_flag).first()
 
         if not active_model:
             return {

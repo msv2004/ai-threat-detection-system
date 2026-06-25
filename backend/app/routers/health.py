@@ -36,7 +36,7 @@ def health_model(db: Session = Depends(get_db)):
     """
     Checks the status of the active model and verifies its physical artifacts exist on disk.
     """
-    model = db.query(TrainedModel).filter(TrainedModel.active_flag == True).first()
+    model = db.query(TrainedModel).filter(TrainedModel.active_flag).first()
     if not model:
         return {
             "status": "degraded",
@@ -194,7 +194,6 @@ def health_aggregator(db: Session = Depends(get_db)):
         is_healthy = False
         health_results["cache"] = {"status": "unhealthy", "error": str(e)}
 
-    status_code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
     
     # We return the aggregated status
     return {

@@ -22,8 +22,8 @@ class FeatureExtractor:
         bwd_packets_per_sec = flow.bwd_packets / duration
         
         # Ratios
-        packet_ratio = (flow.fwd_packets / flow.bwd_packets) if flow.bwd_packets > 0 else float(flow.fwd_packets)
-        byte_ratio = (flow.fwd_bytes / flow.bwd_bytes) if flow.bwd_bytes > 0 else float(flow.fwd_bytes)
+        (flow.fwd_packets / flow.bwd_packets) if flow.bwd_packets > 0 else float(flow.fwd_packets)
+        (flow.fwd_bytes / flow.bwd_bytes) if flow.bwd_bytes > 0 else float(flow.fwd_bytes)
         
         # Basic derived numeric features that mimic common datasets (e.g. CICIDS)
         features = {

@@ -1,6 +1,6 @@
 import time
 from typing import Dict, Any, Callable
-from scapy.all import IP, TCP, UDP, ICMP, Packet
+from scapy.all import IP, TCP, UDP, Packet
 
 class FlowRecord:
     def __init__(self, flow_id: str, src_ip: str, dst_ip: str, src_port: int, dst_port: int, protocol: int):
@@ -78,7 +78,7 @@ class FlowBuilder:
 
     def process_packet(self, packet: Packet):
         """Processes a single raw packet."""
-        if not IP in packet:
+        if IP not in packet:
             return
 
         src_ip = packet[IP].src

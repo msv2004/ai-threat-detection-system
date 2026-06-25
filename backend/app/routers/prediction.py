@@ -86,7 +86,6 @@ def list_predictions(
     # Map to schema response
     responses = []
     for r in records:
-        explainability = []
         responses.append(PredictionResponse(
             prediction_id=r.id,
             model_id=r.model_id or UUID("00000000-0000-0000-0000-000000000000"),

@@ -1,6 +1,6 @@
 import pytest
-import pandas as pd
 import os
+import uuid
 from fastapi.testclient import TestClient
 from uuid import uuid4
 from unittest.mock import patch
@@ -8,7 +8,6 @@ from app.main import app
 
 client = TestClient(app)
 
-import uuid
 
 @pytest.fixture(autouse=True)
 def mock_db_sessions(db_session):

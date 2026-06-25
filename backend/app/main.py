@@ -1,13 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import settings
-from app.database.session import get_db, SessionLocal
+from app.database.session import SessionLocal
 from app.models.role import Role
 from app.repositories.user_repository import UserRepository
 from app.routers.auth import router as auth_router
@@ -45,7 +43,7 @@ def seed_roles():
                 if not user_repo.get_role_by_name(name):
                     new_role = Role(name=name, description=description)
                     user_repo.create_role(new_role)
-            except Exception as e:
+            except Exception:
                 # If DB is not available yet (e.g. during migrations), skip seeding silently
                 pass
     finally:
@@ -132,11 +130,11 @@ app.include_router(prediction_router, prefix=settings.API_V1_STR)
 app.include_router(analytics_router, prefix=settings.API_V1_STR)
 app.include_router(health_router)  # /health prefix routes (not prefixed with /api/v1)
 
-from app.detection.routers import router as detection_router
+from app.detection.routers import router as detection_router  # noqa: E402
 app.include_router(detection_router, prefix=f"{settings.API_V1_STR}/detection")
 
-from fastapi import WebSocket, WebSocketDisconnect
-from app.websocket.manager import websocket_manager
+from fastapi import WebSocket, WebSocketDisconnect  # noqa: E402
+from app.websocket.manager import websocket_manager  # noqa: E402
 
 @app.websocket("/ws/alerts")
 async def websocket_alerts_endpoint(websocket: WebSocket):

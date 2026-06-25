@@ -30,7 +30,7 @@ def run_training_job(
     
     db = SessionLocal()
     repo = TrainingRepository(db)
-    preprocessing_repo = PreprocessingRepository(db)
+    PreprocessingRepository(db)
     
     started_at = datetime.now(timezone.utc)
     repo.update_job(job_id, status="running", started_at=started_at)

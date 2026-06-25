@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
-from datetime import datetime
 from app.models.prediction import PredictionHistory, Threat, PredictionJob
 
 class PredictionRepository:

@@ -11,7 +11,7 @@ from unittest.mock import patch
 from app.main import app
 from app.models.dataset import Dataset
 from app.models.preprocessing import ProcessedDataset
-from app.models.training import TrainingJob, TrainedModel
+from app.models.training import TrainedModel
 
 client = TestClient(app)
 

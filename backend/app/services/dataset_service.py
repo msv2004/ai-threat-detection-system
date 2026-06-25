@@ -1,8 +1,7 @@
 import os
-import shutil
 from fastapi import UploadFile, BackgroundTasks
 from uuid import UUID
-from typing import List, Optional
+from typing import List
 from app.repositories.dataset_repository import DatasetRepository
 from app.models.dataset import Dataset
 from app.services.dataset_tasks import process_dataset_background_task

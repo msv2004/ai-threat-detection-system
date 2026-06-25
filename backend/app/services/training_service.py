@@ -1,6 +1,6 @@
 from fastapi import BackgroundTasks
 from uuid import UUID
-from typing import List, Optional
+from typing import List
 import os
 import shutil
 
