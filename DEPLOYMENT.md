@@ -45,7 +45,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 3. Choose the **Docker runtime** (it will auto-detect `backend/Dockerfile` if context is set to `backend`).
 4. Set the following Environment Variables in Render:
    *   `DATABASE_URL`: `postgresql://postgres:[YOUR_PASSWORD]@db.[YOUR_PROJECT_ID].supabase.co:5432/postgres` (your Supabase string)
-   *   `SECRET_KEY`: `<PASTE_YOUR_GENERATED_SECRET_KEY_HERE>`
+   *   `SECRET_KEY`: `<YOUR_SECRET_KEY>`
    *   `ALGORITHM`: `HS256`
    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
    *   `LOG_FORMAT`: `JSON`
