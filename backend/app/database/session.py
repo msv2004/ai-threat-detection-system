@@ -2,11 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
 
-# Parse the database URL to ensure compatibility with SQLAlchemy
+# Parse the database URL to ensure compatibility with SQLAlchemy and psycopg (v3)
 database_url = settings.DATABASE_URL
 if database_url.startswith("postgres://"):
-    # SQLAlchemy 1.4+ deprecated postgres:// prefix in favor of postgresql://
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
+    database_url = database_url.replace("postgres://", "postgresql+psycopg://", 1)
+elif database_url.startswith("postgresql://") and not database_url.startswith("postgresql+psycopg://"):
+    database_url = database_url.replace("postgresql://", "postgresql+psycopg://", 1)
 
 # Configure the SQLAlchemy connection pool
 # pool_pre_ping: tests connections before executing queries (pings the DB)
