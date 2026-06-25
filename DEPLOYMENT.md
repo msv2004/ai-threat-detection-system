@@ -31,7 +31,7 @@ The production environment consists of the following components:
 3. Choose the **Docker runtime** (it will auto-detect `backend/Dockerfile` if context is set to `backend`).
 4. Set the following Environment Variables in Render:
    *   `DATABASE_URL`: `postgresql://postgres:[AithreatDetectio]@db.zmoqbamqdnjtepevgrol.supabase.co:5432/postgres` (your Supabase string)
-   *   `SECRET_KEY`: `[YOUR_GENERATED_SECURE_SECRET]`
+   *   `SECRET_KEY`: `4fd285d268ef99029ef9ba40b375607d840b8b85f866138f1a0068567c2d7486`
    *   `ALGORITHM`: `HS256`
    *   `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
    *   `LOG_FORMAT`: `JSON`
@@ -43,7 +43,7 @@ The production environment consists of the following components:
 3. Set the build commands:
    *   Build Command: `npm run build`
    *   Output Directory: `dist`
-4. Deploy. Vercel provisions a global HTTPS endpoint (e.g. `https://ai-threat-soc.vercel.app`).
+4. Deploy. Vercel provisions a global HTTPS endpoint (e.g. `https://ai-threat-soc-msv.vercel.app`).
 
 ---
 
