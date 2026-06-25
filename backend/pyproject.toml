@@ -1,0 +1,41 @@
+[project]
+name = "ai-threat-detection-system"
+version = "0.1.0"
+description = "AI Threat Detection System Backend"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy",
+    "psycopg[binary]",
+    "alembic",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "bcrypt",
+    "python-multipart",
+    "python-dotenv",
+    "numpy",
+    "pandas",
+    "scikit-learn",
+    "joblib",
+    "scipy",
+    "pydantic",
+    "pydantic-settings",
+    "httpx",
+    "requests"
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "ruff"
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+
