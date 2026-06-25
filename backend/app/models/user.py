@@ -16,8 +16,8 @@ class User(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id"), nullable=False)
 
     # Relationships
-    role: Mapped["Role"] = relationship(back_populates="users")
-    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
+    role: Mapped["Role"] = relationship(back_populates="users")  # noqa: F821
+    refresh_tokens: Mapped[list["RefreshToken"]] = relationship(  # noqa: F821
         back_populates="user",
         cascade="all, delete-orphan"
     )

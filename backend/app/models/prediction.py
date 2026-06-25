@@ -1,8 +1,8 @@
 import uuid
-from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, JSON, Boolean
+from sqlalchemy import Column, String, Integer, Float, DateTime, ForeignKey, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from app.database.base import Base
 
 class PredictionHistory(Base):

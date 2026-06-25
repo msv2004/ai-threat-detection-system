@@ -15,7 +15,7 @@ class Role(Base):
 
     # Relationships
     # Back-populates "role" in User model
-    users: Mapped[list["User"]] = relationship(
+    users: Mapped[list["User"]] = relationship(  # noqa: F821
         back_populates="role",
         cascade="all, delete-orphan"
     )
