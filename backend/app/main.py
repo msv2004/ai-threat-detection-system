@@ -145,3 +145,7 @@ async def websocket_alerts_endpoint(websocket: WebSocket):
             await websocket.receive_text()
     except WebSocketDisconnect:
         websocket_manager.disconnect(websocket)
+
+@app.api_route("/", methods=["GET", "HEAD"])
+async def root_health_check():
+    return {"status": "ok", "message": "API is running"}
