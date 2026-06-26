@@ -46,7 +46,10 @@ class TrainingRepository:
         started_at: Optional[datetime] = None, 
         finished_at: Optional[datetime] = None, 
         duration: Optional[float] = None, 
-        error_message: Optional[str] = None
+        error_message: Optional[str] = None,
+        progress_stage: Optional[str] = None,
+        progress_percent: Optional[int] = None,
+        progress_log: Optional[str] = None
     ) -> Optional[TrainingJob]:
         job = self.get_job(job_id)
         if job:
@@ -59,6 +62,14 @@ class TrainingRepository:
                 job.duration = duration
             if error_message:
                 job.error_message = error_message
+            if progress_stage:
+                job.progress_stage = progress_stage
+            if progress_percent is not None:
+                job.progress_percent = progress_percent
+            if progress_log:
+                if not job.progress_logs:
+                    job.progress_logs = []
+                job.progress_logs = list(job.progress_logs) + [progress_log]
             self.db.commit()
             self.db.refresh(job)
         return job

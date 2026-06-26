@@ -33,7 +33,14 @@ def run_training_job(
     PreprocessingRepository(db)
     
     started_at = datetime.now(timezone.utc)
-    repo.update_job(job_id, status="running", started_at=started_at)
+    repo.update_job(
+        job_id, 
+        status="running", 
+        started_at=started_at,
+        progress_stage="Loading",
+        progress_percent=10,
+        progress_log="[1/5] Initializing job configuration and resolving datasets..."
+    )
     
     # Log training_started event
     from app.services.event_store_service import EventStoreService
@@ -69,6 +76,13 @@ def run_training_job(
         test_features_resolved = resolve_processed_path(processed_dataset, processed_dataset.test_features_path)
         test_labels_resolved = resolve_processed_path(processed_dataset, processed_dataset.test_labels_path)
 
+        repo.update_job(
+            job_id,
+            status="running",
+            progress_percent=20,
+            progress_log=f"[2/5] Loading preprocessed Parquet splits for {algorithm}..."
+        )
+
         if not os.path.exists(train_features_resolved):
             raise FileNotFoundError(f"Training features file not found at {train_features_resolved}")
         if not os.path.exists(train_labels_resolved):
@@ -92,8 +106,24 @@ def run_training_job(
         # 3. Instantiate Trainer from Abstraction Factory
         trainer = TrainerFactory.get_trainer(algorithm)
         
+        repo.update_job(
+            job_id,
+            status="running",
+            progress_stage="Training",
+            progress_percent=40,
+            progress_log=f"[3/5] Starting classifier training on {len(X_train)} samples..."
+        )
+        
         # 4. Train Model
         model = trainer.train(X_train, y_train, config)
+        
+        repo.update_job(
+            job_id,
+            status="running",
+            progress_stage="Evaluating",
+            progress_percent=75,
+            progress_log=f"[4/5] Training complete. Commencing evaluation on {len(X_test)} test samples..."
+        )
         
         # 5. Evaluate Model
         metrics = trainer.evaluate(model, X_test, y_test)
@@ -101,6 +131,14 @@ def run_training_job(
         # 6. Explain Model (Feature Importance)
         feature_names = list(X_train.columns)
         explainability = trainer.get_explainability(model, feature_names)
+        
+        repo.update_job(
+            job_id,
+            status="running",
+            progress_stage="Saving",
+            progress_percent=90,
+            progress_log="[5/5] Serializing model binaries and registering registry parameters..."
+        )
         
         # 7. Create model directory: models/{user_id}/{model_name}/v{version}/
         version = repo.get_next_model_version(model_name, user_id)
@@ -174,7 +212,10 @@ def run_training_job(
             job_id, 
             status="completed", 
             finished_at=finished_at, 
-            duration=duration
+            duration=duration,
+            progress_stage="Completed",
+            progress_percent=100,
+            progress_log="Training job finished successfully!"
         )
         logger.info(f"Training job {job_id} completed successfully in {duration:.2f}s")
         
@@ -208,7 +249,10 @@ def run_training_job(
             status="failed", 
             finished_at=finished_at, 
             duration=duration, 
-            error_message=str(e)
+            error_message=str(e),
+            progress_stage="Failed",
+            progress_percent=100,
+            progress_log=f"Job failed with error: {str(e)}"
         )
         
         # Log training_failed event

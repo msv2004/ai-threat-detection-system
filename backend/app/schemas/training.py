@@ -30,6 +30,12 @@ class TrainingJobResponse(BaseModel):
     finished_at: Optional[datetime] = None
     duration: Optional[float] = None
     error_message: Optional[str] = None
+    
+    # Progress monitoring
+    progress_stage: Optional[str] = "Queued"
+    progress_percent: Optional[int] = 0
+    progress_logs: Optional[List[str]] = None
+    
     created_at: datetime
     updated_at: datetime
 

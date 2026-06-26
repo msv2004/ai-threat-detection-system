@@ -22,6 +22,12 @@ class TrainingJob(Base):
     error_message = Column(String, nullable=True)
     
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    
+    # Progress monitoring fields
+    progress_stage = Column(String, default="Queued", nullable=True)
+    progress_percent = Column(Integer, default=0, nullable=True)
+    progress_logs = Column(JSON, default=list, nullable=True)
+    
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
