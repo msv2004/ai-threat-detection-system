@@ -1,7 +1,6 @@
 import os
 from uuid import UUID
 from app.database.session import SessionLocal
-from app.repositories.dataset_repository import DatasetRepository
 from app.repositories.preprocessing_repository import PreprocessingRepository
 from app.core.preprocessor import DatasetPreprocessor
 from app.schemas.preprocessing import PreprocessingConfig

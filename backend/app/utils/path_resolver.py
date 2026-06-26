@@ -1,5 +1,4 @@
 import os
-from uuid import UUID
 
 # Resolve base directories relative to this file
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
