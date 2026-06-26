@@ -175,6 +175,57 @@ export const authService = {
   },
 };
 
+export async function apiUpload(path: string, file: File, onProgress: (progress: number) => void): Promise<any> {
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const API_PREFIX = `${BASE_URL}/api/v1`;
+  const url = `${API_PREFIX}${path}`;
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', url);
+
+    const accessToken = useAuthStore.getState().accessToken;
+    if (accessToken) {
+      xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+    }
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const responseData = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+          resolve(responseData);
+        } catch {
+          resolve({});
+        }
+      } else {
+        let errorMsg = 'API request failed';
+        try {
+          const errData = JSON.parse(xhr.responseText);
+          errorMsg = errData.detail || errorMsg;
+        } catch {
+          errorMsg = xhr.statusText || errorMsg;
+        }
+        reject(new Error(typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg)));
+      }
+    };
+
+    xhr.onerror = () => {
+      reject(new Error('Network error during file upload.'));
+    };
+
+    const formData = new FormData();
+    formData.append('file', file);
+    xhr.send(formData);
+  });
+}
+
 export const datasetService = {
   async list() {
     return apiFetch('/datasets/');
@@ -184,7 +235,10 @@ export const datasetService = {
     return apiFetch(`/datasets/${id}`);
   },
 
-  async upload(file: File) {
+  async upload(file: File, onProgress?: (progress: number) => void) {
+    if (onProgress) {
+      return apiUpload('/datasets/upload', file, onProgress);
+    }
     const formData = new FormData();
     formData.append('file', file);
     return apiFetch('/datasets/upload', {

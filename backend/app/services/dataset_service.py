@@ -8,7 +8,7 @@ from app.services.dataset_tasks import process_dataset_background_task
 from app.core.exceptions import ValidationError, NotFoundError
 
 # Root path for datasets
-DATASETS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../datasets"))
+DATASETS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../datasets"))
 os.makedirs(DATASETS_DIR, exist_ok=True)
 
 ALLOWED_EXTENSIONS = {".csv", ".pcap"}

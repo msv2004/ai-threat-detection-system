@@ -74,7 +74,7 @@ def health_storage():
     Verifies that system storage locations (datasets/ and models/) are writable by creating and deleting temporary files.
     """
     # Root path for datasets and models directories
-    datasets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../datasets"))
+    datasets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../datasets"))
     models_dir = "models"
     
     dirs = {

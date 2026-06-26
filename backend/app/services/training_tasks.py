@@ -97,7 +97,8 @@ def run_training_job(
         
         # 7. Create model directory: models/{user_id}/{model_name}/v{version}/
         version = repo.get_next_model_version(model_name, user_id)
-        model_dir = os.path.join("models", str(user_id), model_name, f"v{version}")
+        models_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../models"))
+        model_dir = os.path.join(models_base_dir, str(user_id), model_name, f"v{version}")
         os.makedirs(model_dir, exist_ok=True)
         
         # 8. Save Artifacts

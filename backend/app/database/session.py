@@ -1,4 +1,5 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from app.config import settings
 
@@ -13,12 +14,25 @@ elif database_url.startswith("postgresql://") and not database_url.startswith("p
 # pool_pre_ping: tests connections before executing queries (pings the DB)
 # pool_size: number of persistent connections to hold in the pool
 # max_overflow: additional connections allowed above pool_size during peak demand
+connect_args = {}
+if database_url.startswith("sqlite"):
+    # SQLite requires check_same_thread=False for multi-thread FastAPI access
+    connect_args["check_same_thread"] = False
+
 engine = create_engine(
     database_url,
-    pool_size=5,
-    max_overflow=10,
-    pool_pre_ping=True
+    pool_size=5 if not database_url.startswith("sqlite") else None,
+    max_overflow=10 if not database_url.startswith("sqlite") else None,
+    pool_pre_ping=True,
+    connect_args=connect_args
 )
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    if database_url.startswith("sqlite"):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 # Setup a thread-local session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

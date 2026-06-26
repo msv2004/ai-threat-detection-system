@@ -42,7 +42,8 @@ def run_preprocessing_job(job_id: UUID, dataset_id: UUID, config_dict: dict, fil
 
         # 3. Save splits
         # Create output directory: datasets/{user_id}/processed/
-        processed_dir = os.path.join("datasets", str(user_id), "processed")
+        datasets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../datasets"))
+        processed_dir = os.path.join(datasets_dir, str(user_id), "processed")
         os.makedirs(processed_dir, exist_ok=True)
 
         # File paths

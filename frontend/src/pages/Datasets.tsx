@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { datasetService, preprocessingService } from '../services/api';
 import { 
@@ -14,6 +14,7 @@ import {
   CheckCircle,
   XCircle,
   FileText,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -35,6 +36,7 @@ export default function Datasets() {
   // File upload states
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   
@@ -50,41 +52,62 @@ export default function Datasets() {
 
   // Active view states
   const [selectedProfileDatasetId, setSelectedProfileDatasetId] = useState<string>('');
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // Queries
-  const { data: datasets, isLoading: isDatasetsLoading, isError: isDatasetsError, refetch: refetchDatasets } = useQuery({
+  const { data: datasets, isLoading: isDatasetsLoading, isError: isDatasetsError, refetch: refetchDatasets, isFetching: isDatasetsFetching } = useQuery({
     queryKey: ['datasets'],
     queryFn: datasetService.list,
     retry: 1,
   });
 
-  const { data: preprocessingJobs, isLoading: isJobsLoading, isError: isJobsError, refetch: refetchJobs } = useQuery({
+  const { data: preprocessingJobs, isLoading: isJobsLoading, isError: isJobsError, refetch: refetchJobs, isFetching: isJobsFetching } = useQuery({
     queryKey: ['preprocessing_jobs'],
     queryFn: preprocessingService.listJobs,
     refetchInterval: 3000,
     retry: 1,
   });
 
-  const { data: datasetProfile } = useQuery({
+  const { data: datasetProfile, isLoading: isProfileLoading, isError: isProfileError } = useQuery({
     queryKey: ['dataset_profile', selectedProfileDatasetId],
     queryFn: () => preprocessingService.getReport(selectedProfileDatasetId),
     enabled: !!selectedProfileDatasetId,
-    retry: 1,
+    retry: false,
   });
+
+  const isRefreshing = isDatasetsFetching || isJobsFetching;
+
+  // Track dataset list changes to auto-select newly processed ones
+  const [prevDatasetCount, setPrevDatasetCount] = useState(0);
+  useEffect(() => {
+    if (datasets) {
+      // If we got a new dataset that is ready, and we don't have a selection, auto-select it
+      if (datasets.length > prevDatasetCount) {
+        const readyDataset = datasets.find(d => d.status === 'ready' || d.status === 'completed');
+        if (readyDataset && !selectedDatasetId) {
+          setSelectedDatasetId(readyDataset.id);
+          localStorage.setItem('selected_dataset_id', readyDataset.id);
+        }
+      }
+      setPrevDatasetCount(datasets.length);
+    }
+  }, [datasets, prevDatasetCount, selectedDatasetId]);
 
   // Mutations
   const uploadMutation = useMutation({
-    mutationFn: datasetService.upload,
+    mutationFn: (file: File) => datasetService.upload(file, (progress) => setUploadProgress(progress)),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
       setUploadFile(null);
       setUploading(false);
+      setUploadProgress(0);
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 4000);
     },
     onError: (err: any) => {
       setUploadError(err.message || 'File upload failed. Check file format and size (max 5MB).');
       setUploading(false);
+      setUploadProgress(0);
     }
   });
 
@@ -92,6 +115,19 @@ export default function Datasets() {
     mutationFn: datasetService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      setDeleteTargetId(null);
+      // Clear selected dataset if it was deleted
+      if (selectedDatasetId === deleteTargetId) {
+        setSelectedDatasetId('');
+        localStorage.removeItem('selected_dataset_id');
+      }
+      if (selectedProfileDatasetId === deleteTargetId) {
+        setSelectedProfileDatasetId('');
+      }
+    },
+    onError: (err: any) => {
+      alert(`Delete failed: ${err.message || 'Server error'}`);
+      setDeleteTargetId(null);
     }
   });
 
@@ -99,7 +135,6 @@ export default function Datasets() {
     mutationFn: preprocessingService.start,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['preprocessing_jobs'] });
-      setSelectedDatasetId('');
     }
   });
 
@@ -156,9 +191,10 @@ export default function Datasets() {
         </div>
         <button
           onClick={() => { refetchDatasets(); refetchJobs(); }}
-          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+          disabled={isRefreshing}
+          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
         >
-          <RefreshCw className="w-3.5 h-3.5" />
+          <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-accent' : ''}`} />
           Refresh
         </button>
       </div>
@@ -239,6 +275,21 @@ export default function Datasets() {
                 </div>
               )}
 
+              {uploading && (
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] text-text-secondary font-semibold">
+                    <span>Ingesting File...</span>
+                    <span>{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-surface-2 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className="bg-accent h-1.5 transition-all duration-300 rounded-full" 
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={uploading || !uploadFile}
@@ -247,7 +298,7 @@ export default function Datasets() {
                 {uploading ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Uploading...
+                    Uploading ({uploadProgress}%)
                   </>
                 ) : (
                   <>
@@ -444,7 +495,7 @@ export default function Datasets() {
                         <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
                           <button
                             disabled={deleteMutation.isPending}
-                            onClick={() => deleteMutation.mutate(d.id)}
+                            onClick={() => setDeleteTargetId(d.id)}
                             className="p-1.5 border border-border-subtle hover:border-red-500/30 rounded-lg text-text-tertiary hover:text-red-400 transition-all"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -528,10 +579,18 @@ export default function Datasets() {
                 Dataset Profile Report
               </h3>
 
-              {!datasetProfile ? (
+              {isProfileLoading ? (
                 <div className="text-center py-6 flex flex-col items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-accent" />
                   <span className="text-xs text-text-secondary">Generating statistical summary...</span>
+                </div>
+              ) : isProfileError ? (
+                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 p-4 rounded-xl flex gap-3 items-start text-xs leading-relaxed">
+                  <AlertTriangle className="w-4.5 h-4.5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold block mb-1">Profile Report not generated yet</span>
+                    You must compile this dataset first using the Preprocessing Console. This splits features, standardizes scales, and profiles key metrics like missing value ratios and classes.
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-text-secondary">
@@ -569,6 +628,47 @@ export default function Datasets() {
         </div>
 
       </div>
+      {/* Delete Confirmation Modal */}
+      {deleteTargetId && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-surface-1 border border-border-strong rounded-xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center gap-2.5 text-red-500">
+                <AlertTriangle className="w-5 h-5 shrink-0" />
+                <h3 className="text-sm font-bold">Delete Dataset</h3>
+              </div>
+              <button onClick={() => setDeleteTargetId(null)} className="text-text-tertiary hover:text-text-primary">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-xs text-text-secondary leading-relaxed">
+              Are you sure you want to permanently delete this dataset? This will remove all related preprocessing runs and trained models. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                onClick={() => setDeleteTargetId(null)}
+                className="px-4 py-2 border border-border-default rounded-lg bg-surface-2 text-text-secondary hover:text-text-primary text-xs font-semibold transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteMutation.mutate(deleteTargetId)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-40 text-white rounded-lg text-xs font-semibold transition-colors flex items-center gap-2"
+              >
+                {deleteMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete permanently'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
