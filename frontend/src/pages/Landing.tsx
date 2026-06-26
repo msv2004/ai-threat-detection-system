@@ -114,7 +114,7 @@ export default function Landing() {
             </Link>
             <Link 
               to="/register" 
-              className="btn btn-gold btn-sm text-xs px-6 py-2.5"
+              className="btn btn-gold btn-sm text-xs"
             >
               Get Started
             </Link>
@@ -212,10 +212,10 @@ export default function Landing() {
             transition={{ duration: 0.6, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
           >
-            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm px-10">
+            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm">
               Get Protected
             </Link>
-            <Link to="/login" className="btn btn-gold btn-lg text-sm px-10">
+            <Link to="/login" className="btn btn-gold btn-lg text-sm">
               Free Assessment
             </Link>
           </motion.div>
@@ -409,10 +409,10 @@ export default function Landing() {
             Deploy Aegis AI SOC in minutes. Upload your first dataset, train a classifier, and start detecting threats autonomously.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm px-12">
+            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm">
               Start Free
             </Link>
-            <Link to="/login" className="btn btn-gold btn-lg text-sm px-12">
+            <Link to="/login" className="btn btn-gold btn-lg text-sm">
               Sign In
             </Link>
           </div>
@@ -434,7 +434,7 @@ export default function Landing() {
             ))}
           </div>
           <div className="text-xs text-text-tertiary">
-            © {new Date().getFullYear()} Aegis SOC. All rights reserved.
+            © 2026 Aegis SOC-MSV. All rights reserved.
           </div>
         </div>
       </footer>

@@ -117,8 +117,8 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white uppercase tracking-wider">Security Analytics</h2>
-          <p className="text-xs text-text-secondary mt-0.5 font-sans">Observe threat volume trends and ML pipeline performance stability</p>
+          <h2 className="text-2xl font-bold text-white">Security Analytics</h2>
+          <p className="text-sm text-text-secondary mt-0.5">Observe threat volume trends and ML pipeline performance stability</p>
         </div>
         <button
           onClick={handleRefreshAll}

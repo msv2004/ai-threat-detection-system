@@ -116,8 +116,8 @@ export default function Models() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white uppercase tracking-wider">Model Registry</h2>
-          <p className="text-xs text-text-secondary mt-0.5 font-sans">Deploy network classifiers and check features importance weights</p>
+          <h2 className="text-2xl font-bold text-white">Model Registry</h2>
+          <p className="text-sm text-text-secondary mt-0.5">Deploy network classifiers and check features importance weights</p>
         </div>
         <button
           onClick={() => refetch()}

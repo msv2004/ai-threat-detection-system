@@ -187,15 +187,20 @@ select.input {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
-  padding: 10px 20px;
+  height: 38px;
+  padding: 0 16px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
   border: 1px solid transparent;
   outline: none;
-  line-height: 1.4;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+  user-select: none;
+  line-height: 1;
 }
 
 .btn:disabled {
@@ -206,12 +211,14 @@ select.input {
 .btn-primary {
   background-color: var(--color-accent);
   color: var(--color-text-inverse);
-  box-shadow: 0 4px 14px rgba(0, 212, 255, 0.2);
+  border: 1px solid var(--color-accent);
+  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.15);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-accent-hover);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.35);
+  border-color: var(--color-accent-hover);
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.25);
   transform: translateY(-1px);
 }
 
@@ -222,7 +229,7 @@ select.input {
 .btn-secondary {
   background-color: var(--color-surface-2);
   color: var(--color-text-primary);
-  border-color: var(--color-border-strong);
+  border: 1px solid var(--color-border-strong);
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -230,9 +237,14 @@ select.input {
   border-color: var(--color-text-secondary);
 }
 
+.btn-secondary:active:not(:disabled) {
+  background-color: var(--color-surface-4);
+}
+
 .btn-ghost {
   background-color: transparent;
   color: var(--color-text-secondary);
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover:not(:disabled) {
@@ -240,10 +252,14 @@ select.input {
   color: var(--color-text-primary);
 }
 
+.btn-ghost:active:not(:disabled) {
+  background-color: var(--color-surface-3);
+}
+
 .btn-danger {
   background-color: rgba(255, 71, 87, 0.08);
   color: var(--color-semantic-critical);
-  border-color: rgba(255, 71, 87, 0.2);
+  border: 1px solid rgba(255, 71, 87, 0.2);
 }
 
 .btn-danger:hover:not(:disabled) {
@@ -251,11 +267,15 @@ select.input {
   border-color: var(--color-semantic-critical);
 }
 
+.btn-danger:active:not(:disabled) {
+  background-color: rgba(255, 71, 87, 0.24);
+}
+
 /* Gold outlined button (Landing page) */
 .btn-gold {
   background-color: transparent;
   color: var(--color-gold);
-  border: 2px solid var(--color-gold);
+  border: 1px solid var(--color-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -267,10 +287,14 @@ select.input {
   box-shadow: 0 0 24px rgba(212, 168, 67, 0.3);
 }
 
+.btn-gold:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
 .btn-gold-filled {
   background-color: var(--color-gold);
   color: #000000;
-  border: 2px solid var(--color-gold);
+  border: 1px solid var(--color-gold);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -283,16 +307,22 @@ select.input {
   transform: translateY(-1px);
 }
 
+.btn-gold-filled:active:not(:disabled) {
+  transform: translateY(0);
+}
+
 .btn-sm {
-  padding: 6px 12px;
+  height: 30px;
+  padding: 0 12px;
   font-size: 12px;
-  border-radius: 6px;
+  border-radius: 4px;
 }
 
 .btn-lg {
-  padding: 14px 28px;
-  font-size: 15px;
-  border-radius: 10px;
+  height: 46px;
+  padding: 0 24px;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
 /* ── Section badge (Landing) ─────────────── */

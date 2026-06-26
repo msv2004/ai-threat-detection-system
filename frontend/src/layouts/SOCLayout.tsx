@@ -398,10 +398,21 @@ export default function SOCLayout() {
         <BackendBanner />
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-[1440px] mx-auto animate-fade-in">
+        <div className="flex-1 overflow-y-auto flex flex-col p-6 md:p-8">
+          <div className="max-w-[1600px] xl:max-w-[1800px] w-full mx-auto animate-fade-in flex-1">
             <Outlet />
           </div>
+          {/* Footer */}
+          <footer className="mt-8 border-t border-border-default pt-6 text-xs text-text-tertiary">
+            <div className="max-w-[1600px] xl:max-w-[1800px] w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div>© 2026 Aegis SOC-MSV. All rights reserved.</div>
+              <div className="flex gap-6">
+                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Privacy Policy</a>
+                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Terms of Service</a>
+                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Documentation</a>
+              </div>
+            </div>
+          </footer>
         </div>
       </main>
       <Onboarding />

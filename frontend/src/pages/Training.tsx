@@ -181,8 +181,8 @@ export default function Training() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white uppercase tracking-wider">AI Training Console</h2>
-          <p className="text-xs text-text-secondary mt-0.5 font-sans">Deploy training parameters and execute classifiers pipelines</p>
+          <h2 className="text-2xl font-bold text-white">AI Training Console</h2>
+          <p className="text-sm text-text-secondary mt-0.5">Deploy training parameters and execute classifiers pipelines</p>
         </div>
         <button
           onClick={() => refetch()}
