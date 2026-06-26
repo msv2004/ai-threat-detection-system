@@ -103,9 +103,20 @@ class DatasetService:
         dataset = self.get_dataset(dataset_id, user_id)
         
         # 1. Collect all associated file paths before database deletion
+        from app.utils.path_resolver import (
+            resolve_dataset_path,
+            resolve_processed_path,
+            resolve_model_path,
+            resolve_prediction_path
+        )
+        
         files_to_delete = []
-        if dataset.file_path:
-            files_to_delete.append(dataset.file_path)
+        try:
+            resolved_ds_path = resolve_dataset_path(dataset)
+            if resolved_ds_path:
+                files_to_delete.append(resolved_ds_path)
+        except Exception:
+            pass
             
         # Processed datasets (parquet files and preprocessor models)
         try:
@@ -114,16 +125,19 @@ class DatasetService:
                 for attr in ["train_features_path", "train_labels_path", "test_features_path", "test_labels_path", "preprocessor_path"]:
                     val = getattr(pd, attr, None)
                     if val:
-                        files_to_delete.append(val)
+                        resolved_pd_path = resolve_processed_path(pd, val)
+                        if resolved_pd_path:
+                            files_to_delete.append(resolved_pd_path)
         except Exception:
             pass
 
-        # Trained models
+        # Trained models (directories)
         try:
             trained_models = dataset.trained_models
             for model in trained_models:
-                if model.file_path:
-                    files_to_delete.append(model.file_path)
+                resolved_m_path = resolve_model_path(model)
+                if resolved_m_path:
+                    files_to_delete.append(resolved_m_path)
         except Exception:
             pass
 
@@ -132,7 +146,9 @@ class DatasetService:
             prediction_jobs = dataset.prediction_jobs
             for pj in prediction_jobs:
                 if pj.output_file_path:
-                    files_to_delete.append(pj.output_file_path)
+                    resolved_pred_path = resolve_prediction_path(pj, pj.output_file_path)
+                    if resolved_pred_path:
+                        files_to_delete.append(resolved_pred_path)
         except Exception:
             pass
 
@@ -140,11 +156,15 @@ class DatasetService:
         self.repository.delete(dataset)
 
         # 3. Clean up physical files from disk
+        import shutil
         from app.core.logger import logger
         for file_path in files_to_delete:
             if file_path and os.path.exists(file_path):
                 try:
-                    os.remove(file_path)
+                    if os.path.isdir(file_path):
+                        shutil.rmtree(file_path, ignore_errors=True)
+                    else:
+                        os.remove(file_path)
                 except Exception as e:
                     logger.error(f"Failed to remove file {file_path} during dataset deletion: {e}")
 

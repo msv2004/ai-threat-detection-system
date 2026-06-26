@@ -23,6 +23,9 @@ class TrainingService:
         user_id: int, 
         background_tasks: BackgroundTasks
     ) -> TrainingJob:
+        import os
+        from app.utils.path_resolver import resolve_processed_path
+
         # Verify processed dataset exists and belongs to the user
         db = self.preprocessing_repo.db
         processed_dataset = db.query(ProcessedDataset).filter(ProcessedDataset.id == config.processed_dataset_id).first()
@@ -34,6 +37,17 @@ class TrainingService:
         dataset = processed_dataset.original_dataset
         if not dataset or dataset.uploaded_by != user_id:
             raise NotFoundError("Processed dataset not found")
+
+        # Verify physical splits existence
+        for path_attr in ["train_features_path", "train_labels_path", "test_features_path", "test_labels_path"]:
+            stored_path = getattr(processed_dataset, path_attr, None)
+            resolved_split_path = resolve_processed_path(processed_dataset, stored_path)
+            if not resolved_split_path or not os.path.exists(resolved_split_path):
+                raise BadRequestError(
+                    "Processed dataset split files are missing from disk. "
+                    "Because Render containers are ephemeral, local files are wiped periodically on container restarts. "
+                    "Please re-run the Preprocessing step on the original dataset to regenerate these splits."
+                )
 
         # Create job
         job = self.repo.create_job(

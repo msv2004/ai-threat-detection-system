@@ -120,6 +120,10 @@ export default function Datasets() {
         return oldDatasets.filter(d => d.id !== deletedId);
       });
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
+      queryClient.invalidateQueries({ queryKey: ['preprocessing_jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['training_jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['models'] });
+      
       setDeleteTargetId(null);
       // Clear selected dataset if it was deleted
       if (selectedDatasetId === deletedId) {

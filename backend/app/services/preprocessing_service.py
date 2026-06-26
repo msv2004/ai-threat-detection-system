@@ -14,6 +14,9 @@ class PreprocessingService:
         self.dataset_repo = dataset_repo
 
     def start_job(self, config: PreprocessingConfig, user_id: int, background_tasks: BackgroundTasks) -> PreprocessingJob:
+        import os
+        from app.utils.path_resolver import resolve_dataset_path
+
         # Verify dataset exists and belongs to user
         dataset = self.dataset_repo.get_by_id(config.dataset_id)
         if not dataset or dataset.uploaded_by != user_id:
@@ -21,6 +24,15 @@ class PreprocessingService:
             
         if dataset.status != "ready":
             raise BadRequestError("Dataset is not ready for preprocessing.")
+
+        # Verify physical file existence
+        resolved_path = resolve_dataset_path(dataset)
+        if not resolved_path or not os.path.exists(resolved_path):
+            raise BadRequestError(
+                "Dataset file is missing from the backend disk. "
+                "Because Render containers are ephemeral, local files are wiped periodically on container restarts. "
+                "Please delete this dataset and re-upload the CSV file."
+            )
 
         # Create job
         job = self.repo.create_job(dataset.id, config)
@@ -31,7 +43,7 @@ class PreprocessingService:
             job.id,
             dataset.id,
             config.model_dump(mode="json"),
-            dataset.file_path,
+            resolved_path,
             user_id
         )
 

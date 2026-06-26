@@ -15,16 +15,29 @@ def run_preprocessing_job(job_id: UUID, dataset_id: UUID, config_dict: dict, fil
     db = SessionLocal()
     try:
         repo = PreprocessingRepository(db)
-        DatasetRepository(db)
+        from app.models.dataset import Dataset
+        from app.utils.path_resolver import resolve_dataset_path
 
         # Update status to running
         repo.update_job_status(job_id, "running")
+
+        # Resolve dataset and dynamic file path
+        dataset = db.query(Dataset).filter(Dataset.id == dataset_id).first()
+        if not dataset:
+            raise FileNotFoundError(f"Dataset with ID {dataset_id} not found in database")
+        
+        resolved_file_path = resolve_dataset_path(dataset)
+        if not os.path.exists(resolved_file_path):
+            raise FileNotFoundError(
+                f"Dataset file not found at {resolved_file_path}. "
+                "The file was likely wiped due to container recycle. Please re-upload."
+            )
 
         # Construct Config
         config = PreprocessingConfig(**config_dict)
 
         # Initialize preprocessor
-        preprocessor = DatasetPreprocessor(file_path, config)
+        preprocessor = DatasetPreprocessor(resolved_file_path, config)
         
         # 1. Profile Dataset
         profile_data = preprocessor.profile_dataset()

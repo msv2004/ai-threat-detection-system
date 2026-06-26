@@ -146,10 +146,19 @@ class PredictionService:
             else:
                 model_record = self.get_active_model(user_id)
 
-            # 2. Load Model and Preprocessor from Cache
+            # 2. Resolve Model Path and Load from Cache
+            from app.utils.path_resolver import resolve_model_path
+            resolved_model_dir = resolve_model_path(model_record)
+            if not resolved_model_dir or not os.path.exists(resolved_model_dir):
+                raise BadRequestError(
+                    "Model binary folder is missing from disk. "
+                    "Because Render containers are ephemeral, local files are wiped periodically on container restarts. "
+                    "Please re-train or activate a model first."
+                )
+
             try:
-                model = model_cache.get_model(model_record.file_path)
-                preprocessor_state = model_cache.get_preprocessor(model_record.file_path)
+                model = model_cache.get_model(resolved_model_dir)
+                preprocessor_state = model_cache.get_preprocessor(resolved_model_dir)
             except Exception as e:
                 logger.error(f"Failed to load cached model artifacts: {e}")
                 raise BadRequestError(f"Failed to load model artifacts. Ensure model files exist on disk. Error: {str(e)}")
@@ -385,12 +394,23 @@ class PredictionService:
         
         # Verify dataset exists and belongs to user
         from app.models.dataset import Dataset
+        from app.utils.path_resolver import resolve_dataset_path, resolve_model_path
+        
         dataset = db.query(Dataset).filter(Dataset.id == config.dataset_id).first()
         if not dataset or dataset.uploaded_by != user_id:
             raise NotFoundError("Dataset not found")
             
         if dataset.status != "ready":
             raise BadRequestError("Dataset is not ready for predictions.")
+
+        # Verify raw dataset file exists
+        resolved_dataset_path_val = resolve_dataset_path(dataset)
+        if not resolved_dataset_path_val or not os.path.exists(resolved_dataset_path_val):
+            raise BadRequestError(
+                "Dataset file is missing from backend disk. "
+                "Because Render containers are ephemeral, local files are wiped periodically on container restarts. "
+                "Please delete this dataset and re-upload the CSV file."
+            )
 
         # Resolve model
         if config.model_id:
@@ -399,6 +419,15 @@ class PredictionService:
                 raise NotFoundError("Model not found")
         else:
             model_record = self.get_active_model(user_id)
+
+        # Verify model directory exists
+        resolved_model_dir = resolve_model_path(model_record)
+        if not resolved_model_dir or not os.path.exists(resolved_model_dir):
+            raise BadRequestError(
+                "Model files are missing from backend disk. "
+                "Because Render containers are ephemeral, local files are wiped periodically on container restarts. "
+                "Please retrain or activate a model."
+            )
 
         # Create Prediction Job
         job = self.repo.create_prediction_job(user_id, model_record.id, dataset.id)

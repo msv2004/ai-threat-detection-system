@@ -42,11 +42,17 @@ def run_prediction_job(job_id: UUID, dataset_id: UUID, model_id: Optional[UUID],
             raise ValueError("Dataset not found or unauthorized")
 
         # 3. Read dataset file from disk
-        ext = os.path.splitext(dataset.file_path)[1].lower()
+        from app.utils.path_resolver import resolve_dataset_path, resolve_model_path
+        
+        resolved_dataset_path_val = resolve_dataset_path(dataset)
+        if not resolved_dataset_path_val or not os.path.exists(resolved_dataset_path_val):
+            raise FileNotFoundError(f"Dataset file not found at {resolved_dataset_path_val}")
+
+        ext = os.path.splitext(resolved_dataset_path_val)[1].lower()
         if ext == '.csv':
-            raw_df = pd.read_csv(dataset.file_path)
+            raw_df = pd.read_csv(resolved_dataset_path_val)
         elif ext == '.parquet':
-            raw_df = pd.read_parquet(dataset.file_path)
+            raw_df = pd.read_parquet(resolved_dataset_path_val)
         else:
             raise ValueError(f"Unsupported file format: {ext}")
 
@@ -54,8 +60,12 @@ def run_prediction_job(job_id: UUID, dataset_id: UUID, model_id: Optional[UUID],
             raise ValueError("Dataset is empty")
 
         # 4. Load Model and Preprocessor
-        model = model_cache.get_model(model_record.file_path)
-        preprocessor_state = model_cache.get_preprocessor(model_record.file_path)
+        resolved_model_dir = resolve_model_path(model_record)
+        if not resolved_model_dir or not os.path.exists(resolved_model_dir):
+            raise FileNotFoundError(f"Model directory not found at {resolved_model_dir}")
+
+        model = model_cache.get_model(resolved_model_dir)
+        preprocessor_state = model_cache.get_preprocessor(resolved_model_dir)
 
         # 5. Preprocess DataFrame
         preprocessed_df = prediction_service.preprocess_dataframe(raw_df, preprocessor_state)

@@ -62,19 +62,26 @@ def run_training_job(
             raise ValueError(f"ProcessedDataset with ID {processed_dataset_id} not found")
         
         # 2. Load Parquet files
-        if not os.path.exists(processed_dataset.train_features_path):
-            raise FileNotFoundError(f"Training features file not found at {processed_dataset.train_features_path}")
-        if not os.path.exists(processed_dataset.train_labels_path):
-            raise FileNotFoundError(f"Training labels file not found at {processed_dataset.train_labels_path}")
-        if not os.path.exists(processed_dataset.test_features_path):
-            raise FileNotFoundError(f"Test features file not found at {processed_dataset.test_features_path}")
-        if not os.path.exists(processed_dataset.test_labels_path):
-            raise FileNotFoundError(f"Test labels file not found at {processed_dataset.test_labels_path}")
+        from app.utils.path_resolver import resolve_processed_path
+        
+        train_features_resolved = resolve_processed_path(processed_dataset, processed_dataset.train_features_path)
+        train_labels_resolved = resolve_processed_path(processed_dataset, processed_dataset.train_labels_path)
+        test_features_resolved = resolve_processed_path(processed_dataset, processed_dataset.test_features_path)
+        test_labels_resolved = resolve_processed_path(processed_dataset, processed_dataset.test_labels_path)
+
+        if not os.path.exists(train_features_resolved):
+            raise FileNotFoundError(f"Training features file not found at {train_features_resolved}")
+        if not os.path.exists(train_labels_resolved):
+            raise FileNotFoundError(f"Training labels file not found at {train_labels_resolved}")
+        if not os.path.exists(test_features_resolved):
+            raise FileNotFoundError(f"Test features file not found at {test_features_resolved}")
+        if not os.path.exists(test_labels_resolved):
+            raise FileNotFoundError(f"Test labels file not found at {test_labels_resolved}")
             
-        X_train = pd.read_parquet(processed_dataset.train_features_path)
-        y_train = pd.read_parquet(processed_dataset.train_labels_path).iloc[:, 0]
-        X_test = pd.read_parquet(processed_dataset.test_features_path)
-        y_test = pd.read_parquet(processed_dataset.test_labels_path).iloc[:, 0]
+        X_train = pd.read_parquet(train_features_resolved)
+        y_train = pd.read_parquet(train_labels_resolved).iloc[:, 0]
+        X_test = pd.read_parquet(test_features_resolved)
+        y_test = pd.read_parquet(test_labels_resolved).iloc[:, 0]
         
         # Ensure correct type (e.g. integer target labels)
         if y_train.dtype == object or y_train.dtype.name == 'category':
