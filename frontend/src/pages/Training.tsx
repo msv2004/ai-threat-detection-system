@@ -181,7 +181,7 @@ export default function Training() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">AI Training Console</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">AI Training Console</h2>
           <p className="text-sm text-text-secondary mt-0.5">Deploy training parameters and execute classifiers pipelines</p>
         </div>
         <button
@@ -198,7 +198,7 @@ export default function Training() {
         {/* Left Hyperparameter Panel */}
         <div className="xl:col-span-1 space-y-6">
           <div className="card p-5 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5 border-b border-border-default pb-3">
+            <h3 className="text-base text-white flex items-center gap-1.5 border-b border-border-default pb-3 heading-display tracking-wider">
               <Sliders className="w-4 h-4 text-accent" />
               Tune Classifier Model
             </h3>
@@ -339,7 +339,7 @@ export default function Training() {
                   <Award className="w-5.5 h-5.5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-extrabold text-semantic-ai uppercase tracking-wider">Top Deployed Model Registry</h4>
+                  <h4 className="text-sm font-extrabold text-semantic-ai heading-display tracking-wider">Top Deployed Model Registry</h4>
                   <span className="text-sm font-bold text-white mt-0.5 block">{bestModel.algorithm} v{bestModel.version}</span>
                 </div>
               </div>
@@ -369,7 +369,7 @@ export default function Training() {
           {activeRunningJob && (
             <div className="card p-5 space-y-4 text-left border-accent-border/30 shadow-[0_0_15px_rgba(6,182,212,0.03)]">
               <div className="flex items-center justify-between border-b border-border-default pb-3">
-                <h4 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+                <h4 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
                   <TerminalIcon className="w-4 h-4 text-accent animate-pulse" />
                   Live Pipeline Logs
                 </h4>
@@ -409,7 +409,7 @@ export default function Training() {
           {/* Training Logs timeline history */}
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-border-default bg-surface-1/40">
-              <h3 className="text-xs font-bold text-white uppercase">Compilation Job History</h3>
+              <h3 className="text-base text-white heading-display tracking-wider">Compilation Job History</h3>
             </div>
             
             <div className="divide-y divide-border-subtle text-xs font-semibold text-left">

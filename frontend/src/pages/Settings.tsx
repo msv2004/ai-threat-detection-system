@@ -99,7 +99,7 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">SOC Control Center</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">SOC Control Center</h2>
           <p className="text-sm text-text-secondary mt-0.5">Configure detections, retention, identity controls, escalation paths, and SIEM integrations.</p>
         </div>
         <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export default function SettingsPage() {
               <div className="card-static p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Monitor className="w-4 h-4 text-accent" />
-                  <h3 className="text-sm font-bold text-white">Workspace & Theme</h3>
+                  <h3 className="text-base text-white heading-display tracking-wider">Workspace & Theme</h3>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -223,7 +223,7 @@ export default function SettingsPage() {
               <div className="card-static p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <Key className="w-4 h-4 text-accent" />
-                  <h3 className="text-sm font-bold text-white">API Credentials</h3>
+                  <h3 className="text-base text-white heading-display tracking-wider">API Credentials</h3>
                 </div>
 
                 <div className="space-y-4">
@@ -273,7 +273,7 @@ export default function SettingsPage() {
               <div className="card-static p-6">
                 <div className="flex items-center gap-2 mb-5">
                   <User className="w-4 h-4 text-accent" />
-                  <h3 className="text-sm font-bold text-white">Profile</h3>
+                  <h3 className="text-base text-white heading-display tracking-wider">Profile</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
             <div className="card-static p-6">
               <div className="flex items-center gap-2 mb-5">
                 <Shield className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-white">Detection Policy</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Detection Policy</h3>
               </div>
               <div className="space-y-4">
                 <div>
@@ -332,7 +332,7 @@ export default function SettingsPage() {
             <div className="card-static p-6">
               <div className="flex items-center gap-2 mb-5">
                 <Lock className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-white">Identity & Access Management</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Identity & Access Management</h3>
               </div>
               <p className="text-sm text-text-secondary">Role-based access control and MFA settings will be available in a future update.</p>
             </div>
@@ -342,7 +342,7 @@ export default function SettingsPage() {
             <div className="card-static p-6">
               <div className="flex items-center gap-2 mb-5">
                 <Cpu className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-white">SIEM Integrations</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">SIEM Integrations</h3>
               </div>
               <p className="text-sm text-text-secondary">Connect to Splunk, Elastic, QRadar, and other SIEM platforms. Coming soon.</p>
             </div>
@@ -355,7 +355,7 @@ export default function SettingsPage() {
           <div className="card-static p-5">
             <div className="flex items-center gap-2 mb-4">
               <Database className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold text-white">Retention Health</h3>
+              <h3 className="text-base text-white heading-display tracking-wider">Retention Health</h3>
             </div>
             <div className="space-y-4">
               {retentionHealth.map(item => (
@@ -377,7 +377,7 @@ export default function SettingsPage() {
 
           {/* Audit Activity */}
           <div className="card-static p-5">
-            <h3 className="text-sm font-bold text-white mb-4">Audit Activity</h3>
+            <h3 className="text-base text-white mb-4 heading-display tracking-wider">Audit Activity</h3>
             <div className="space-y-3">
               {[
                 { event: 'MFA enforced', by: 'SOC Manager', time: '2m ago' },

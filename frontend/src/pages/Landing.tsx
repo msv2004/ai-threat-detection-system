@@ -174,21 +174,12 @@ export default function Landing() {
         </div>
         
         <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
-          {/* Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <span className="section-badge text-text-secondary">{'{ NO. #1 AI THREAT DETECTION }'}</span>
-          </motion.div>
-
           {/* Main heading */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 0.95, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="font-display text-[clamp(3rem,8vw,7.5rem)] leading-[0.95] text-gold mt-6 tracking-wide"
+            className="font-display text-[clamp(3rem,8vw,7.5rem)] leading-[0.95] text-gold mt-12 tracking-wide"
           >
             ADVANCED<br />
             CYBER SECURITY
@@ -205,39 +196,25 @@ export default function Landing() {
             AI-powered cybersecurity solutions tailored for evolving network threats.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* Redesigned CTA Buttons - with increased vertical/horizontal padding and gap */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-14 mb-20"
           >
-            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm">
+            <Link 
+              to="/register" 
+              className="btn btn-gold-filled text-sm px-10 py-4 h-auto font-display text-base tracking-widest min-w-[200px]"
+            >
               Get Protected
             </Link>
-            <Link to="/login" className="btn btn-gold btn-lg text-sm">
+            <Link 
+              to="/login" 
+              className="btn btn-gold text-sm px-10 py-4 h-auto font-display text-base tracking-widest min-w-[200px]"
+            >
               Free Assessment
             </Link>
-          </motion.div>
-
-          {/* Trust indicator */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-            className="flex items-center justify-center gap-3 mt-12"
-          >
-            <div className="flex -space-x-2">
-              {[0,1,2].map(i => (
-                <div key={i} className="w-9 h-9 rounded-full bg-surface-3 border-2 border-black flex items-center justify-center text-xs font-bold text-text-secondary">
-                  {['SC','AK','JL'][i]}
-                </div>
-              ))}
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Star className="w-4 h-4 text-gold fill-gold" />
-              <span className="text-sm text-text-secondary font-medium">4.9/5 Rating Clients</span>
-            </div>
           </motion.div>
         </div>
 

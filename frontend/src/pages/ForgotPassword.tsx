@@ -28,12 +28,20 @@ export default function ForgotPassword() {
       >
         {/* Brand */}
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-3 mb-4">
+          <Link to="/" className="inline-flex items-center gap-3 mb-4 hover:opacity-90 transition-opacity">
             <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
-              <Shield className="w-7 h-7 text-accent" />
+              <svg className="w-6 h-6 text-accent" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(0, 212, 255, 0.05)"/>
+                <path d="M12 11V7" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="12" cy="15" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-extrabold text-base tracking-widest text-white uppercase leading-none font-display">AEGIS</span>
+              <span className="text-[9px] text-accent font-mono-data tracking-wider uppercase leading-none mt-1">SOC-MSV</span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-white">Reset Password</h1>
+          <h1 className="text-3xl text-white heading-display tracking-wider">Reset Password</h1>
           <p className="text-sm text-text-secondary mt-1">Enter your email to receive a recovery link</p>
         </div>
 

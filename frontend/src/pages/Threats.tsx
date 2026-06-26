@@ -147,7 +147,7 @@ export default function Threats() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Vulnerability Scanner</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">Threat Monitoring</h2>
           <p className="text-sm text-text-secondary mt-0.5">Identify and track security vulnerabilities</p>
         </div>
         <button onClick={() => refetch()} className="btn btn-primary flex items-center gap-2 self-start">
@@ -164,7 +164,7 @@ export default function Threats() {
             <div className="p-5 border-b border-border-default">
               <div className="flex items-center gap-2 mb-4">
                 <ShieldAlert className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-white">Vulnerabilities</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Vulnerabilities</h3>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1 flex items-center gap-2 bg-surface-0 border border-border-strong rounded-lg px-3 py-2">
@@ -368,7 +368,7 @@ export default function Threats() {
               className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1 border-l border-border-default z-50 overflow-y-auto p-6 space-y-5"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Threat Details</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Threat Details</h3>
                 <button onClick={() => setSelectedThreat(null)} className="p-1.5 rounded-lg hover:bg-surface-2 text-text-secondary">
                   <X className="w-5 h-5" />
                 </button>

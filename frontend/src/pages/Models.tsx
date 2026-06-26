@@ -116,7 +116,7 @@ export default function Models() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Model Registry</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">Model Registry</h2>
           <p className="text-sm text-text-secondary mt-0.5">Deploy network classifiers and check features importance weights</p>
         </div>
         <button
@@ -137,7 +137,7 @@ export default function Models() {
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-border-default flex justify-between items-center bg-surface-1/40">
               <div>
-                <h3 className="text-xs font-bold text-white uppercase">Inference Classifiers</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Inference Classifiers</h3>
                 <p className="text-[10px] text-text-secondary mt-0.5">Trained model variables registry</p>
               </div>
               <span className="text-[10px] text-text-tertiary">{models?.length || 0} model(s) registered</span>
@@ -245,7 +245,7 @@ export default function Models() {
           {/* Model Metrics Comparison Chart */}
           {formattedComparison.length > 0 && (
             <div className="card p-5 space-y-4">
-              <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+              <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
                 <BarChart className="w-4 h-4 text-accent" />
                 Algorithm Comparison Metrics
               </h3>
@@ -279,7 +279,7 @@ export default function Models() {
             <div className="card p-5 space-y-4">
               <div className="border-b border-border-default pb-3 flex justify-between items-center">
                 <div>
-                  <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+                  <h3 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
                     <Layers className="w-4 h-4 text-accent" />
                     Feature Weights
                   </h3>

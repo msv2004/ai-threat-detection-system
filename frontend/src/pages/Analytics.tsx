@@ -117,7 +117,7 @@ export default function Analytics() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Security Analytics</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">Security Analytics</h2>
           <p className="text-sm text-text-secondary mt-0.5">Observe threat volume trends and ML pipeline performance stability</p>
         </div>
         <button
@@ -202,7 +202,7 @@ export default function Analytics() {
         {/* Threat Timeline (2 columns) */}
         <div className="lg:col-span-2 card p-5 space-y-4 text-left">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border-default pb-3 gap-3">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+            <h3 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
               <TrendingUp className="w-4 h-4 text-accent" />
               Timeline Trend Vectors
             </h3>
@@ -265,7 +265,7 @@ export default function Analytics() {
 
         {/* Severity Distribution Donut (1 column) */}
         <div className="lg:col-span-1 card p-5 space-y-4 text-left">
-          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <ShieldAlert className="w-4 h-4 text-accent" />
             Severity Distribution
           </h3>
@@ -315,7 +315,7 @@ export default function Analytics() {
         
         {/* Radar of Categories */}
         <div className="card p-5 space-y-4 text-left">
-          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <Shield className="w-4 h-4 text-accent" />
             Threat Vector Classification
           </h3>
@@ -348,7 +348,7 @@ export default function Analytics() {
 
         {/* Inference steps latency stability */}
         <div className="card p-5 space-y-4 text-left">
-          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <Activity className="w-4 h-4 text-accent" />
             Inference Latency Stability
           </h3>

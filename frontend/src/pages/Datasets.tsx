@@ -215,7 +215,7 @@ export default function Datasets() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">Data Ingestion</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">Data Ingestion</h2>
           <p className="text-sm text-text-secondary mt-0.5">Upload and preprocess network capture datasets</p>
         </div>
         <button
@@ -244,7 +244,7 @@ export default function Datasets() {
           
           {/* Upload card */}
           <div className="card p-5 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5 border-b border-border-default pb-3">
+            <h3 className="text-base text-white flex items-center gap-1.5 border-b border-border-default pb-3 heading-display tracking-wider">
               <Upload className="w-4 h-4 text-accent" />
               Ingest Log CSV
             </h3>
@@ -343,7 +343,7 @@ export default function Datasets() {
 
           {/* Preprocessing setup Console */}
           <div className="card p-5 space-y-4">
-            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5 border-b border-border-default pb-3">
+            <h3 className="text-base text-white flex items-center gap-1.5 border-b border-border-default pb-3 heading-display tracking-wider">
               <Settings2 className="w-4 h-4 text-accent" />
               Preprocessing Console
             </h3>
@@ -453,7 +453,7 @@ export default function Datasets() {
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-border-default flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-surface-1/40">
               <div>
-                <h3 className="text-xs font-bold text-white uppercase">Ingested Repositories</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Ingested Repositories</h3>
                 <p className="text-[10px] text-text-secondary mt-0.5">Isolated log packets files</p>
               </div>
               
@@ -549,7 +549,7 @@ export default function Datasets() {
           {/* Preprocessing Jobs List queue */}
           <div className="card overflow-hidden">
             <div className="p-4 border-b border-border-default bg-surface-1/40">
-              <h3 className="text-xs font-bold text-white uppercase">Preprocessing Queue Logs</h3>
+              <h3 className="text-base text-white heading-display tracking-wider">Preprocessing Queue Logs</h3>
             </div>
             
             <div className="p-4 space-y-3 max-h-56 overflow-y-auto">
@@ -616,7 +616,7 @@ export default function Datasets() {
                 className="card p-5 space-y-4 text-left"
               >
                 <div className="flex items-center justify-between border-b border-border-default pb-3">
-                  <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+                  <h3 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
                     <Layers className="w-4 h-4 text-accent" />
                     Inflow profile statistics
                   </h3>
@@ -695,7 +695,7 @@ export default function Datasets() {
             <div className="flex justify-between items-start">
               <div className="flex items-center gap-2 text-semantic-critical">
                 <AlertTriangle className="w-5 h-5 shrink-0" />
-                <h3 className="text-sm font-bold uppercase tracking-wider">Delete Ingested File</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Delete Ingested File</h3>
               </div>
               <button onClick={() => setDeleteTargetId(null)} className="text-text-tertiary hover:text-white cursor-pointer">
                 <X className="w-4 h-4" />

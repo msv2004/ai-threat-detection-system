@@ -28,7 +28,8 @@ import {
   Clock,
   Sun,
   Moon,
-  Monitor
+  Monitor,
+  ChevronDown
 } from 'lucide-react';
 
 const NAV_SECTIONS = [
@@ -136,19 +137,26 @@ export default function SOCLayout() {
         `}
       >
         {/* Brand Header */}
-        <div className="h-16 flex items-center border-b border-border-default px-4 justify-between">
+        <div className="h-20 flex items-center border-b border-border-default px-4 justify-between shrink-0">
           <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
-              <Shield className="w-5 h-5 text-accent" />
+              <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(0, 212, 255, 0.05)"/>
+                <path d="M12 11V7" stroke="currentColor" strokeWidth="2"/>
+                <circle cx="12" cy="15" r="1" fill="currentColor"/>
+              </svg>
             </div>
             {!sidebarCollapsed && (
-              <span className="font-extrabold text-[15px] tracking-wide text-white">Aegis SOC</span>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-sm tracking-widest text-white uppercase leading-none font-display">AEGIS</span>
+                <span className="text-[8px] text-accent font-mono-data tracking-wider uppercase leading-none mt-0.5">SOC-MSV</span>
+              </div>
             )}
           </Link>
           {!sidebarCollapsed && (
             <button
               onClick={() => setSidebarCollapsed(true)}
-              className="hidden md:block p-1 rounded hover:bg-surface-2 text-text-tertiary transition-colors"
+              className="hidden md:block p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"
             >
               <PanelLeftClose className="w-4 h-4" />
             </button>
@@ -277,68 +285,75 @@ export default function SOCLayout() {
       {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Header Bar */}
-        <header className="h-14 flex items-center justify-between px-6 bg-surface-1 border-b border-border-default z-20 shrink-0">
-          <div className="flex items-center gap-4">
+        <header className="h-20 flex items-center justify-between px-8 bg-surface-1 border-b border-border-default z-20 shrink-0">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 rounded-lg hover:bg-surface-2 text-text-secondary"
+              className="md:hidden p-2.5 rounded-lg hover:bg-surface-2 text-text-secondary"
             >
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Search */}
-            <div className={`
-              hidden md:flex items-center gap-2.5 bg-surface-0 border rounded-lg px-3 py-1.5 transition-all duration-200
-              ${searchFocused ? 'border-accent w-72 shadow-[0_0_12px_rgba(0,212,255,0.08)]' : 'border-border-strong w-56'}
-            `}>
-              <Search className="w-4 h-4 text-text-tertiary" />
+            {/* Redesigned Premium Logo inside Top Nav for Mobile/Tablet or collapsed layouts */}
+            <div className="flex md:hidden items-center gap-2">
+              <div className="w-8 h-8 rounded bg-accent/10 border border-accent/20 flex items-center justify-center">
+                <svg className="w-4.5 h-4.5 text-accent" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(0, 212, 255, 0.05)"/>
+                </svg>
+              </div>
+              <span className="font-display font-bold text-xs tracking-wider text-white">AEGIS</span>
+            </div>
+
+            {/* Redesigned Global Search Bar */}
+            <div className="hidden md:flex search-container w-64 md:w-[320px] lg:w-[380px]">
+              <Search className="w-4.5 h-4.5 text-text-tertiary shrink-0" />
               <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search operations, threats, or metrics..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="bg-transparent text-xs text-white placeholder-text-tertiary outline-none flex-1"
+                className="search-input"
               />
-              <kbd className="hidden lg:inline-flex items-center gap-0.5 text-[10px] text-text-tertiary bg-surface-2 px-1.5 py-0.5 rounded border border-border-default font-mono-data">
-                ⌘K
+              <kbd className="search-badge">
+                Ctrl + K
               </kbd>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             {/* Live ticker */}
             {isSniffing && activeStats && (
-              <div className="hidden lg:flex items-center gap-2 bg-surface-0 border border-semantic-critical/20 rounded-lg px-3 py-1.5 max-w-md overflow-hidden">
+              <div className="hidden xl:flex items-center gap-2 bg-surface-0 border border-semantic-critical/20 rounded-lg px-3 py-2 max-w-sm overflow-hidden">
                 <div className="w-2 h-2 rounded-full bg-semantic-critical pulse-red shrink-0" />
                 <div className="overflow-hidden whitespace-nowrap">
-                  <span className="text-[11px] font-mono-data text-text-secondary ticker-scroll inline-block">
-                    LIVE: Packets={activeStats.packet_count || 0} • Flows={activeStats.flow_count || 0} • Threats={activeStats.threat_count || 0} • Engine active on adapter
+                  <span className="text-[10px] font-mono-data text-text-secondary ticker-scroll inline-block">
+                    LIVE: Pkts={activeStats.packet_count || 0} • Flows={activeStats.flow_count || 0} • Threats={activeStats.threat_count || 0}
                   </span>
                 </div>
               </div>
             )}
 
-            {/* Uptime badge */}
-            <div className="hidden lg:flex items-center gap-1.5 bg-semantic-success/8 border border-semantic-success/15 rounded-lg px-3 py-1.5">
-              <Activity className="w-3.5 h-3.5 text-semantic-success" />
-              <span className="text-[11px] font-bold font-mono-data text-semantic-success">99.982%</span>
+            {/* Redesigned Operational System Health Badge */}
+            <div className="hidden lg:flex status-badge-operational">
+              <div className="status-badge-dot pulse-emerald" />
+              <span>Operational 99.98%</span>
             </div>
 
-            {/* Clock */}
-            <div className="hidden lg:flex items-center gap-1.5 text-text-tertiary">
-              <Clock className="w-3.5 h-3.5" />
-              <span className="text-[11px] font-mono-data">{timeStr}</span>
+            {/* Current Time display */}
+            <div className="hidden lg:flex items-center gap-1.5 text-text-secondary bg-surface-2 px-3 py-2 rounded-lg border border-border-default h-10">
+              <Clock className="w-3.5 h-3.5 text-text-tertiary" />
+              <span className="text-xs font-mono-data leading-none">{timeStr}</span>
             </div>
 
             {/* Theme toggles */}
-            <div className="hidden lg:flex items-center gap-1 border-l border-border-default pl-3 ml-1">
-              <button className="p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"><Sun className="w-3.5 h-3.5" /></button>
-              <button className="p-1.5 rounded hover:bg-surface-2 text-accent transition-colors"><Moon className="w-3.5 h-3.5" /></button>
-              <button className="p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"><Monitor className="w-3.5 h-3.5" /></button>
+            <div className="hidden lg:flex items-center gap-1 bg-surface-2 p-0.5 rounded-lg border border-border-default h-10">
+              <button className="p-1.5 rounded hover:bg-surface-3 text-text-tertiary transition-colors"><Sun className="w-3.5 h-3.5" /></button>
+              <button className="p-1.5 rounded hover:bg-surface-3 text-accent transition-colors"><Moon className="w-3.5 h-3.5" /></button>
+              <button className="p-1.5 rounded hover:bg-surface-3 text-text-tertiary transition-colors"><Monitor className="w-3.5 h-3.5" /></button>
             </div>
 
             {/* Notification Bell */}
-            <button className="relative p-2 rounded-lg hover:bg-surface-2 text-text-secondary transition-colors border border-transparent">
+            <button className="relative icon-btn-premium h-10 w-10">
               <Bell className="w-4.5 h-4.5" />
               {unreadAlerts > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-semantic-critical text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
@@ -347,21 +362,27 @@ export default function SOCLayout() {
               )}
             </button>
 
-            {/* User Profile */}
+            {/* Settings Quick Access Link */}
+            <Link to="/settings" className="hidden sm:flex icon-btn-premium h-10 w-10">
+              <Settings className="w-4.5 h-4.5" />
+            </Link>
+
+            {/* Redesigned User Profile */}
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2.5 p-1 pl-2 rounded-lg hover:bg-surface-2 transition-all border border-transparent cursor-pointer"
+                className="flex items-center gap-3 p-1 pl-2.5 pr-2 rounded-xl bg-surface-2 border border-border-default hover:bg-surface-3 transition-all cursor-pointer h-10"
               >
-                <div className="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-xs font-bold text-accent uppercase">
+                <div className="w-7 h-7 rounded-full bg-accent/15 border border-accent/30 flex items-center justify-center text-xs font-bold text-accent uppercase">
                   {user?.email?.[0] || 'U'}
                 </div>
                 <div className="hidden md:block text-left">
                   <div className="text-xs font-bold text-white leading-tight truncate max-w-[100px]">
                     {user?.email?.split('@')[0] || 'Operator'}
                   </div>
-                  <div className="text-[9px] text-text-tertiary leading-tight">SOC Manager</div>
+                  <div className="text-[9px] text-text-tertiary font-bold tracking-wider uppercase leading-none mt-0.5">SOC Manager</div>
                 </div>
+                <ChevronDown className="w-3.5 h-3.5 text-text-tertiary" />
               </button>
 
               {userMenuOpen && (

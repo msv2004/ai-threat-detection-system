@@ -217,7 +217,7 @@ export default function Dashboard() {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white">SOC Overview</h2>
+          <h2 className="text-3xl text-white heading-display tracking-wider">SOC Overview</h2>
           <p className="text-sm text-text-secondary mt-0.5">Security Operations Center Dashboard</p>
         </div>
         <div className="flex gap-2">
@@ -251,7 +251,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold text-white">Active Threats</h3>
+              <h3 className="text-base text-white heading-display tracking-wider">Active Threats</h3>
             </div>
             <span className="text-[10px] font-bold uppercase tracking-wider text-semantic-critical bg-semantic-critical/10 px-2 py-0.5 rounded">Live</span>
           </div>
@@ -306,7 +306,7 @@ export default function Dashboard() {
             <div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-accent" />
-                <h3 className="text-sm font-bold text-white">Live Attack Map</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Live Attack Map</h3>
               </div>
               <p className="text-[11px] text-text-tertiary mt-0.5">Global intrusion telemetry, command paths, and sinkhole pulses</p>
             </div>
@@ -354,7 +354,7 @@ export default function Dashboard() {
         <div className="card-static p-5">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-white">Threat Activity (24h)</h3>
+            <h3 className="text-base text-white heading-display tracking-wider">Threat Activity (24h)</h3>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={liveHistory.length > 0 ? liveHistory : threatActivityData}>
@@ -386,7 +386,7 @@ export default function Dashboard() {
         <div className="card-static p-5">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-white">Severity Distribution</h3>
+            <h3 className="text-base text-white heading-display tracking-wider">Severity Distribution</h3>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
@@ -424,7 +424,7 @@ export default function Dashboard() {
         {/* Security Posture Radar */}
         <div className="card-static p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white">Security Posture</h3>
+            <h3 className="text-base text-white heading-display tracking-wider">Security Posture</h3>
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-bold text-accent font-mono-data">78.5</span>
               <span className="text-xs text-text-tertiary">/100</span>
@@ -443,7 +443,7 @@ export default function Dashboard() {
         <div className="card-static p-5">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-white">Attack Types</h3>
+            <h3 className="text-base text-white heading-display tracking-wider">Attack Types</h3>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={attackTypeData}>
@@ -463,7 +463,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <TerminalIcon className="w-4 h-4 text-accent" />
-              <h3 className="text-sm font-bold text-white">Live Log Stream</h3>
+              <h3 className="text-base text-white heading-display tracking-wider">Live Log Stream</h3>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-semantic-success pulse-emerald" />
@@ -494,7 +494,7 @@ export default function Dashboard() {
       <div className="card-static p-5">
         <div className="flex items-center gap-2 mb-4">
           <Radio className="w-4 h-4 text-accent" />
-          <h3 className="text-sm font-bold text-white">Network Capture Engine</h3>
+          <h3 className="text-base text-white heading-display tracking-wider">Network Capture Engine</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
@@ -564,7 +564,7 @@ export default function Dashboard() {
               className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1 border-l border-border-default z-50 overflow-y-auto p-6 space-y-5"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">Threat Investigation</h3>
+                <h3 className="text-base text-white heading-display tracking-wider">Threat Investigation</h3>
                 <button onClick={() => setSelectedThreat(null)} className="p-1.5 rounded-lg hover:bg-surface-2 text-text-secondary">
                   <X className="w-5 h-5" />
                 </button>
