@@ -44,9 +44,9 @@ export default function Training() {
   const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
   const [trainingProgress, setTrainingProgress] = useState(0);
 
-  // Advanced Hyperparameters (Visual controls only)
   const [estimators, setEstimators] = useState(100);
   const [maxDepth, setMaxDepth] = useState(12);
+  const [modelName, setModelName] = useState('');
 
   // Queries
   const { data: trainingJobs, isLoading: isJobsLoading, isError: isJobsError, refetch } = useQuery({
@@ -151,10 +151,15 @@ export default function Training() {
     const prepJob = completedPrepJobs.find(j => j.id === selectedJobId);
     if (!prepJob || !prepJob.processed_dataset) return;
 
+    const finalModelName = modelName.trim() || `${algorithm.replace(/\s+/g, '_')}_${Date.now()}`;
+
     trainMutation.mutate({
-      dataset_id: prepJob.dataset_id,
       processed_dataset_id: prepJob.processed_dataset.id,
       algorithm,
+      model_name: finalModelName,
+      hyperparameters: algorithm === 'Random Forest'
+        ? { n_estimators: estimators, max_depth: maxDepth }
+        : { max_depth: maxDepth },
     });
   };
 
@@ -221,6 +226,19 @@ export default function Training() {
                     <Link to="/datasets" className="underline font-bold text-accent">Compile datasets</Link>
                   </p>
                 )}
+              </div>
+
+              {/* Model Name */}
+              <div>
+                <label className="block text-[9px] text-text-tertiary mb-1.5 uppercase tracking-wider">Model Name <span className="normal-case opacity-60">(optional, auto-generated if blank)</span></label>
+                <input
+                  type="text"
+                  value={modelName}
+                  onChange={(e) => setModelName(e.target.value)}
+                  placeholder={`${algorithm.replace(/\s+/g, '_')}_v1`}
+                  maxLength={100}
+                  className="input rounded-lg"
+                />
               </div>
 
               {/* Algorithm select cards */}

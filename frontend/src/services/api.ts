@@ -312,9 +312,10 @@ export const modelService = {
   },
 
   async train(config: {
-    dataset_id: string;
     processed_dataset_id: string;
     algorithm: string;
+    model_name: string;
+    hyperparameters?: Record<string, any>;
   }) {
     return apiFetch('/models/train', {
       method: 'POST',
