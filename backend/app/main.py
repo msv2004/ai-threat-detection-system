@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -115,7 +116,6 @@ app = FastAPI(
 )
 
 # Initialize Limiter
-import os
 limiter = Limiter(key_func=get_remote_address, storage_uri=os.getenv("REDIS_URL", "memory://"))
 app.state.limiter = limiter
 
