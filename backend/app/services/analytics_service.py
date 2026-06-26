@@ -47,13 +47,24 @@ class AnalyticsService:
                 "accuracy": active_model.accuracy
             }
 
+        # Critical threats count
+        critical_threats = self.db.query(func.count(Threat.id))\
+            .filter(Threat.user_id == user_id, Threat.severity == "Critical").scalar() or 0
+
+        # Threats today (last 24 hours)
+        day_ago = datetime.now(timezone.utc) - timedelta(days=1)
+        threats_today = self.db.query(func.count(Threat.id))\
+            .filter(Threat.user_id == user_id, Threat.detection_time >= day_ago).scalar() or 0
+
         return {
             "total_predictions": total_predictions,
             "total_threats": total_threats,
             "total_datasets": total_datasets,
             "total_training_jobs": total_training_jobs,
             "average_latency": float(avg_latency),
-            "active_model": active_model_info
+            "active_model": active_model_info,
+            "critical_threats": critical_threats,
+            "threats_today": threats_today
         }
 
     def get_threats_analytics(self, user_id: int) -> Dict[str, Any]:

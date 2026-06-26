@@ -18,6 +18,8 @@ class AnalyticsOverviewResponse(BaseModel):
     total_training_jobs: int
     average_latency: float  # in seconds
     active_model: Optional[ActiveModelOverview] = None
+    critical_threats: int
+    threats_today: int
 
 # Threats Breakdown
 class RecentThreatInfo(BaseModel):

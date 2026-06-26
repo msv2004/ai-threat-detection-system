@@ -39,7 +39,9 @@ export default function Datasets() {
   const [uploadSuccess, setUploadSuccess] = useState(false);
   
   // Preprocessing configuration states
-  const [selectedDatasetId, setSelectedDatasetId] = useState<string>('');
+  const [selectedDatasetId, setSelectedDatasetId] = useState<string>(() => {
+    return localStorage.getItem('selected_dataset_id') || '';
+  });
   const [targetColumn, setTargetColumn] = useState('Label');
   const [missingStrategy, setMissingStrategy] = useState('mean');
   const [scalingStrategy, setScalingStrategy] = useState('standard');
@@ -269,12 +271,15 @@ export default function Datasets() {
                 <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Select Dataset</label>
                 <select
                   value={selectedDatasetId}
-                  onChange={(e) => setSelectedDatasetId(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedDatasetId(e.target.value);
+                    localStorage.setItem('selected_dataset_id', e.target.value);
+                  }}
                   required
                   className="w-full bg-surface-0 border border-border-subtle rounded-lg px-3 py-2 text-text-secondary hover:border-border-default focus:outline-none focus:border-accent transition-colors"
                 >
                   <option value="">-- Choose Ingested File --</option>
-                  {datasets?.filter(d => d.status === 'completed' && d.format?.toLowerCase() === 'csv').map((d) => (
+                  {datasets?.filter(d => (d.status === 'ready' || d.status === 'completed') && (d.dataset_type?.toLowerCase() === 'csv' || d.filename?.toLowerCase().endsWith('.csv'))).map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.filename}
                     </option>
@@ -419,14 +424,14 @@ export default function Datasets() {
                     datasets?.map((d) => (
                       <tr 
                         key={d.id}
-                        onClick={() => d.status === 'completed' && setSelectedProfileDatasetId(d.id)}
+                        onClick={() => (d.status === 'ready' || d.status === 'completed') && setSelectedProfileDatasetId(d.id)}
                         className={`transition-colors cursor-pointer hover:bg-surface-2/50 ${selectedProfileDatasetId === d.id ? 'bg-accent/5' : ''}`}
                       >
                         <td className="p-4 font-semibold text-text-primary max-w-xs truncate">{d.filename}</td>
                         <td className="p-4 text-text-secondary">{(d.size_bytes / 1024 / 1024).toFixed(2)} MB</td>
                         <td className="p-4">
                           <span className={`px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase
-                            ${d.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
+                            ${(d.status === 'ready' || d.status === 'completed') ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
                               d.status === 'failed' ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
                               'text-amber-400 bg-amber-500/10 border-amber-500/20 animate-pulse'}`}
                           >
@@ -479,28 +484,36 @@ export default function Datasets() {
                 </div>
               ) : (
                 preprocessingJobs?.map((job) => (
-                  <div key={job.id} className="bg-surface-2 p-3 rounded-lg border border-border-subtle flex items-center justify-between gap-4 text-xs">
-                    <div>
-                      <div className="font-semibold text-text-primary">Job: {job.id.substring(0, 8)}</div>
-                      <span className="text-[10px] text-text-tertiary">
-                        {job.config?.scaling_strategy} scaling · split {job.config?.test_size}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className={`px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase
-                        ${job.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
-                          job.status === 'failed' ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
-                          'text-amber-400 bg-amber-500/10 border-amber-500/20 animate-pulse'}`}
-                      >
-                        {job.status}
-                      </span>
-                      {job.processed_dataset && (
-                        <span className="text-[10px] text-accent font-semibold bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
-                          {job.processed_dataset.train_samples} train rows
+                  <div key={job.id} className="bg-surface-2 p-3 rounded-lg border border-border-subtle flex flex-col gap-2 text-xs">
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <div className="font-semibold text-text-primary">Job: {job.id.substring(0, 8)}</div>
+                        <span className="text-[10px] text-text-tertiary">
+                          {job.config?.scaling_strategy} scaling · split {job.config?.test_size}
                         </span>
-                      )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className={`px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase
+                          ${job.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
+                            job.status === 'failed' ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
+                            'text-amber-400 bg-amber-500/10 border-amber-500/20 animate-pulse'}`}
+                        >
+                          {job.status}
+                        </span>
+                        {job.processed_dataset && (
+                          <span className="text-[10px] text-accent font-semibold bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
+                            {job.processed_dataset.train_samples} train rows
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    {job.status === 'failed' && job.error_message && (
+                      <div className="text-[10px] text-red-400 bg-red-500/5 border border-red-500/10 p-2 rounded flex items-start gap-1">
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                        <span>{job.error_message}</span>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
