@@ -88,7 +88,7 @@ export default function Landing() {
       
       {/* ── Navigation ── */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 h-20 flex items-center justify-between w-full">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <span className="font-display text-2xl tracking-wider text-gold">{'{ AEGIS }'}</span>
@@ -152,7 +152,7 @@ export default function Landing() {
       </header>
 
       {/* ── Hero Section ── */}
-      <section className="landing-hero-bg relative min-h-screen flex items-center justify-center pt-20">
+      <section className="landing-hero-bg relative min-h-[95vh] lg:min-h-screen py-44 md:py-56 flex items-center justify-center pt-32 pb-24">
         {/* Background cyber imagery overlay */}
         <div className="absolute inset-0 opacity-[0.08]"
           style={{
@@ -173,13 +173,13 @@ export default function Landing() {
             .split('\n').map((line, i) => <div key={i}>{line}</div>)}
         </div>
         
-        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+        <div className="relative z-10 text-center px-6 max-w-[1440px] mx-auto flex flex-col items-center justify-center w-full">
           {/* Main heading */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 0.95, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="font-display text-[clamp(3rem,8vw,7.5rem)] leading-[0.95] text-gold mt-12 tracking-wide"
+            className="font-display text-[clamp(3.5rem,8vw,7.5rem)] leading-[1.3] text-gold mt-12 tracking-wide text-center"
           >
             ADVANCED<br />
             CYBER SECURITY
@@ -190,7 +190,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-text-secondary text-base md:text-lg max-w-2xl mx-auto mt-8 leading-relaxed"
+            className="text-text-secondary text-base md:text-lg max-w-2xl mx-auto mt-10 leading-relaxed text-center"
           >
             Protect critical systems, sensitive data, and digital operations with proactive 
             AI-powered cybersecurity solutions tailored for evolving network threats.
@@ -201,17 +201,17 @@ export default function Landing() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-14 mb-20"
+            className="flex flex-col sm:flex-row items-center justify-center gap-6 md:gap-8 mt-12 mb-0 w-full"
           >
             <Link 
               to="/register" 
-              className="btn btn-gold-filled text-sm px-10 py-4 h-auto font-display text-base tracking-widest min-w-[200px]"
+              className="btn btn-gold-filled text-sm w-60 h-14 font-display text-base tracking-widest flex items-center justify-center"
             >
               Get Protected
             </Link>
             <Link 
               to="/login" 
-              className="btn btn-gold text-sm px-10 py-4 h-auto font-display text-base tracking-widest min-w-[200px]"
+              className="btn btn-gold text-sm w-60 h-14 font-display text-base tracking-widest flex items-center justify-center"
             >
               Free Assessment
             </Link>
@@ -225,10 +225,10 @@ export default function Landing() {
       </section>
 
       {/* ── Stats Bar ── */}
-      <section className="bg-[#0a0a0a] border-y border-white/5 py-12">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <section className="bg-[#0a0a0a] border-y border-white/5 py-16">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center w-full">
           {stats.map((stat) => (
-            <div key={stat.label} className="text-center">
+            <div key={stat.label} className="text-center flex flex-col items-center justify-center">
               <div className="font-display text-4xl md:text-5xl text-gold tracking-wider">{stat.value}</div>
               <div className="text-xs text-text-tertiary uppercase tracking-[0.15em] mt-2 font-semibold">{stat.label}</div>
             </div>
@@ -237,18 +237,18 @@ export default function Landing() {
       </section>
 
       {/* ── Services Section ── */}
-      <section id="features" className="bg-black py-24">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+      <section id="features" className="bg-black py-24 md:py-32">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full">
           {/* Section Header */}
-          <div className="text-center mb-16">
+          <div className="text-center mb-20 max-w-3xl mx-auto flex flex-col items-center">
             <span className="section-badge text-text-tertiary">{'{ OUR CAPABILITIES }'}</span>
-            <h2 className="font-display text-[clamp(2rem,5vw,4.5rem)] text-white mt-4 tracking-wider leading-tight">
+            <h2 className="font-display text-[clamp(2.5rem,6vw,4.5rem)] text-white mt-6 tracking-wider leading-[1.1]">
               AI-POWERED SECURITY<br />SOLUTIONS AVAILABLE
             </h2>
           </div>
 
-          {/* Service Cards */}
-          <div className="space-y-4">
+          {/* Service Cards - Centered 2-column Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {services.map((service, index) => {
               const Icon = service.icon;
               return (
@@ -258,30 +258,33 @@ export default function Landing() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: '-50px' }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="landing-card group p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
+                  className="landing-card group p-8 md:p-10 flex flex-col justify-between gap-6 hover:border-gold/30 hover:shadow-[0_0_30px_rgba(212,168,67,0.05)] transition-all"
                 >
-                  <div className="flex items-start gap-6 flex-1">
+                  <div className="flex flex-col gap-6">
                     {/* Icon */}
                     <div className="w-14 h-14 rounded-lg bg-gold/5 border border-gold/15 flex items-center justify-center shrink-0 group-hover:bg-gold/10 transition-colors">
                       <Icon className="w-7 h-7 text-gold" />
                     </div>
                     {/* Content */}
-                    <div className="flex-1">
-                      <h3 className="font-display text-xl md:text-2xl text-white tracking-wider mb-3">{service.title}</h3>
-                      <p className="text-sm text-text-secondary leading-relaxed max-w-2xl mb-4">{service.description}</p>
-                      <div className="flex flex-wrap gap-4">
+                    <div>
+                      <h3 className="font-display text-2xl text-white tracking-wider mb-3">{service.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed mb-4">{service.description}</p>
+                      <div className="flex flex-wrap gap-2.5">
                         {service.tags.map(tag => (
-                          <span key={tag} className="flex items-center gap-2 text-xs text-text-secondary">
-                            <span className="w-1.5 h-1.5 bg-gold rounded-sm" />
+                          <span key={tag} className="flex items-center gap-1.5 text-xs text-text-secondary bg-white/[0.02] border border-white/[0.05] px-2.5 py-1 rounded">
+                            <span className="w-1 h-1 bg-gold rounded-full" />
                             {tag}
                           </span>
                         ))}
                       </div>
                     </div>
                   </div>
-                  {/* Arrow */}
-                  <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center group-hover:bg-gold/10 group-hover:border-gold/60 transition-all shrink-0">
-                    <ArrowUpRight className="w-5 h-5 text-gold" />
+                  {/* Arrow link in card footer */}
+                  <div className="flex justify-between items-center border-t border-white/5 pt-4 mt-2">
+                    <span className="text-[10px] text-text-tertiary tracking-widest uppercase font-mono-data font-bold">Details</span>
+                    <div className="w-10 h-10 rounded-full border border-gold/20 flex items-center justify-center group-hover:bg-gold/10 group-hover:border-gold/50 transition-all shrink-0">
+                      <ArrowUpRight className="w-4.5 h-4.5 text-gold" />
+                    </div>
                   </div>
                 </motion.div>
               );
@@ -291,16 +294,16 @@ export default function Landing() {
       </section>
 
       {/* ── How It Works ── */}
-      <section id="solutions" className="bg-[#050505] py-24 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-6 lg:px-12">
-          <div className="text-center mb-16">
+      <section id="solutions" className="bg-[#050505] py-24 md:py-32 border-t border-white/5">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full">
+          <div className="text-center mb-20 max-w-3xl mx-auto flex flex-col items-center">
             <span className="section-badge text-text-tertiary">{'{ HOW IT WORKS }'}</span>
-            <h2 className="font-display text-[clamp(2rem,5vw,4rem)] text-white mt-4 tracking-wider">
+            <h2 className="font-display text-[clamp(2.5rem,6vw,4rem)] text-white mt-6 tracking-wider leading-[1.1]">
               END-TO-END AI PIPELINE
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { step: '01', title: 'INGEST', desc: 'Upload network capture CSV datasets or connect live packet sniffing adapters.', icon: Database },
               { step: '02', title: 'PREPROCESS', desc: 'Clean, encode, scale, and split data with automated feature engineering.', icon: Cpu },
@@ -315,7 +318,7 @@ export default function Landing() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.12 }}
-                  className="landing-card p-8 text-center group"
+                  className="landing-card p-8 text-center group flex flex-col justify-between items-center min-h-[260px] border border-white/5 hover:border-gold/20"
                 >
                   <div className="font-display text-5xl text-gold/20 group-hover:text-gold/40 transition-colors">{item.step}</div>
                   <div className="w-12 h-12 mx-auto mt-4 rounded-lg bg-gold/5 border border-gold/10 flex items-center justify-center group-hover:bg-gold/10 transition-colors">
@@ -331,16 +334,16 @@ export default function Landing() {
       </section>
 
       {/* ── FAQ Section ── */}
-      <section id="documentation" className="bg-black py-24 border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6">
-          <div className="text-center mb-12">
+      <section id="documentation" className="bg-black py-24 md:py-32 border-t border-white/5">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 w-full">
+          <div className="text-center mb-16 max-w-3xl mx-auto flex flex-col items-center">
             <span className="section-badge text-text-tertiary">{'{ FAQ }'}</span>
-            <h2 className="font-display text-[clamp(2rem,5vw,3.5rem)] text-white mt-4 tracking-wider">
+            <h2 className="font-display text-[clamp(2.5rem,6vw,3.5rem)] text-white mt-6 tracking-wider leading-[1.1]">
               COMMON QUESTIONS
             </h2>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-4 max-w-4xl mx-auto w-full text-left">
             {faqData.map((faq, index) => (
               <motion.div
                 key={index}
@@ -349,7 +352,7 @@ export default function Landing() {
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full flex items-center justify-between p-6 text-left"
+                  className="w-full flex items-center justify-between p-6 text-left cursor-pointer"
                 >
                   <span className="text-sm font-semibold text-white pr-4">{faq.q}</span>
                   <ChevronDown className={`w-4 h-4 text-gold shrink-0 transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`} />
@@ -376,20 +379,26 @@ export default function Landing() {
       </section>
 
       {/* ── CTA Section ── */}
-      <section className="bg-[#050505] py-24 border-t border-white/5">
-        <div className="max-w-4xl mx-auto px-6 text-center">
+      <section className="bg-[#050505] py-24 md:py-32 border-t border-white/5">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 text-center flex flex-col items-center justify-center w-full">
           <span className="section-badge text-text-tertiary">{'{ GET STARTED }'}</span>
-          <h2 className="font-display text-[clamp(2rem,5vw,4rem)] text-white mt-4 tracking-wider">
+          <h2 className="font-display text-[clamp(2.5rem,6vw,4rem)] text-white mt-6 tracking-wider leading-[1.1] text-center">
             SECURE YOUR NETWORK TODAY
           </h2>
-          <p className="text-text-secondary mt-4 max-w-xl mx-auto">
+          <p className="text-text-secondary mt-6 max-w-xl mx-auto text-center leading-relaxed">
             Deploy Aegis AI SOC in minutes. Upload your first dataset, train a classifier, and start detecting threats autonomously.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
-            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 md:gap-8 mt-12 w-full">
+            <Link 
+              to="/register" 
+              className="btn btn-gold-filled text-sm w-60 h-14 font-display text-base tracking-widest flex items-center justify-center"
+            >
               Start Free
             </Link>
-            <Link to="/login" className="btn btn-gold btn-lg text-sm">
+            <Link 
+              to="/login" 
+              className="btn btn-gold text-sm w-60 h-14 font-display text-base tracking-widest flex items-center justify-center"
+            >
               Sign In
             </Link>
           </div>
@@ -398,7 +407,7 @@ export default function Landing() {
 
       {/* ── Footer ── */}
       <footer className="bg-black border-t border-white/5 py-12">
-        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="max-w-[1440px] mx-auto px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-6 w-full">
           <div className="flex items-center gap-2">
             <span className="font-display text-xl text-gold tracking-wider">{'{ AEGIS }'}</span>
             <span className="text-xs text-text-tertiary">AI Threat Detection Platform</span>
