@@ -1,21 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuthStore } from './stores/authStore';
 import { useSocketStore } from './stores/socketStore';
+import { Loader2 } from 'lucide-react';
 
-// Layouts & Pages
-import SOCLayout from './layouts/SOCLayout';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import Dashboard from './pages/Dashboard';
-import Threats from './pages/Threats';
-import Datasets from './pages/Datasets';
-import Models from './pages/Models';
-import Training from './pages/Training';
-import Analytics from './pages/Analytics';
-import Settings from './pages/Settings';
+// Lazy load pages for performance
+const Landing = lazy(() => import('./pages/Landing'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Threats = lazy(() => import('./pages/Threats'));
+const Datasets = lazy(() => import('./pages/Datasets'));
+const Models = lazy(() => import('./pages/Models'));
+const Training = lazy(() => import('./pages/Training'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const Settings = lazy(() => import('./pages/Settings'));
+const SOCLayout = lazy(() => import('./layouts/SOCLayout'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +27,15 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Loading fallback component
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-surface-0 flex items-center justify-center">
+      <Loader2 className="w-8 h-8 text-accent animate-spin" />
+    </div>
+  );
+}
 
 // Protected Route wrapper component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -47,55 +58,58 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <Routes>
-          {/* Public Auth Routes */}
-          <Route 
-            path="/login" 
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            } 
-          />
-          <Route 
-            path="/register" 
-            element={
-              <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } 
-          />
-          <Route 
-            path="/forgot-password" 
-            element={
-              <PublicRoute>
-                <ForgotPassword />
-              </PublicRoute>
-            } 
-          />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Landing Page */}
+            <Route path="/" element={<Landing />} />
 
-          {/* Protected SOC Dashboard Routes */}
-          <Route 
-            path="/" 
-            element={
-              <ProtectedRoute>
-                <SOCLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="threats" element={<Threats />} />
-            <Route path="datasets" element={<Datasets />} />
-            <Route path="models" element={<Models />} />
-            <Route path="training" element={<Training />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
+            {/* Public Auth Routes */}
+            <Route 
+              path="/login" 
+              element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/register" 
+              element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } 
+            />
+            <Route 
+              path="/forgot-password" 
+              element={
+                <PublicRoute>
+                  <ForgotPassword />
+                </PublicRoute>
+              } 
+            />
 
-          {/* Catch-all fallback */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+            {/* Protected SOC Dashboard Routes */}
+            <Route 
+              element={
+                <ProtectedRoute>
+                  <SOCLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="dashboard" element={<Dashboard />} />
+              <Route path="threats" element={<Threats />} />
+              <Route path="datasets" element={<Datasets />} />
+              <Route path="models" element={<Models />} />
+              <Route path="training" element={<Training />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Catch-all fallback */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </QueryClientProvider>
   );

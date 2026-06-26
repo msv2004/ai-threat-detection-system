@@ -1,26 +1,37 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { 
-  detectionService, 
-  analyticsService, 
-  threatService, 
-  modelService 
+import { Link } from 'react-router-dom';
+import {
+  detectionService,
+  analyticsService,
+  threatService,
+  modelService
 } from '../services/api';
 import { useSocketStore } from '../stores/socketStore';
-import { 
-  Play, 
-  Square, 
-  Activity, 
-  AlertOctagon, 
-  Cpu, 
-  Radio, 
-  Clock, 
-  TrendingUp, 
+import PageHeader from '../components/ui/PageHeader';
+import Badge, { severityToBadgeVariant, statusToBadgeVariant } from '../components/ui/Badge';
+import { InfoTip } from '../components/ui/Tooltip';
+import EmptyState from '../components/ui/EmptyState';
+import { SkeletonCard } from '../components/ui/Skeleton';
+import {
+  Play,
+  Square,
+  Activity,
+  AlertTriangle,
+  Cpu,
+  Radio,
+  TrendingUp,
   ShieldAlert,
   ArrowRight,
   RefreshCw,
-  Search,
-  ExternalLink
+  Database,
+  Flame,
+  BarChart3,
+  Shield,
+  Clock,
+  Zap,
+  ChevronRight,
+  X,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -35,27 +46,24 @@ export default function Dashboard() {
   const [pcapFilePath, setPcapFilePath] = useState('datasets/sample_attack.pcap');
   const [replaySpeed, setReplaySpeed] = useState(1.0);
 
-  // Fetch Dashboard Analytics Overview
+  // Queries
   const { data: overview, isLoading: isOverviewLoading } = useQuery({
     queryKey: ['overview'],
     queryFn: analyticsService.overview,
     refetchInterval: 5000,
   });
 
-  // Fetch Live Threats list
   const { data: threatsList, isLoading: isThreatsLoading } = useQuery({
     queryKey: ['threats'],
     queryFn: () => threatService.list(),
   });
 
-  // Fetch Active Capture Session Status
   const { data: sessionStatus } = useQuery({
     queryKey: ['detection_status'],
     queryFn: detectionService.status,
     refetchInterval: 2000,
   });
 
-  // Fetch registered models to locate the active one
   const { data: models } = useQuery({
     queryKey: ['models'],
     queryFn: modelService.list,
@@ -63,20 +71,25 @@ export default function Dashboard() {
 
   const activeModel = models?.find(m => m.is_active);
 
-  // Capture start mutation
+  // Mutations
   const startCaptureMutation = useMutation({
     mutationFn: detectionService.start,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['detection_status'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['detection_status'] }),
   });
 
-  // Capture stop mutation
   const stopCaptureMutation = useMutation({
     mutationFn: detectionService.stop,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['detection_status'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['detection_status'] }),
+  });
+
+  const updateThreatStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      threatService.updateStatus(id, status),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['threats'] });
+      queryClient.invalidateQueries({ queryKey: ['overview'] });
+      if (selectedThreat && selectedThreat.id === data.id) setSelectedThreat(data);
+    }
   });
 
   const handleStartCapture = () => {
@@ -88,465 +101,395 @@ export default function Dashboard() {
     });
   };
 
-  const handleStopCapture = () => {
-    stopCaptureMutation.mutate();
-  };
-
-  // Enriched threat resolution mutation
-  const updateThreatStatusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) => 
-      threatService.updateStatus(id, status),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['threats'] });
-      queryClient.invalidateQueries({ queryKey: ['overview'] });
-      if (selectedThreat && selectedThreat.id === data.id) {
-        setSelectedThreat(data);
-      }
-    }
-  });
-
-  // Aggregate active status stats
   const activeSessionStats = wsStats || sessionStatus;
   const isSniffing = activeSessionStats?.status === 'running';
+  const criticalCount = overview?.critical_threats || 0;
+  const threatsToday = overview?.threats_today || 0;
+  const displayThreats = threatsList ? threatsList.slice(0, 8) : [];
 
-  const criticalThreatsCount = overview?.critical_threats || 0;
-  const threatsTodayCount = overview?.threats_today || 0;
-
-  // Filter latest threats
-  const displayThreats = threatsList ? threatsList.slice(0, 10) : [];
-
-  const getSeverityBadgeClass = (severity: string) => {
-    switch (severity?.toLowerCase()) {
-      case 'critical':
-        return 'bg-red-500/25 border-red-500/50 text-red-400';
-      case 'high':
-        return 'bg-orange-500/20 border-orange-500/40 text-orange-400';
-      case 'medium':
-        return 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400';
-      default:
-        return 'bg-cyan-500/10 border-cyan-500/30 text-cyan-400';
-    }
-  };
+  // Check if user has any data at all (for first-time guidance)
+  const isNewUser = !isOverviewLoading && !overview?.total_predictions && displayThreats.length === 0;
 
   return (
-    <div className="space-y-6 relative">
-      {/* 5-SECOND ANSWER 1: IS NETWORK UNDER ATTACK? */}
-      {isUnderAttack && (
-        <div className="p-4 bg-red-950/40 border border-red-500/50 rounded-xl glow-destructive flex items-center justify-between animate-pulse-glow">
-          <div className="flex items-center gap-3">
-            <AlertOctagon className="w-6 h-6 text-red-500 animate-bounce" />
+    <div className="space-y-6">
+      <PageHeader
+        title="Dashboard"
+        description="Security posture overview and real-time threat monitoring."
+      />
+
+      {/* First-time user guidance */}
+      {isNewUser && (
+        <div className="card p-5 border-l-4 border-l-accent bg-accent/[0.03] animate-fade-in">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+              <Zap className="w-5 h-5 text-accent" />
+            </div>
             <div>
-              <h2 className="text-sm font-bold text-red-400 font-mono tracking-wider m-0 leading-none">SYS_ALERT: ACTIVE EXPLOITATION DETECTED</h2>
-              <span className="text-[10px] text-red-500/80 font-mono mt-1 block">
-                MACHINE LEARNING INFERENCE CLASSIFIED HIGH-SEVERITY TRAFFIC IN CURRENT STREAM.
-              </span>
+              <h3 className="text-sm font-semibold text-text-primary mb-1">Welcome to Aegis</h3>
+              <p className="text-sm text-text-secondary leading-relaxed mb-3">
+                Get started by uploading a network traffic dataset, training a detection model, then running threat analysis on your data.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link to="/datasets" className="btn btn-primary btn-sm">
+                  <Database className="w-3.5 h-3.5" /> Upload Dataset
+                </Link>
+                <Link to="/training" className="btn btn-secondary btn-sm">
+                  <Flame className="w-3.5 h-3.5" /> Train Model
+                </Link>
+              </div>
             </div>
           </div>
-          <span className="text-[10px] font-mono bg-red-500 text-white px-2.5 py-1 rounded font-bold uppercase tracking-widest">
-            COMPROMISED
-          </span>
         </div>
       )}
 
-      {/* Grid containing Answer 2 & 3 widgets */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* KPI 1: Active Model Info */}
-        <div className="glass-panel p-5 rounded-xl border border-white/5 flex items-center justify-between">
-          <div>
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">ACTIVE INFERENCE MODEL</span>
-            <div className="text-lg font-bold text-white mt-1 font-mono">
-              {activeModel ? activeModel.algorithm : 'No Model Loaded'}
+      {/* Active threat alert banner */}
+      {isUnderAttack && (
+        <div className="card p-4 border-l-4 border-l-severity-critical bg-red-500/[0.04] glow-critical animate-fade-in">
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse shrink-0" />
+            <div>
+              <h3 className="text-sm font-semibold text-red-400">Active Threat Detected</h3>
+              <p className="text-xs text-text-secondary mt-0.5">
+                AI models have classified high-severity traffic in the current detection stream. Review the threat feed for details.
+              </p>
             </div>
-            <span className="text-xs text-[#06b6d4] font-mono mt-1 block">
-              Version {activeModel ? `v${activeModel.version}` : 'N/A'} • {activeModel ? `${(activeModel.accuracy || 0.98 * 100).toFixed(1)}% Accuracy` : 'N/A'}
-            </span>
-          </div>
-          <div className="p-3 bg-cyan-950/30 border border-cyan-500/20 rounded-lg">
-            <Cpu className="w-5 h-5 text-[#06b6d4]" />
+            <Link to="/threats" className="btn btn-sm btn-danger shrink-0 ml-auto">
+              View Threats
+            </Link>
           </div>
         </div>
+      )}
 
-        {/* KPI 2: Today's Volume */}
-        <div className="glass-panel p-5 rounded-xl border border-white/5 flex items-center justify-between relative overflow-hidden">
-          <div>
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">THREATS CLASSIFIED (TODAY)</span>
-            <div className="text-2xl font-bold font-mono mt-1 text-white">
-              {threatsTodayCount}
+      {/* KPI cards grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {isOverviewLoading ? (
+          Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : (
+          <>
+            {/* Active Model */}
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Active Model</span>
+                <InfoTip content="The currently deployed machine learning model used for threat classification." />
+              </div>
+              <div className="text-lg font-bold text-text-primary">
+                {activeModel ? activeModel.algorithm : 'None'}
+              </div>
+              <span className="text-xs text-text-secondary mt-1 block">
+                {activeModel ? `v${activeModel.version} · ${((activeModel.accuracy || 0) * 100).toFixed(1)}% accuracy` : 'No model deployed'}
+              </span>
             </div>
-            <span className="text-xs text-white/40 font-mono mt-1 block">
-              Inferences run: {overview?.total_predictions || 0}
-            </span>
-          </div>
-          <div className="p-3 bg-cyan-950/30 border border-cyan-500/20 rounded-lg">
-            <TrendingUp className="w-5 h-5 text-[#06b6d4]" />
-          </div>
-        </div>
 
-        {/* KPI 3: Answer 3 - HOW SEVERE IS IT? */}
-        <div className={`glass-panel p-5 rounded-xl border flex items-center justify-between transition-all duration-300 ${criticalThreatsCount > 0 ? 'border-red-500/30 bg-red-950/5' : 'border-white/5'}`}>
-          <div>
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">CRITICAL INTENSITY EVENTS</span>
-            <div className={`text-2xl font-bold font-mono mt-1 ${criticalThreatsCount > 0 ? 'text-red-500' : 'text-white'}`}>
-              {criticalThreatsCount}
+            {/* Threats Today */}
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Threats Today</span>
+                <InfoTip content="Number of suspicious network flows classified as threats in the last 24 hours." />
+              </div>
+              <div className="text-2xl font-bold text-text-primary">{threatsToday}</div>
+              <span className="text-xs text-text-secondary mt-1 block">
+                {overview?.total_predictions || 0} total predictions
+              </span>
             </div>
-            <span className="text-xs text-white/40 font-mono mt-1 block">
-              Requires immediate mitigation playbooks
-            </span>
-          </div>
-          <div className={`p-3 rounded-lg ${criticalThreatsCount > 0 ? 'bg-red-950/50 border border-red-500/30' : 'bg-cyan-950/30 border border-cyan-500/20'}`}>
-            <ShieldAlert className={`w-5 h-5 ${criticalThreatsCount > 0 ? 'text-red-500 animate-pulse' : 'text-[#06b6d4]'}`} />
-          </div>
-        </div>
 
+            {/* Critical Events */}
+            <div className={`card p-5 ${criticalCount > 0 ? 'border-red-500/20 glow-critical' : ''}`}>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Critical Events</span>
+                <InfoTip content="High-severity threats requiring immediate investigation and response." />
+              </div>
+              <div className={`text-2xl font-bold ${criticalCount > 0 ? 'text-red-400' : 'text-text-primary'}`}>
+                {criticalCount}
+              </div>
+              <span className="text-xs text-text-secondary mt-1 block">
+                {criticalCount > 0 ? 'Immediate action required' : 'No critical incidents'}
+              </span>
+            </div>
+
+            {/* Detection Latency */}
+            <div className="card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-medium text-text-tertiary uppercase tracking-wide">Avg. Latency</span>
+                <InfoTip content="Average time for the AI model to classify a single network flow." />
+              </div>
+              <div className="text-2xl font-bold text-text-primary">
+                {overview?.average_latency ? `${overview.average_latency.toFixed(2)}ms` : '—'}
+              </div>
+              <span className="text-xs text-text-secondary mt-1 block">
+                Per-flow inference time
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Main Section */}
+      {/* Main content grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-        
-        {/* Sidebar Controls & NIDS capture details (1 column) */}
-        <div className="xl:col-span-1 space-y-6">
-          
-          {/* Sniffer Controller Panel */}
-          <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-            <h3 className="text-xs font-mono font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3 flex items-center gap-2">
-              <Radio className="w-4 h-4 text-[#06b6d4]" />
-              NIDS Capture Engine
-            </h3>
+
+        {/* Detection Engine panel */}
+        <div className="xl:col-span-1 space-y-4">
+          <div className="card p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
+                <Radio className="w-4 h-4 text-accent" />
+                Detection Engine
+              </h3>
+              <InfoTip content="Start or stop the network intrusion detection system. Live mode captures from your network interface; PCAP mode replays recorded traffic." />
+            </div>
 
             {isSniffing ? (
               <div className="space-y-4">
-                <div className="p-3 bg-emerald-950/30 border border-emerald-500/20 rounded-lg text-center font-mono">
-                  <div className="text-xs text-emerald-400 font-bold flex items-center justify-center gap-1.5 animate-pulse">
-                    <span className="w-2 h-2 bg-emerald-400 rounded-full" />
-                    ENGINE ACTIVE
-                  </div>
-                  <span className="text-[10px] text-white/40 mt-1 block">
-                    NIC: {activeSessionStats?.interface} • {activeSessionStats?.mode?.toUpperCase()}
-                  </span>
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
+                  <span className="text-xs font-semibold text-emerald-400">Active</span>
+                  <span className="text-xs text-text-tertiary ml-auto">{activeSessionStats?.interface}</span>
                 </div>
 
-                <div className="space-y-2.5 text-xs font-mono text-white/60 bg-[#070b13] p-3 rounded-lg border border-white/5">
-                  <div className="flex justify-between">
-                    <span>PACKETS CAPTURED</span>
-                    <span className="text-white font-bold">{activeSessionStats?.packet_count || 0}</span>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-text-secondary">
+                    <span>Packets</span>
+                    <span className="font-mono-data font-semibold text-text-primary">{activeSessionStats?.packet_count || 0}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>FLOWS BUILT</span>
-                    <span className="text-white font-bold">{activeSessionStats?.flow_count || 0}</span>
+                  <div className="flex justify-between text-text-secondary">
+                    <span>Flows</span>
+                    <span className="font-mono-data font-semibold text-text-primary">{activeSessionStats?.flow_count || 0}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>THREATS PARSED</span>
-                    <span className="text-red-400 font-bold">{activeSessionStats?.threat_count || 0}</span>
+                  <div className="flex justify-between text-text-secondary">
+                    <span>Threats</span>
+                    <span className="font-mono-data font-semibold text-red-400">{activeSessionStats?.threat_count || 0}</span>
                   </div>
-                  <div className="flex justify-between border-t border-white/5 pt-2 mt-2">
-                    <span>ACTIVE DURATION</span>
-                    <span className="text-[#06b6d4] font-bold">
+                  <div className="flex justify-between text-text-secondary border-t border-border-subtle pt-2 mt-2">
+                    <span>Duration</span>
+                    <span className="font-mono-data font-semibold text-text-primary">
                       {activeSessionStats?.duration_seconds ? `${activeSessionStats.duration_seconds.toFixed(0)}s` : '0s'}
                     </span>
                   </div>
                 </div>
 
-                <button
-                  onClick={handleStopCapture}
-                  className="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 hover:border-red-500/50 text-red-400 font-mono py-2.5 rounded-lg text-xs uppercase tracking-wider font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <Square className="w-3.5 h-3.5 fill-red-400" />
-                  HALT DETECTION
+                <button onClick={() => stopCaptureMutation.mutate()} className="btn btn-danger w-full btn-sm">
+                  <Square className="w-3.5 h-3.5" /> Stop Detection
                 </button>
               </div>
             ) : (
-              <div className="space-y-4">
-                {/* Interface Settings */}
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">CAPTURE MODE</label>
-                    <div className="grid grid-cols-2 gap-2 bg-[#070b13] p-1 rounded-lg border border-white/5">
-                      <button
-                        onClick={() => setCaptureMode('live')}
-                        className={`text-center py-1.5 rounded font-mono text-[10px] uppercase font-bold transition-colors ${captureMode === 'live' ? 'bg-cyan-500/10 text-[#06b6d4]' : 'text-white/40 hover:text-white'}`}
-                      >
-                        Live NIC
-                      </button>
-                      <button
-                        onClick={() => setCaptureMode('offline')}
-                        className={`text-center py-1.5 rounded font-mono text-[10px] uppercase font-bold transition-colors ${captureMode === 'offline' ? 'bg-cyan-500/10 text-[#06b6d4]' : 'text-white/40 hover:text-white'}`}
-                      >
-                        PCAP File
-                      </button>
-                    </div>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-text-secondary mb-1.5">Mode</label>
+                  <div className="grid grid-cols-2 gap-1.5 bg-surface-0 p-1 rounded-lg border border-border-subtle">
+                    <button
+                      onClick={() => setCaptureMode('live')}
+                      className={`text-center py-2 rounded-md text-xs font-semibold transition-colors ${captureMode === 'live' ? 'bg-accent/10 text-accent' : 'text-text-tertiary hover:text-text-secondary'}`}
+                    >Live Capture</button>
+                    <button
+                      onClick={() => setCaptureMode('offline')}
+                      className={`text-center py-2 rounded-md text-xs font-semibold transition-colors ${captureMode === 'offline' ? 'bg-accent/10 text-accent' : 'text-text-tertiary hover:text-text-secondary'}`}
+                    >PCAP Replay</button>
                   </div>
-
-                  {captureMode === 'live' ? (
-                    <div>
-                      <label className="block text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">NETWORK INTERFACE</label>
-                      <input
-                        type="text"
-                        value={captureInterface}
-                        onChange={(e) => setCaptureInterface(e.target.value)}
-                        placeholder="e.g. eth0, Wi-Fi"
-                        className="w-full bg-[#070b13] border border-white/10 px-3 py-2 rounded text-xs text-white focus:outline-none focus:border-[#06b6d4] font-mono"
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <div>
-                        <label className="block text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">PCAP FILE PATH</label>
-                        <input
-                          type="text"
-                          value={pcapFilePath}
-                          onChange={(e) => setPcapFilePath(e.target.value)}
-                          placeholder="datasets/sample.pcap"
-                          className="w-full bg-[#070b13] border border-white/10 px-3 py-2 rounded text-xs text-white focus:outline-none focus:border-[#06b6d4] font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[10px] font-mono text-white/40 mb-1 uppercase tracking-wider">REPLAY SPEED multiplier</label>
-                        <input
-                          type="number"
-                          step="0.5"
-                          min="0"
-                          value={replaySpeed}
-                          onChange={(e) => setReplaySpeed(parseFloat(e.target.value))}
-                          className="w-full bg-[#070b13] border border-white/10 px-3 py-2 rounded text-xs text-white focus:outline-none focus:border-[#06b6d4] font-mono"
-                        />
-                      </div>
-                    </>
-                  )}
                 </div>
 
-                <button
-                  onClick={handleStartCapture}
-                  disabled={startCaptureMutation.isPending}
-                  className="w-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/50 text-[#06b6d4] font-mono py-2.5 rounded-lg text-xs uppercase tracking-wider font-bold transition-all cursor-pointer flex items-center justify-center gap-2"
-                >
-                  <Play className="w-3.5 h-3.5 fill-[#06b6d4]" />
-                  START SNIFFING
+                {captureMode === 'live' ? (
+                  <div>
+                    <label className="block text-xs font-medium text-text-secondary mb-1.5">Network Interface</label>
+                    <input
+                      type="text"
+                      value={captureInterface}
+                      onChange={(e) => setCaptureInterface(e.target.value)}
+                      placeholder="e.g. eth0, Wi-Fi"
+                      className="input input-sm"
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">PCAP File Path</label>
+                      <input type="text" value={pcapFilePath} onChange={(e) => setPcapFilePath(e.target.value)} className="input input-sm" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-text-secondary mb-1.5">Replay Speed</label>
+                      <input type="number" step="0.5" min="0" value={replaySpeed} onChange={(e) => setReplaySpeed(parseFloat(e.target.value))} className="input input-sm" />
+                    </div>
+                  </>
+                )}
+
+                <button onClick={handleStartCapture} disabled={startCaptureMutation.isPending} className="btn btn-primary w-full btn-sm">
+                  <Play className="w-3.5 h-3.5" /> Start Detection
                 </button>
               </div>
             )}
           </div>
 
-          {/* Quick Metrics Graph Widget */}
-          <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-3 font-mono">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3">
-              Performance KPIs
-            </h3>
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] text-white/40 block">AVERAGE DETECTION LATENCY</span>
-                <span className="text-base text-white font-bold mt-1 block">
-                  {overview?.average_latency ? `${overview.average_latency.toFixed(2)} ms` : '0.05 ms'}
-                </span>
-              </div>
-              <div>
-                <span className="text-[10px] text-white/40 block">ACTIVE ENGINE THREADS</span>
-                <span className="text-xs text-emerald-400 font-bold mt-1 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  Sniffer, FlowBuilder, Predictor
-                </span>
-              </div>
+          {/* Quick actions */}
+          <div className="card p-5 space-y-3">
+            <h3 className="text-sm font-semibold text-text-primary">Quick Actions</h3>
+            <div className="space-y-1.5">
+              {[
+                { label: 'Upload Dataset', icon: Database, path: '/datasets', color: 'text-blue-400' },
+                { label: 'Train Model', icon: Flame, path: '/training', color: 'text-orange-400' },
+                { label: 'View Analytics', icon: BarChart3, path: '/analytics', color: 'text-emerald-400' },
+              ].map(action => (
+                <Link
+                  key={action.path}
+                  to={action.path}
+                  className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-surface-2 transition-colors group"
+                >
+                  <action.icon className={`w-4 h-4 ${action.color}`} />
+                  <span className="text-sm text-text-secondary group-hover:text-text-primary transition-colors">{action.label}</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-text-tertiary ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
+              ))}
             </div>
           </div>
-
         </div>
 
-        {/* Live Threat Logs (3 columns) */}
-        <div className="xl:col-span-3 space-y-6">
-          
-          <div className="glass-panel rounded-xl border border-white/5 overflow-hidden flex flex-col h-[540px]">
-            {/* Table Header */}
-            <div className="p-5 border-b border-white/5 flex items-center justify-between bg-[#0a0f1d]/50">
-              <div className="flex items-center gap-3">
-                <div className="p-1.5 bg-red-950/20 border border-red-500/20 rounded">
-                  <ShieldAlert className="w-4 h-4 text-red-500 animate-pulse" />
-                </div>
-                <div>
-                  <h3 className="text-xs font-mono font-bold text-white tracking-wider uppercase m-0 leading-none">
-                    Answer 2: Live Intrusion Logs
-                  </h3>
-                  <span className="text-[9px] text-white/40 tracking-widest font-mono mt-1 block">
-                    AI CLASSIFIED NETWORK THREAT VECTOR ANALYSIS
-                  </span>
-                </div>
+        {/* Recent threats */}
+        <div className="xl:col-span-3">
+          <div className="card overflow-hidden">
+            <div className="p-5 flex items-center justify-between border-b border-border-subtle">
+              <div>
+                <h3 className="text-sm font-semibold text-text-primary">Recent Threats</h3>
+                <p className="text-xs text-text-secondary mt-0.5">AI-classified security incidents from recent analysis</p>
               </div>
-              
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-cyan-500 animate-pulse' : 'bg-red-500'}`} />
-                <span className="text-[9px] text-white/40 font-mono tracking-wider">
-                  {isConnected ? 'STREAMING' : 'OFFLINE'}
-                </span>
-              </div>
+              <Link to="/threats" className="btn btn-ghost btn-sm text-accent">
+                View all <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
 
-            {/* Scrollable threat feeds */}
-            <div className="flex-1 overflow-y-auto divide-y divide-white/5 font-mono text-xs">
-              {isThreatsLoading ? (
-                <div className="flex items-center justify-center h-full gap-2 text-white/40">
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Loading network threat indexes...</span>
-                </div>
-              ) : displayThreats.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center p-6 text-white/30 space-y-2">
-                  <Activity className="w-8 h-8 text-white/10" />
-                  <span>No security vulnerabilities detected. System safe.</span>
-                </div>
-              ) : (
-                displayThreats.map((threat: any) => (
+            {isThreatsLoading ? (
+              <div className="p-8 flex items-center justify-center gap-2 text-text-secondary text-sm">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                Loading threats...
+              </div>
+            ) : displayThreats.length === 0 ? (
+              <EmptyState
+                icon={ShieldAlert}
+                title="No threats detected"
+                description="No security incidents found. Upload a dataset and run detection to begin analysis."
+                action={<Link to="/datasets" className="btn btn-primary btn-sm"><Database className="w-3.5 h-3.5" /> Upload Dataset</Link>}
+              />
+            ) : (
+              <div className="divide-y divide-border-subtle">
+                {displayThreats.map((threat: any) => (
                   <div
                     key={threat.id}
                     onClick={() => setSelectedThreat(threat)}
-                    className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/[0.02] cursor-pointer transition-colors border-l-2 border-transparent hover:border-[#06b6d4]"
+                    className="px-5 py-4 flex items-center justify-between gap-4 table-row-hover cursor-pointer transition-colors"
                   >
-                    <div className="space-y-1.5">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 border text-[9px] rounded font-bold uppercase ${getSeverityBadgeClass(threat.severity)}`}>
-                          {threat.severity}
-                        </span>
-                        <span className="text-white font-bold text-sm">{threat.attack_category}</span>
-                        <span className="text-white/40 text-[10px]">{threat.mitre_technique_id} - {threat.mitre_technique_name}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-[10px] text-white/50">
-                        <span>SRC: <span className="text-white/80">{threat.src_ip || '192.168.1.10'}</span></span>
-                        <span>DST: <span className="text-white/80">{threat.dst_ip || '10.0.0.45'}</span></span>
-                        <span>PORT: <span className="text-white/80">{threat.dst_port || 80}</span></span>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <Badge variant={severityToBadgeVariant(threat.severity)}>
+                        {threat.severity}
+                      </Badge>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-text-primary truncate">{threat.attack_category}</div>
+                        <div className="text-xs text-text-tertiary mt-0.5">
+                          {threat.mitre_technique_id} · {threat.src_ip && `${threat.src_ip} → ${threat.dst_ip}`}
+                        </div>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-4 shrink-0 sm:text-right">
-                      <div>
-                        <div className="text-[10px] text-white/40">Confidence</div>
-                        <span className="text-white font-bold">{(threat.virustotal_score || 92)}%</span>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-white/40">Detected</div>
-                        <span className="text-white/60 text-[10px]">
+                    <div className="flex items-center gap-4 shrink-0 text-right">
+                      <div className="hidden sm:block">
+                        <div className="text-xs text-text-tertiary">
                           {threat.created_at ? formatDistanceToNow(new Date(threat.created_at), { addSuffix: true }) : 'Just now'}
-                        </span>
+                        </div>
                       </div>
-                      <ArrowRight className="w-4 h-4 text-white/30" />
+                      <ChevronRight className="w-4 h-4 text-text-tertiary" />
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-
         </div>
-
       </div>
 
-      {/* Threat Intelligence Enrichment Drawer (Answer 2 Detail & Resolution workflow) */}
+      {/* Threat detail drawer */}
       {selectedThreat && (
-        <div className="fixed inset-0 z-50 bg-[#080b11]/80 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-lg bg-[#0a0f1d] border-l border-white/10 h-full p-6 overflow-y-auto flex flex-col font-mono">
+        <div className="fixed inset-0 z-50 flex justify-end animate-overlay" onClick={() => setSelectedThreat(null)}>
+          <div className="w-full max-w-lg bg-surface-1 border-l border-border-subtle h-full overflow-y-auto animate-slide-in-right" onClick={e => e.stopPropagation()}>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-white/5 pb-4 mb-5">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-5 h-5 text-red-400" />
-                <h2 className="text-sm font-bold text-white uppercase tracking-wider m-0">Threat Analysis</h2>
-              </div>
-              <button 
-                onClick={() => setSelectedThreat(null)}
-                className="text-white/40 hover:text-white text-xs border border-white/10 px-2 py-1 rounded"
-              >
-                CLOSE [ESC]
+            <div className="sticky top-0 bg-surface-1 border-b border-border-subtle p-5 flex items-center justify-between z-10">
+              <h2 className="text-base font-semibold text-text-primary">Threat Details</h2>
+              <button onClick={() => setSelectedThreat(null)} className="btn btn-ghost btn-sm">
+                <X className="w-4 h-4" /> Close
               </button>
             </div>
 
-            {/* Content info */}
-            <div className="flex-1 space-y-6 text-xs">
-              
-              {/* Core classification */}
-              <div className="bg-[#070b13] p-4 rounded-lg border border-white/5 space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-white/40 uppercase">CLASSIFICATION</span>
-                  <span className={`px-2.5 py-0.5 border rounded text-[9px] font-bold ${getSeverityBadgeClass(selectedThreat.severity)}`}>
+            <div className="p-5 space-y-6">
+              {/* Classification */}
+              <div className="card p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-text-tertiary">Classification</span>
+                  <Badge variant={severityToBadgeVariant(selectedThreat.severity)}>
                     {selectedThreat.severity}
-                  </span>
+                  </Badge>
                 </div>
-                <div className="text-base text-white font-bold">{selectedThreat.attack_category}</div>
-                <div className="text-white/40 text-[11px]">MITRE technique: <span className="text-[#06b6d4]">{selectedThreat.mitre_technique_id} - {selectedThreat.mitre_technique_name}</span></div>
+                <div className="text-lg font-semibold text-text-primary">{selectedThreat.attack_category}</div>
+                <div className="text-sm text-text-secondary">
+                  MITRE ATT&CK: <span className="text-accent">{selectedThreat.mitre_technique_id}</span> — {selectedThreat.mitre_technique_name}
+                </div>
               </div>
 
-              {/* IP / Connection Details */}
-              <div className="space-y-2">
-                <h4 className="text-[10px] text-white/40 uppercase tracking-widest">NETWORK VECTOR METRICS</h4>
-                <div className="bg-[#070b13] p-3 rounded-lg border border-white/5 grid grid-cols-2 gap-4">
+              {/* Network details */}
+              <div>
+                <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-3">Network Details</h4>
+                <div className="card p-4 grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-[9px] text-white/40">SOURCE IP</span>
-                    <div className="text-white mt-0.5">{selectedThreat.src_ip || '192.168.1.10'}</div>
+                    <span className="text-xs text-text-tertiary">Source IP</span>
+                    <div className="font-mono-data text-text-primary mt-0.5">{selectedThreat.src_ip || '—'}</div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-white/40">DESTINATION IP</span>
-                    <div className="text-white mt-0.5">{selectedThreat.dst_ip || '10.0.0.45'}</div>
+                    <span className="text-xs text-text-tertiary">Destination IP</span>
+                    <div className="font-mono-data text-text-primary mt-0.5">{selectedThreat.dst_ip || '—'}</div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-white/40">PORT / PROTOCOL</span>
-                    <div className="text-white mt-0.5">
-                      {selectedThreat.dst_port || 80} / {selectedThreat.protocol || 'TCP'}
-                    </div>
+                    <span className="text-xs text-text-tertiary">Port / Protocol</span>
+                    <div className="font-mono-data text-text-primary mt-0.5">{selectedThreat.dst_port || '—'} / {selectedThreat.protocol || '—'}</div>
                   </div>
                   <div>
-                    <span className="text-[9px] text-white/40">FLOW SIGNATURE</span>
-                    <div className="text-white mt-0.5 font-mono truncate text-[10px]" title={selectedThreat.flow_id}>
-                      {selectedThreat.flow_id || 'F_83c162da'}
-                    </div>
+                    <span className="text-xs text-text-tertiary">Flow ID</span>
+                    <div className="font-mono-data text-text-primary mt-0.5 truncate text-xs" title={selectedThreat.flow_id}>{selectedThreat.flow_id || '—'}</div>
                   </div>
                 </div>
               </div>
 
-              {/* Threat Intelligence scores */}
-              <div className="space-y-2">
-                <h4 className="text-[10px] text-white/40 uppercase tracking-widest">THREAT INTEL REPUTATION ENRICHMENT</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-[#070b13] p-3 rounded-lg border border-white/5 text-center">
-                    <span className="text-[9px] text-white/40">ABUSEIPDB CONFIDENCE</span>
-                    <div className="text-lg font-bold text-orange-400 mt-1">
-                      {selectedThreat.abuseipdb_score || 85}%
-                    </div>
-                    <span className="text-[9px] text-white/30 block mt-0.5">IP reported malicious</span>
+              {/* Threat intel */}
+              <div>
+                <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-3">Threat Intelligence</h4>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="card p-4 text-center">
+                    <span className="text-xs text-text-tertiary">AbuseIPDB</span>
+                    <div className="text-xl font-bold text-orange-400 mt-1">{selectedThreat.abuseipdb_score || 0}%</div>
                   </div>
-                  <div className="bg-[#070b13] p-3 rounded-lg border border-white/5 text-center">
-                    <span className="text-[9px] text-white/40">VIRUSTOTAL SCORE</span>
-                    <div className="text-lg font-bold text-red-400 mt-1">
-                      {selectedThreat.virustotal_score || 9}/10
-                    </div>
-                    <span className="text-[9px] text-white/30 block mt-0.5">Security engine hits</span>
+                  <div className="card p-4 text-center">
+                    <span className="text-xs text-text-tertiary">VirusTotal</span>
+                    <div className="text-xl font-bold text-red-400 mt-1">{selectedThreat.virustotal_score || 0}/10</div>
                   </div>
                 </div>
               </div>
 
-              {/* Recommended Response Playbook */}
-              <div className="space-y-2">
-                <h4 className="text-[10px] text-white/40 uppercase tracking-widest">RECOMMENDED SOC ACTION PLAYBOOK</h4>
-                <div className="bg-[#070b13] p-4.5 rounded-lg border border-white/5 text-xs text-white/80 space-y-2">
-                  <p className="font-bold text-[#06b6d4]">Playbook: {selectedThreat.mitre_technique_id}</p>
-                  <p className="text-white/60 text-[11px] leading-relaxed">
-                    {selectedThreat.recommended_action || 'Deploy active state firewall rules to drop traffic originating from this source IP. Inspect active sessions and verify target service logs for credential dumps.'}
-                  </p>
+              {/* Recommendation */}
+              <div>
+                <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-3">Recommended Action</h4>
+                <div className="card p-4 text-sm text-text-secondary leading-relaxed">
+                  {selectedThreat.recommended_action || 'Review the source IP and consider blocking at the firewall level. Inspect targeted system logs for indicators of compromise.'}
                 </div>
               </div>
 
-              {/* Resolution Workflow */}
-              <div className="space-y-3 border-t border-white/5 pt-4">
-                <label className="block text-[10px] text-white/40 uppercase tracking-widest">INCIDENT STATUS RESOLUTION</label>
+              {/* Resolution workflow */}
+              <div>
+                <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-3">Status</h4>
                 <div className="flex gap-2">
                   {['Open', 'Investigating', 'Resolved', 'Dismissed'].map((statusOption) => {
-                    const isCurrent = selectedThreat.resolution_status?.toLowerCase() === statusOption.toLowerCase() || 
+                    const isCurrent = selectedThreat.resolution_status?.toLowerCase() === statusOption.toLowerCase() ||
                                       (statusOption === 'Open' && !selectedThreat.resolution_status);
                     return (
                       <button
                         key={statusOption}
                         disabled={updateThreatStatusMutation.isPending}
                         onClick={() => updateThreatStatusMutation.mutate({ id: selectedThreat.id, status: statusOption })}
-                        className={`
-                          flex-1 py-2 border rounded font-bold transition-all text-[10px] uppercase text-center cursor-pointer
-                          ${isCurrent 
-                            ? 'bg-cyan-500/10 border-cyan-500/50 text-[#06b6d4]' 
-                            : 'bg-[#070b13] border-white/5 text-white/50 hover:text-white'}
-                        `}
+                        className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all border ${
+                          isCurrent
+                            ? 'bg-accent/10 border-accent/30 text-accent'
+                            : 'bg-surface-2 border-border-subtle text-text-tertiary hover:text-text-secondary hover:border-border-default'
+                        }`}
                       >
                         {statusOption}
                       </button>
@@ -554,12 +497,10 @@ export default function Dashboard() {
                   })}
                 </div>
               </div>
-
             </div>
           </div>
         </div>
       )}
-
     </div>
   );
 }
