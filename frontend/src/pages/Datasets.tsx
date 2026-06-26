@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { datasetService, preprocessingService } from '../services/api';
 import { 
@@ -7,14 +7,27 @@ import {
   Trash2, 
   Settings2, 
   Play, 
-  TrendingUp, 
   RefreshCw, 
   Loader2, 
   AlertTriangle,
   Info,
-  CheckCircle
+  CheckCircle,
+  XCircle,
+  FileText,
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+
+function SkeletonRow() {
+  return (
+    <tr className="animate-pulse">
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-40" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-16" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-20" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-24" /></td>
+      <td className="p-4 text-right"><div className="h-6 w-6 bg-white/10 rounded ml-auto" /></td>
+    </tr>
+  );
+}
 
 export default function Datasets() {
   const queryClient = useQueryClient();
@@ -23,6 +36,7 @@ export default function Datasets() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   
   // Preprocessing configuration states
   const [selectedDatasetId, setSelectedDatasetId] = useState<string>('');
@@ -36,21 +50,24 @@ export default function Datasets() {
   const [selectedProfileDatasetId, setSelectedProfileDatasetId] = useState<string>('');
 
   // Queries
-  const { data: datasets, isLoading: isDatasetsLoading } = useQuery({
+  const { data: datasets, isLoading: isDatasetsLoading, isError: isDatasetsError, refetch: refetchDatasets } = useQuery({
     queryKey: ['datasets'],
     queryFn: datasetService.list,
+    retry: 1,
   });
 
-  const { data: preprocessingJobs, isLoading: isJobsLoading } = useQuery({
+  const { data: preprocessingJobs, isLoading: isJobsLoading, isError: isJobsError, refetch: refetchJobs } = useQuery({
     queryKey: ['preprocessing_jobs'],
     queryFn: preprocessingService.listJobs,
-    refetchInterval: 3000, // Poll active jobs
+    refetchInterval: 3000,
+    retry: 1,
   });
 
   const { data: datasetProfile } = useQuery({
     queryKey: ['dataset_profile', selectedProfileDatasetId],
     queryFn: () => preprocessingService.getReport(selectedProfileDatasetId),
     enabled: !!selectedProfileDatasetId,
+    retry: 1,
   });
 
   // Mutations
@@ -60,9 +77,11 @@ export default function Datasets() {
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
       setUploadFile(null);
       setUploading(false);
+      setUploadSuccess(true);
+      setTimeout(() => setUploadSuccess(false), 4000);
     },
     onError: (err: any) => {
-      setUploadError(err.message || 'File upload failed');
+      setUploadError(err.message || 'File upload failed. Check file format and size (max 5MB).');
       setUploading(false);
     }
   });
@@ -85,6 +104,19 @@ export default function Datasets() {
   const handleUploadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadFile) return;
+    
+    // Validate file size (5MB limit)
+    if (uploadFile.size > 5 * 1024 * 1024) {
+      setUploadError('File exceeds the 5MB size limit. Please use a smaller dataset slice.');
+      return;
+    }
+    
+    // Validate file type
+    if (!uploadFile.name.endsWith('.csv')) {
+      setUploadError('Only .csv files are supported. Convert PCAP files using CICFlowMeter first.');
+      return;
+    }
+    
     setUploading(true);
     setUploadError(null);
     uploadMutation.mutate(uploadFile);
@@ -104,13 +136,38 @@ export default function Datasets() {
     });
   };
 
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) setUploadFile(file);
+  }, []);
+
+  const handleDragOver = (e: React.DragEvent) => e.preventDefault();
+
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Page Header */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wider uppercase m-0 leading-none">Dataset Manager</h1>
-          <span className="text-[10px] text-white/40 tracking-widest mt-1 block">INGEST CAPTURE LOGS & PREPARE INFERENCE MATRICES</span>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Datasets</h1>
+          <p className="text-text-secondary text-sm mt-1">Upload network traffic CSVs and configure the preprocessing pipeline.</p>
+        </div>
+        <button
+          onClick={() => { refetchDatasets(); refetchJobs(); }}
+          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Refresh
+        </button>
+      </div>
+
+      {/* Info guidance banner */}
+      <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 flex gap-3 items-start">
+        <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+        <div className="text-xs text-text-secondary">
+          <span className="font-semibold text-text-primary block mb-1">Accepted formats: CSV only (max 5MB)</span>
+          Compatible datasets: <a href="https://www.unb.ca/cic/datasets/ids-2017.html" target="_blank" rel="noreferrer" className="text-accent hover:underline">CIC-IDS2017</a>, <a href="https://research.unsw.edu.au/projects/unsw-nb15-dataset" target="_blank" rel="noreferrer" className="text-accent hover:underline">UNSW-NB15</a>, NSL-KDD, or any labeled network traffic CSV.
+          After uploading, run preprocessing to generate train/test splits before training a model.
         </div>
       </div>
 
@@ -120,82 +177,104 @@ export default function Datasets() {
         <div className="xl:col-span-1 space-y-6">
           
           {/* File Upload card */}
-          <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3 flex items-center gap-2">
-              <Upload className="w-4 h-4 text-[#06b6d4]" />
-              Ingest Capture Logs
+          <div className="card p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 border-b border-border-subtle pb-3">
+              <Upload className="w-4 h-4 text-accent" />
+              Upload Dataset
             </h3>
 
             <form onSubmit={handleUploadSubmit} className="space-y-4">
-              <div className="border border-dashed border-white/10 rounded-lg p-6 flex flex-col items-center justify-center bg-[#070b13] hover:border-cyan-500/50 transition-colors">
-                <Database className="w-8 h-8 text-white/20 mb-3" />
-                <span className="text-[10px] text-white/40 text-center uppercase tracking-wide">
-                  CSV or PCAP network traffic log
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                className="border-2 border-dashed border-border-default hover:border-accent/50 rounded-xl p-6 flex flex-col items-center justify-center bg-surface-0 transition-colors cursor-pointer text-center"
+              >
+                <Database className="w-8 h-8 text-text-tertiary mb-3" />
+                <span className="text-xs text-text-secondary font-medium">
+                  Drag & drop your CSV file here
                 </span>
+                <span className="text-[10px] text-text-tertiary mt-1">or click below to browse</span>
                 
                 <input
                   type="file"
-                  accept=".csv,.pcap"
-                  onChange={(e) => e.target.files && setUploadFile(e.target.files[0])}
+                  accept=".csv"
+                  onChange={(e) => {
+                    setUploadError(null);
+                    e.target.files && setUploadFile(e.target.files[0]);
+                  }}
                   className="hidden"
                   id="dataset-uploader"
                 />
                 
                 <label 
                   htmlFor="dataset-uploader"
-                  className="mt-4 px-3 py-1.5 border border-white/10 hover:border-[#06b6d4] rounded bg-slate-900 text-white/80 hover:text-[#06b6d4] text-[10px] font-bold uppercase transition-colors cursor-pointer"
+                  className="mt-4 px-3 py-1.5 border border-border-default hover:border-accent rounded-lg bg-surface-2 text-text-secondary hover:text-accent text-xs font-semibold transition-colors cursor-pointer"
                 >
-                  {uploadFile ? 'Change File' : 'Browse File'}
+                  {uploadFile ? 'Change File' : 'Browse CSV File'}
                 </label>
 
                 {uploadFile && (
-                  <span className="text-[10px] text-[#06b6d4] font-bold mt-3 text-center truncate max-w-xs">
-                    Selected: {uploadFile.name} ({(uploadFile.size / 1024 / 1024).toFixed(2)} MB)
-                  </span>
+                  <div className="flex items-center gap-1.5 mt-3">
+                    <FileText className="w-3 h-3 text-accent" />
+                    <span className="text-[10px] text-accent font-semibold truncate max-w-[160px]">
+                      {uploadFile.name} ({(uploadFile.size / 1024 / 1024).toFixed(2)} MB)
+                    </span>
+                  </div>
                 )}
               </div>
 
               {uploadError && (
-                <div className="p-3 bg-red-950/20 border border-red-500/20 text-red-400 text-[10px] rounded-lg">
+                <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-lg">
+                  <XCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                   {uploadError}
+                </div>
+              )}
+
+              {uploadSuccess && (
+                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-lg">
+                  <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                  Dataset uploaded successfully! Select it below to preprocess.
                 </div>
               )}
 
               <button
                 type="submit"
                 disabled={uploading || !uploadFile}
-                className="w-full bg-[#06b6d4]/10 hover:bg-[#06b6d4]/20 border border-[#06b6d4]/30 hover:border-[#06b6d4]/50 text-[#06b6d4] py-2.5 rounded-lg text-xs uppercase tracking-wider font-bold transition-all disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-accent/10 hover:bg-accent/20 border border-accent/30 hover:border-accent/50 text-accent py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
               >
                 {uploading ? (
                   <>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    Ingesting raw bits...
+                    Uploading...
                   </>
                 ) : (
-                  <span>Upload Dataset</span>
+                  <>
+                    <Upload className="w-3.5 h-3.5" />
+                    Upload Dataset
+                  </>
                 )}
               </button>
             </form>
           </div>
 
           {/* Preprocessing setup Console */}
-          <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3 flex items-center gap-2">
-              <Settings2 className="w-4 h-4 text-[#06b6d4]" />
+          <div className="card p-5 space-y-4">
+            <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 border-b border-border-subtle pb-3">
+              <Settings2 className="w-4 h-4 text-accent" />
               Preprocessing Console
             </h3>
 
             <form onSubmit={handleStartPreprocessing} className="space-y-4 text-xs">
               <div>
-                <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">SELECT RAW DATASET</label>
+                <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Select Dataset</label>
                 <select
                   value={selectedDatasetId}
                   onChange={(e) => setSelectedDatasetId(e.target.value)}
                   required
-                  className="w-full bg-[#070b13] border border-white/10 rounded px-3 py-2 text-white/80 focus:outline-none focus:border-[#06b6d4]"
+                  className="w-full bg-surface-0 border border-border-subtle rounded-lg px-3 py-2 text-text-secondary hover:border-border-default focus:outline-none focus:border-accent transition-colors"
                 >
                   <option value="">-- Choose Ingested File --</option>
-                  {datasets?.filter(d => d.status === 'completed' && d.format.toLowerCase() === 'csv').map((d) => (
+                  {datasets?.filter(d => d.status === 'completed' && d.format?.toLowerCase() === 'csv').map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.filename}
                     </option>
@@ -204,22 +283,23 @@ export default function Datasets() {
               </div>
 
               <div>
-                <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">TARGET LABEL COLUMN</label>
+                <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Target Label Column</label>
                 <input
                   type="text"
                   value={targetColumn}
                   onChange={(e) => setTargetColumn(e.target.value)}
-                  className="w-full bg-[#070b13] border border-white/10 rounded px-3 py-2 text-white focus:outline-none focus:border-[#06b6d4]"
+                  placeholder="e.g. Label"
+                  className="w-full bg-surface-0 border border-border-subtle rounded-lg px-3 py-2 text-text-primary focus:outline-none focus:border-accent transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">MISSING VALUE</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Missing Values</label>
                   <select
                     value={missingStrategy}
                     onChange={(e) => setMissingStrategy(e.target.value)}
-                    className="w-full bg-[#070b13] border border-white/10 rounded px-2.5 py-1.5 text-white/80 focus:outline-none"
+                    className="w-full bg-surface-0 border border-border-subtle rounded-lg px-2.5 py-2 text-text-secondary focus:outline-none focus:border-accent"
                   >
                     <option value="mean">Mean fill</option>
                     <option value="median">Median fill</option>
@@ -228,11 +308,11 @@ export default function Datasets() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">FEATURE SCALING</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Feature Scaling</label>
                   <select
                     value={scalingStrategy}
                     onChange={(e) => setScalingStrategy(e.target.value)}
-                    className="w-full bg-[#070b13] border border-white/10 rounded px-2.5 py-1.5 text-white/80 focus:outline-none"
+                    className="w-full bg-surface-0 border border-border-subtle rounded-lg px-2.5 py-2 text-text-secondary focus:outline-none focus:border-accent"
                   >
                     <option value="standard">StandardScaler</option>
                     <option value="min-max">MinMax scaling</option>
@@ -242,18 +322,18 @@ export default function Datasets() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">CATEGORICALS</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Categoricals</label>
                   <select
                     value={encodingStrategy}
                     onChange={(e) => setEncodingStrategy(e.target.value)}
-                    className="w-full bg-[#070b13] border border-white/10 rounded px-2.5 py-1.5 text-white/80 focus:outline-none"
+                    className="w-full bg-surface-0 border border-border-subtle rounded-lg px-2.5 py-2 text-text-secondary focus:outline-none focus:border-accent"
                   >
                     <option value="label">Label encoding</option>
                     <option value="one-hot">One-Hot encode</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] text-white/40 mb-1 uppercase tracking-wider">TEST SIZE SPLIT</label>
+                  <label className="block text-[10px] text-text-tertiary mb-1.5 uppercase tracking-wider font-semibold">Test Split</label>
                   <input
                     type="number"
                     step="0.05"
@@ -261,7 +341,7 @@ export default function Datasets() {
                     max="0.5"
                     value={testSize}
                     onChange={(e) => setTestSize(parseFloat(e.target.value))}
-                    className="w-full bg-[#070b13] border border-white/10 rounded px-2.5 py-1.5 text-white focus:outline-none"
+                    className="w-full bg-surface-0 border border-border-subtle rounded-lg px-2.5 py-2 text-text-primary focus:outline-none focus:border-accent"
                   />
                 </div>
               </div>
@@ -269,10 +349,10 @@ export default function Datasets() {
               <button
                 type="submit"
                 disabled={startPreprocessingMutation.isPending || !selectedDatasetId}
-                className="w-full bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/50 text-[#06b6d4] py-2.5 rounded-lg text-xs uppercase tracking-wider font-bold transition-all disabled:opacity-40 cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-accent/10 hover:bg-accent/20 border border-accent/30 hover:border-accent/50 text-accent py-2.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 flex items-center justify-center gap-2"
               >
-                <Play className="w-3.5 h-3.5 fill-[#06b6d4]" />
-                Compile Dataset
+                <Play className="w-3.5 h-3.5 fill-accent" />
+                {startPreprocessingMutation.isPending ? 'Starting...' : 'Compile Dataset'}
               </button>
             </form>
           </div>
@@ -283,33 +363,56 @@ export default function Datasets() {
         <div className="xl:col-span-2 space-y-6">
           
           {/* Datasets Table */}
-          <div className="glass-panel rounded-xl border border-white/5 overflow-hidden">
-            <div className="p-4 border-b border-white/5 bg-[#0a0f1d]/50">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase m-0 leading-none">Ingested Datasets</h3>
+          <div className="card overflow-hidden">
+            <div className="p-4 border-b border-border-subtle flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-text-primary">Ingested Datasets</h3>
+              <span className="text-[10px] text-text-tertiary">{datasets?.length || 0} file(s)</span>
             </div>
             
             <div className="overflow-x-auto text-xs">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-[#080d18]/50 border-b border-white/5 text-white/40 uppercase tracking-wider font-bold">
-                    <th className="p-4">FILENAME</th>
-                    <th className="p-4">SIZE</th>
-                    <th className="p-4">STATUS</th>
-                    <th className="p-4">INGESTED</th>
-                    <th className="p-4 text-right">ACTIONS</th>
+                  <tr className="bg-surface-2/50 border-b border-border-subtle text-text-tertiary uppercase tracking-wider text-[10px] font-semibold">
+                    <th className="p-4">Filename</th>
+                    <th className="p-4">Size</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4">Uploaded</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-white/80">
+                <tbody className="divide-y divide-border-subtle">
                   {isDatasetsLoading ? (
+                    <>
+                      <SkeletonRow />
+                      <SkeletonRow />
+                      <SkeletonRow />
+                    </>
+                  ) : isDatasetsError ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-white/40">
-                        Loading database catalog...
+                      <td colSpan={5} className="p-8 text-center">
+                        <div className="flex flex-col items-center gap-2 text-text-secondary">
+                          <AlertTriangle className="w-6 h-6 text-amber-400" />
+                          <p className="text-xs font-semibold">Could not load datasets</p>
+                          <p className="text-[11px] text-text-tertiary">The backend may be starting up (cold start ~15s). Try refreshing.</p>
+                          <button
+                            onClick={() => refetchDatasets()}
+                            className="mt-2 px-3 py-1.5 bg-surface-2 border border-border-default rounded-lg text-xs font-semibold hover:border-border-strong transition-colors"
+                          >
+                            Retry
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ) : datasets?.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-white/30">
-                        No ingested datasets found.
+                      <td colSpan={5} className="p-12 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-surface-2 border border-border-subtle flex items-center justify-center">
+                            <Database className="w-6 h-6 text-text-tertiary" />
+                          </div>
+                          <p className="text-sm font-semibold text-text-primary">No datasets uploaded yet</p>
+                          <p className="text-xs text-text-secondary max-w-xs">Upload a labeled network traffic CSV (e.g. CIC-IDS2017) to get started.</p>
+                        </div>
                       </td>
                     </tr>
                   ) : (
@@ -317,27 +420,27 @@ export default function Datasets() {
                       <tr 
                         key={d.id}
                         onClick={() => d.status === 'completed' && setSelectedProfileDatasetId(d.id)}
-                        className={`transition-colors cursor-pointer hover:bg-white/[0.01] ${selectedProfileDatasetId === d.id ? 'bg-cyan-500/[0.03]' : ''}`}
+                        className={`transition-colors cursor-pointer hover:bg-surface-2/50 ${selectedProfileDatasetId === d.id ? 'bg-accent/5' : ''}`}
                       >
-                        <td className="p-4 font-bold text-white max-w-xs truncate">{d.filename}</td>
-                        <td className="p-4 text-white/60">{(d.size_bytes / 1024 / 1024).toFixed(2)} MB</td>
+                        <td className="p-4 font-semibold text-text-primary max-w-xs truncate">{d.filename}</td>
+                        <td className="p-4 text-text-secondary">{(d.size_bytes / 1024 / 1024).toFixed(2)} MB</td>
                         <td className="p-4">
-                          <span className={`px-2 py-0.5 border rounded text-[9px] font-bold uppercase
-                            ${d.status === 'completed' ? 'text-emerald-400 bg-emerald-950/20 border-emerald-500/30' : 
-                              d.status === 'failed' ? 'text-red-400 bg-red-950/20 border-red-500/30' : 
-                              'text-yellow-400 bg-yellow-950/10 border-yellow-500/30 animate-pulse'}
-                          `}>
+                          <span className={`px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase
+                            ${d.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
+                              d.status === 'failed' ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
+                              'text-amber-400 bg-amber-500/10 border-amber-500/20 animate-pulse'}`}
+                          >
                             {d.status}
                           </span>
                         </td>
-                        <td className="p-4 text-white/40 text-[10px]">
+                        <td className="p-4 text-text-tertiary text-[10px]">
                           {formatDistanceToNow(new Date(d.created_at), { addSuffix: true })}
                         </td>
                         <td className="p-4 text-right" onClick={(e) => e.stopPropagation()}>
                           <button
                             disabled={deleteMutation.isPending}
                             onClick={() => deleteMutation.mutate(d.id)}
-                            className="p-1.5 border border-white/10 hover:border-red-500/30 rounded text-white/40 hover:text-red-400 transition-all cursor-pointer"
+                            className="p-1.5 border border-border-subtle hover:border-red-500/30 rounded-lg text-text-tertiary hover:text-red-400 transition-all"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -351,37 +454,50 @@ export default function Datasets() {
           </div>
 
           {/* Preprocessing Jobs List */}
-          <div className="glass-panel rounded-xl border border-white/5 overflow-hidden">
-            <div className="p-4 border-b border-white/5 bg-[#0a0f1d]/50">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase m-0 leading-none">Preprocessing Task Queue</h3>
+          <div className="card overflow-hidden">
+            <div className="p-4 border-b border-border-subtle">
+              <h3 className="text-sm font-semibold text-text-primary">Preprocessing Task Queue</h3>
             </div>
             
-            <div className="p-4 space-y-3.5 max-h-56 overflow-y-auto">
+            <div className="p-4 space-y-3 max-h-56 overflow-y-auto">
               {isJobsLoading ? (
-                <div className="text-center py-4 text-white/40 text-xs">Loading queue pipeline...</div>
+                <div className="space-y-3">
+                  {[1,2].map(i => (
+                    <div key={i} className="h-14 bg-surface-2 rounded-lg animate-pulse border border-border-subtle" />
+                  ))}
+                </div>
+              ) : isJobsError ? (
+                <div className="text-center py-4 flex flex-col items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  <p className="text-xs text-text-secondary">Could not load preprocessing jobs.</p>
+                  <button onClick={() => refetchJobs()} className="text-xs text-accent hover:underline">Retry</button>
+                </div>
               ) : preprocessingJobs?.length === 0 ? (
-                <div className="text-center py-4 text-white/30 text-xs">No preprocessing task logs found.</div>
+                <div className="text-center py-6 flex flex-col items-center gap-2">
+                  <Settings2 className="w-5 h-5 text-text-tertiary" />
+                  <p className="text-xs text-text-secondary">No preprocessing jobs yet. Upload a dataset and compile it above.</p>
+                </div>
               ) : (
                 preprocessingJobs?.map((job) => (
-                  <div key={job.id} className="bg-[#070b13] p-3 rounded-lg border border-white/5 flex items-center justify-between gap-4 text-xs">
+                  <div key={job.id} className="bg-surface-2 p-3 rounded-lg border border-border-subtle flex items-center justify-between gap-4 text-xs">
                     <div>
-                      <div className="font-bold text-white">JOB: {job.id.substring(0, 8)}</div>
-                      <span className="text-[10px] text-white/40">
-                        Algorithm scaling: {job.config.scaling_strategy} scaling • split {job.config.test_size}
+                      <div className="font-semibold text-text-primary">Job: {job.id.substring(0, 8)}</div>
+                      <span className="text-[10px] text-text-tertiary">
+                        {job.config?.scaling_strategy} scaling · split {job.config?.test_size}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <span className={`px-2 py-0.5 border rounded text-[9px] font-bold uppercase
-                        ${job.status === 'completed' ? 'text-emerald-400 bg-emerald-950/20 border-emerald-500/30' : 
-                          job.status === 'failed' ? 'text-red-400 bg-red-950/20 border-red-500/30' : 
-                          'text-yellow-400 bg-yellow-950/10 border-yellow-500/30 animate-pulse'}
-                      `}>
+                      <span className={`px-2 py-0.5 border rounded-md text-[9px] font-bold uppercase
+                        ${job.status === 'completed' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 
+                          job.status === 'failed' ? 'text-red-400 bg-red-500/10 border-red-500/20' : 
+                          'text-amber-400 bg-amber-500/10 border-amber-500/20 animate-pulse'}`}
+                      >
                         {job.status}
                       </span>
                       {job.processed_dataset && (
-                        <span className="text-[10px] text-cyan-500 font-bold bg-[#06b6d4]/10 border border-[#06b6d4]/20 px-1.5 py-0.5 rounded">
-                          TRAIN: {job.processed_dataset.train_samples}
+                        <span className="text-[10px] text-accent font-semibold bg-accent/10 border border-accent/20 px-1.5 py-0.5 rounded">
+                          {job.processed_dataset.train_samples} train rows
                         </span>
                       )}
                     </div>
@@ -391,42 +507,42 @@ export default function Datasets() {
             </div>
           </div>
 
-          {/* Profiling Report Preview panel */}
+          {/* Profiling Report */}
           {selectedProfileDatasetId && (
-            <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-              <h3 className="text-xs font-bold text-[#06b6d4] tracking-widest uppercase border-b border-white/5 pb-3 flex items-center gap-2">
-                <Info className="w-4 h-4" />
-                Dataset Profiling Report
+            <div className="card p-5 space-y-4">
+              <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 border-b border-border-subtle pb-3">
+                <Info className="w-4 h-4 text-accent" />
+                Dataset Profile Report
               </h3>
 
               {!datasetProfile ? (
-                <div className="text-center py-6 text-white/40 text-xs">
-                  <Loader2 className="w-4 h-4 animate-spin mx-auto mb-2" />
-                  Generating statistical summaries...
+                <div className="text-center py-6 flex flex-col items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-accent" />
+                  <span className="text-xs text-text-secondary">Generating statistical summary...</span>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-white/70">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-text-secondary">
                   <div className="space-y-3">
                     <div>
-                      <span className="text-[9px] text-white/40 uppercase">DUPLICATE ROWS FOUND</span>
-                      <div className="text-sm font-bold text-white mt-0.5">{datasetProfile.duplicate_rows} rows</div>
+                      <span className="text-[9px] text-text-tertiary uppercase font-semibold">Duplicate Rows</span>
+                      <div className="text-sm font-bold text-text-primary mt-0.5">{datasetProfile.duplicate_rows} rows</div>
                     </div>
                     <div>
-                      <span className="text-[9px] text-white/40 uppercase">NUMERIC FEATURE VECTORS</span>
-                      <div className="text-white font-mono mt-1 max-h-24 overflow-y-auto border border-white/5 p-2 bg-[#070b13] rounded">
-                        {datasetProfile.numeric_features.join(', ') || 'None'}
+                      <span className="text-[9px] text-text-tertiary uppercase font-semibold">Numeric Features</span>
+                      <div className="text-text-secondary font-mono mt-1 max-h-24 overflow-y-auto border border-border-subtle p-2 bg-surface-0 rounded-lg text-[10px]">
+                        {datasetProfile.numeric_features?.join(', ') || 'None'}
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-3">
                     <div>
-                      <span className="text-[9px] text-white/40 uppercase">CLASS LABELS DISTRIBUTION</span>
-                      <div className="mt-1.5 space-y-1.5 bg-[#070b13] border border-white/5 p-3 rounded">
-                        {Object.entries(datasetProfile.class_distribution).map(([label, count]: [string, any]) => (
-                          <div key={label} className="flex justify-between font-mono">
-                            <span className="text-white/50">{label === '1' || label === '1.0' ? 'MALICIOUS (1)' : 'BENIGN (0)'}:</span>
-                            <span className="text-white font-bold">{count} rows</span>
+                      <span className="text-[9px] text-text-tertiary uppercase font-semibold">Class Distribution</span>
+                      <div className="mt-1.5 space-y-1.5 bg-surface-0 border border-border-subtle p-3 rounded-lg">
+                        {Object.entries(datasetProfile.class_distribution || {}).map(([label, count]: [string, any]) => (
+                          <div key={label} className="flex justify-between font-mono text-[10px]">
+                            <span className="text-text-tertiary">{label === '1' || label === '1.0' ? 'Malicious (1)' : 'Benign (0)'}:</span>
+                            <span className="text-text-primary font-bold">{count} rows</span>
                           </div>
                         ))}
                       </div>

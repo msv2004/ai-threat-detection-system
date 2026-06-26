@@ -81,14 +81,16 @@ body {
 }
 
 /* ── Card system ──────────────────────────── */
-.card {
+.card,
+.glass-panel {
   background-color: var(--color-surface-1);
   border: 1px solid var(--color-border-subtle);
   border-radius: 12px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover {
+.card:hover,
+.glass-panel:hover {
   border-color: var(--color-border-default);
 }
 

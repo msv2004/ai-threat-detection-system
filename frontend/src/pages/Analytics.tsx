@@ -39,15 +39,17 @@ export default function Analytics() {
   const [timeRange, setTimeRange] = useState('this_week');
 
   // Fetch Threat Aggregates
-  const { data: threatStats, isLoading: isThreatStatsLoading, refetch: refetchThreats } = useQuery({
+  const { data: threatStats, isLoading: isThreatStatsLoading, isError: isThreatStatsError, refetch: refetchThreats } = useQuery({
     queryKey: ['analytics_threats'],
     queryFn: analyticsService.threats,
+    retry: 1,
   });
 
   // Fetch Timeline Data
-  const { data: timelineData, isLoading: isTimelineLoading, refetch: refetchTimeline } = useQuery({
+  const { data: timelineData, isLoading: isTimelineLoading, isError: isTimelineError, refetch: refetchTimeline } = useQuery({
     queryKey: ['analytics_timeline', timeRange],
     queryFn: () => analyticsService.timeline(timeRange),
+    retry: 1,
   });
 
   // Fetch Model Monitoring Stats
@@ -109,16 +111,16 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 font-sans">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/5 pb-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wider uppercase m-0 leading-none">Security Analytics</h1>
-          <span className="text-[10px] text-white/40 tracking-widest mt-1 block">OBSERVE NETWORK TRAFFIC TRENDS & MODEL LATENCIES</span>
+          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Security Analytics</h1>
+          <p className="text-text-secondary text-sm mt-1">Observe network traffic trends and model performance metrics.</p>
         </div>
         <button
           onClick={handleRefreshAll}
-          className="inline-flex items-center gap-2 bg-[#090d18] border border-white/10 hover:border-white/20 text-white/60 hover:text-white px-3.5 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Refresh Stats
@@ -175,9 +177,21 @@ export default function Analytics() {
 
           <div className="h-72">
             {isTimelineLoading ? (
-              <div className="flex items-center justify-center h-full text-white/40 text-xs">Generating timeline points...</div>
+              <div className="h-full flex items-center justify-center">
+                <div className="w-full h-full animate-pulse bg-surface-2 rounded-lg" />
+              </div>
+            ) : isTimelineError ? (
+              <div className="flex flex-col items-center justify-center h-full gap-2">
+                <AlertIcon className="w-5 h-5 text-amber-400" />
+                <p className="text-xs text-text-secondary">Could not load timeline data.</p>
+                <button onClick={() => refetchTimeline()} className="text-xs text-accent hover:underline">Retry</button>
+              </div>
             ) : formattedTimeline.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-white/30 text-xs">No historical anomalies recorded in chosen range.</div>
+              <div className="flex flex-col items-center justify-center h-full gap-2">
+                <Activity className="w-5 h-5 text-text-tertiary" />
+                <p className="text-xs text-text-secondary">No threat data in the selected period.</p>
+                <p className="text-[10px] text-text-tertiary">Run a detection session from the Dashboard to populate this chart.</p>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={formattedTimeline}>
@@ -207,9 +221,19 @@ export default function Analytics() {
 
           <div className="h-64 flex items-center justify-center">
             {isThreatStatsLoading ? (
-              <span className="text-white/40 text-xs">Resolving sectors...</span>
+              <div className="w-40 h-40 rounded-full animate-pulse bg-surface-2" />
+            ) : isThreatStatsError ? (
+              <div className="flex flex-col items-center gap-2">
+                <AlertIcon className="w-5 h-5 text-amber-400" />
+                <p className="text-xs text-text-secondary">Could not load severity data.</p>
+                <button onClick={() => refetchThreats()} className="text-xs text-accent hover:underline">Retry</button>
+              </div>
             ) : severityChartData.length === 0 ? (
-              <span className="text-white/30 text-xs">No severity metrics recorded.</span>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <ShieldAlert className="w-5 h-5 text-text-tertiary" />
+                <p className="text-xs text-text-secondary">No severity data yet.</p>
+                <p className="text-[10px] text-text-tertiary">Threats will appear here after running detection.</p>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -247,9 +271,17 @@ export default function Analytics() {
 
           <div className="h-64 flex items-center justify-center">
             {isThreatStatsLoading ? (
-              <span className="text-white/40 text-xs">Resolving radar metrics...</span>
+              <div className="w-full h-full animate-pulse bg-surface-2 rounded-lg" />
+            ) : isThreatStatsError ? (
+              <div className="flex flex-col items-center gap-2">
+                <AlertIcon className="w-5 h-5 text-amber-400" />
+                <p className="text-xs text-text-secondary">Could not load category data.</p>
+              </div>
             ) : categoriesChartData.length === 0 ? (
-              <span className="text-white/30 text-xs">No classification logs.</span>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <TrendingUp className="w-5 h-5 text-text-tertiary" />
+                <p className="text-xs text-text-secondary">No classification logs yet.</p>
+              </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={categoriesChartData}>

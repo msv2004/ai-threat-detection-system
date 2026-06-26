@@ -31,7 +31,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-0 text-text-primary flex flex-col font-sans selection:bg-accent/30 selection:text-white">
+    <div className="min-h-screen bg-surface-0 text-text-primary flex flex-col font-sans selection:bg-accent/30 selection:text-white scroll-smooth">
       {/* Sticky Navigation Bar */}
       <header className="h-16 border-b border-border-subtle bg-surface-1/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-8 flex items-center justify-between">
         <div className="flex items-center gap-6">

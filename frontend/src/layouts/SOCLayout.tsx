@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useSocketStore } from '../stores/socketStore';
 import Onboarding from '../components/Onboarding';
+import BackendBanner from '../components/ui/BackendBanner';
 import {
   LayoutDashboard,
   ShieldAlert,
@@ -311,6 +312,9 @@ export default function SOCLayout() {
             </div>
           </div>
         </header>
+
+        {/* Backend connection warning banner */}
+        <BackendBanner />
 
         {/* Page content */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">

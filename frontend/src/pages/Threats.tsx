@@ -13,6 +13,20 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
+function SkeletonThreatRow() {
+  return (
+    <tr className="animate-pulse">
+      <td className="p-4"><div className="h-4 bg-white/10 rounded w-16" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-28" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-28" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-20" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
+      <td className="p-4"><div className="h-4 bg-white/10 rounded w-20" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-24" /></td>
+    </tr>
+  );
+}
+
 export default function Threats() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,9 +35,10 @@ export default function Threats() {
   const [selectedThreat, setSelectedThreat] = useState<any>(null);
 
   // Fetch all threats
-  const { data: threats, isLoading, refetch } = useQuery({
+  const { data: threats, isLoading, isError, refetch } = useQuery({
     queryKey: ['threats'],
     queryFn: () => threatService.list(),
+    retry: 1,
   });
 
   // Status update mutation
@@ -157,18 +172,42 @@ export default function Threats() {
             </thead>
             <tbody className="divide-y divide-white/5 text-white/80">
               {isLoading ? (
+                <>
+                  <SkeletonThreatRow />
+                  <SkeletonThreatRow />
+                  <SkeletonThreatRow />
+                  <SkeletonThreatRow />
+                </>
+              ) : isError ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-white/40">
-                    <div className="flex items-center justify-center gap-2">
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      Loading incident registry databases...
+                  <td colSpan={7} className="p-10 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <AlertTriangle className="w-6 h-6 text-amber-400" />
+                      <p className="text-sm font-semibold text-white">Could not load threat logs</p>
+                      <p className="text-xs text-white/50">The backend may be warming up. Check your connection and try again.</p>
+                      <button
+                        onClick={() => refetch()}
+                        className="px-3 py-1.5 bg-white/5 border border-white/10 hover:border-white/20 rounded-lg text-xs font-semibold text-white/70 hover:text-white transition-colors mt-1"
+                      >
+                        Retry
+                      </button>
                     </div>
                   </td>
                 </tr>
               ) : filteredThreats.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8 text-center text-white/30">
-                    No threat logs matching current filters found.
+                  <td colSpan={7} className="p-12 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                        <ShieldCheck className="w-6 h-6 text-white/30" />
+                      </div>
+                      <p className="text-sm font-semibold text-white">No threats found</p>
+                      <p className="text-xs text-white/40 max-w-xs">
+                        {searchTerm || severityFilter !== 'All' || statusFilter !== 'All'
+                          ? 'No threats match your current filters. Try broadening your search.'
+                          : 'No threats detected yet. Upload a dataset and run detection from the Dashboard to populate this log.'}
+                      </p>
+                    </div>
                   </td>
                 </tr>
               ) : (

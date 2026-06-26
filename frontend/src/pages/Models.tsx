@@ -10,7 +10,9 @@ import {
   GitBranch,
   RefreshCw,
   Zap,
-  Info
+  Info,
+  AlertTriangle,
+  ArrowRight
 } from 'lucide-react';
 import { 
   BarChart as RechartsBarChart, 
@@ -27,15 +29,31 @@ import {
   PolarRadiusAxis,
   Radar
 } from 'recharts';
+import { Link } from 'react-router-dom';
+
+function SkeletonModelRow() {
+  return (
+    <tr className="animate-pulse">
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-36" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-16" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
+      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
+      <td className="p-4"><div className="h-5 bg-white/10 rounded w-16" /></td>
+      <td className="p-4 text-right"><div className="h-6 w-6 bg-white/10 rounded ml-auto" /></td>
+    </tr>
+  );
+}
 
 export default function Models() {
   const queryClient = useQueryClient();
   const [selectedModelId, setSelectedModelId] = useState<string>('');
 
   // Queries
-  const { data: models, isLoading, refetch } = useQuery({
+  const { data: models, isLoading, isError, refetch } = useQuery({
     queryKey: ['models'],
     queryFn: modelService.list,
+    retry: 1,
   });
 
   const { data: comparisonData } = useQuery({
@@ -98,12 +116,12 @@ export default function Models() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/5 pb-4">
         <div>
-          <h1 className="text-xl font-bold text-white tracking-wider uppercase m-0 leading-none">Model Registry</h1>
-          <span className="text-[10px] text-white/40 tracking-widest mt-1 block">MANAGE MACHINE LEARNING ARTIFACTS & INFERENCE STATES</span>
-        </div>
+        <h1 className="text-2xl font-bold text-text-primary tracking-tight">Model Registry</h1>
+        <p className="text-text-secondary text-sm mt-1">View and activate trained machine learning models for threat detection.</p>
+      </div>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 bg-[#090d18] border border-white/10 hover:border-white/20 text-white/60 hover:text-white px-3.5 py-1.5 rounded-lg text-xs uppercase tracking-wider transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Sync Registry
@@ -116,35 +134,55 @@ export default function Models() {
         <div className="xl:col-span-2 space-y-6">
           
           {/* Models Registry Table */}
-          <div className="glass-panel rounded-xl border border-white/5 overflow-hidden">
-            <div className="p-4 border-b border-white/5 bg-[#0a0f1d]/50">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase m-0 leading-none">Registered Inference Models</h3>
+          <div className="card overflow-hidden">
+            <div className="p-4 border-b border-border-subtle">
+              <h3 className="text-sm font-semibold text-text-primary">Registered Inference Models</h3>
             </div>
             
             <div className="overflow-x-auto text-xs">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-[#080d18]/50 border-b border-white/5 text-white/40 uppercase tracking-wider font-bold">
-                    <th className="p-4">MODEL/ALGORITHM</th>
-                    <th className="p-4">ACCURACY</th>
-                    <th className="p-4">F1 SCORE</th>
-                    <th className="p-4">PRECISION</th>
-                    <th className="p-4">RECALL</th>
-                    <th className="p-4">STATUS</th>
-                    <th className="p-4 text-right">ACTIONS</th>
+                  <tr className="bg-surface-2/50 border-b border-border-subtle text-text-tertiary uppercase tracking-wider text-[10px] font-semibold">
+                    <th className="p-4">Model/Algorithm</th>
+                    <th className="p-4">Accuracy</th>
+                    <th className="p-4">F1 Score</th>
+                    <th className="p-4">Precision</th>
+                    <th className="p-4">Recall</th>
+                    <th className="p-4">Status</th>
+                    <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-white/80">
+                <tbody className="divide-y divide-border-subtle">
                   {isLoading ? (
+                    <>
+                      <SkeletonModelRow />
+                      <SkeletonModelRow />
+                      <SkeletonModelRow />
+                    </>
+                  ) : isError ? (
                     <tr>
-                      <td colSpan={7} className="p-8 text-center text-white/40">
-                        Loading registered model matrices...
+                      <td colSpan={7} className="p-10 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <AlertTriangle className="w-6 h-6 text-amber-400" />
+                          <p className="text-sm font-semibold text-text-primary">Could not load models</p>
+                          <p className="text-xs text-text-secondary">Backend may be warming up. Try refreshing.</p>
+                          <button onClick={() => refetch()} className="px-3 py-1.5 bg-surface-2 border border-border-default rounded-lg text-xs font-semibold hover:border-border-strong transition-colors">Retry</button>
+                        </div>
                       </td>
                     </tr>
                   ) : models?.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="p-8 text-center text-white/30">
-                        No registered models found. Go to Training Console to compile.
+                      <td colSpan={7} className="p-12 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-surface-2 border border-border-subtle flex items-center justify-center">
+                            <Cpu className="w-6 h-6 text-text-tertiary" />
+                          </div>
+                          <p className="text-sm font-semibold text-text-primary">No models trained yet</p>
+                          <p className="text-xs text-text-secondary max-w-xs">Complete a training run to register your first model. Models will appear here once training finishes.</p>
+                          <Link to="/training" className="mt-1 flex items-center gap-1.5 text-xs text-accent hover:underline font-semibold">
+                            Go to Training Console <ArrowRight className="w-3.5 h-3.5" />
+                          </Link>
+                        </div>
                       </td>
                     </tr>
                   ) : (
