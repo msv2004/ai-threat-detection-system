@@ -250,7 +250,7 @@ export default function SOCLayout() {
           {/* Right side: search, notifications, user */}
           <div className="flex items-center gap-2">
             {/* Search (desktop) */}
-            <div className="hidden lg:flex items-center gap-2 bg-surface-0 border border-border-subtle rounded-lg px-3 py-1.5 w-56 focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(59,130,246,0.1)] transition-all">
+            <div className="hidden lg:flex items-center gap-2 bg-surface-0 border border-border-subtle rounded-lg px-3 py-1.5 w-56 focus-within:border-accent focus-within:shadow-[0_0_0_3px_rgba(14,165,233,0.15)] transition-all">
               <Search className="w-4 h-4 text-text-tertiary" />
               <input
                 type="text"

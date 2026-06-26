@@ -25,8 +25,10 @@ import {
   RefreshCw,
   Search,
   Eye,
-  Server
+  Server,
+  Code
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Landing() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'threats' | 'datasets'>('dashboard');
@@ -37,43 +39,45 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07090e] text-[#f0f2f5] flex flex-col font-sans selection:bg-blue-500/30 selection:text-white scroll-smooth relative bg-pattern">
-      {/* Background radial gradients for high-end cyber aesthetics */}
-      <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[160px] pointer-events-none" />
-      <div className="absolute top-[800px] right-1/4 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen bg-[#04060a] text-[#f8fafc] flex flex-col font-sans selection:bg-[#0ea5e9]/30 selection:text-white scroll-smooth relative overflow-x-hidden">
+      {/* Premium Tech Grid & Glow Backgrounds */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-r from-blue-500/10 via-sky-500/10 to-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[800px] -right-1/4 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-[160px] pointer-events-none" />
 
-      {/* Sticky Premium Navigation Bar */}
-      <header className="h-16 border-b border-white/5 bg-[#090c12]/85 backdrop-blur-lg sticky top-0 z-50 px-6 md:px-12 flex items-center justify-between transition-all duration-300">
+      {/* Header */}
+      <header className="h-16 border-b border-border-default bg-[#04060a]/80 backdrop-blur-xl sticky top-0 z-50 px-6 md:px-12 flex items-center justify-between transition-all duration-300">
         <div className="flex items-center gap-10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center shadow-lg shadow-blue-500/5">
-              <Shield className="w-5 h-5 text-blue-400" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#0ea5e9]/20 to-[#2563eb]/20 border border-[#0ea5e9]/30 flex items-center justify-center shadow-lg shadow-blue-500/5 relative group">
+              <div className="absolute inset-0 rounded-xl bg-[#0ea5e9]/10 blur-sm opacity-0 group-hover:opacity-100 transition-opacity" />
+              <Shield className="w-5 h-5 text-[#0ea5e9]" />
             </div>
             <div>
-              <span className="font-extrabold text-[16px] tracking-tight text-white block">Aegis</span>
-              <span className="text-[10px] text-text-secondary block leading-none font-medium uppercase tracking-wider">SOC Operations</span>
+              <span className="font-extrabold text-[15px] tracking-tight text-white block">AEGIS</span>
+              <span className="text-[9px] text-[#64748b] block leading-none font-semibold uppercase tracking-wider">SOC Operations</span>
             </div>
           </div>
           <nav className="hidden lg:flex items-center gap-8 text-[13px] font-semibold text-text-secondary">
             <a href="#about" className="hover:text-white transition-colors relative py-1 group">
               Product
-              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-250" />
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </a>
             <a href="#features" className="hover:text-white transition-colors relative py-1 group">
               Capabilities
-              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-250" />
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </a>
             <a href="#pipeline" className="hover:text-white transition-colors relative py-1 group">
               How It Works
-              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-250" />
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </a>
             <a href="#preview" className="hover:text-white transition-colors relative py-1 group">
               Interactive Preview
-              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-250" />
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </a>
             <a href="#faq" className="hover:text-white transition-colors relative py-1 group">
               FAQ
-              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-250" />
+              <span className="absolute bottom-0 inset-x-0 h-[2px] bg-accent scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </a>
           </nav>
         </div>
@@ -83,27 +87,26 @@ export default function Landing() {
           </Link>
           <Link
             to="/register"
-            className="text-[12px] font-bold bg-blue-600 hover:bg-blue-500 text-white px-4.5 py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 hover:translate-y-[-1px] active:translate-y-[1px]"
+            className="text-[12px] font-bold bg-[#0ea5e9] hover:bg-[#38bdf8] text-white px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 hover:scale-[1.02] active:scale-[0.98]"
           >
             Get Started Free
           </Link>
         </div>
       </header>
 
-      {/* Varonis-Grade Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32 px-6 md:px-12 border-b border-white/5">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-24 md:py-32 px-6 md:px-12 border-b border-border-subtle">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-16 items-center">
-          
           {/* Left Hero Column */}
           <div className="lg:col-span-6 flex flex-col items-start text-left space-y-6">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-[11px] font-bold text-blue-400 uppercase tracking-wider">
-              <Zap className="w-3.5 h-3.5 text-blue-400 animate-pulse" /> 
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest">
+              <Zap className="w-3.5 h-3.5 text-[#0ea5e9] animate-pulse" /> 
               Autonomous Data Security & SOC Analytics
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-[54px] font-extrabold tracking-tight text-white leading-[1.1]">
               AI-Powered Threat Detection <br />
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#0ea5e9] via-indigo-400 to-[#14b8a6] bg-clip-text text-transparent">
                 Made Intuitive & Actionable
               </span>
             </h1>
@@ -115,78 +118,78 @@ export default function Landing() {
             <div className="flex flex-wrap gap-4 w-full pt-2">
               <Link
                 to="/register"
-                className="flex items-center gap-2 font-bold bg-blue-600 hover:bg-blue-500 text-white text-[13px] px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 hover:translate-y-[-1px] active:translate-y-0"
+                className="flex items-center gap-2 font-bold bg-[#0ea5e9] hover:bg-[#38bdf8] text-white text-[13px] px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Get Started Free <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/login"
-                className="flex items-center gap-2 font-bold bg-white/5 border border-white/10 hover:border-white/20 text-white text-[13px] px-6 py-3.5 rounded-xl transition-all hover:bg-white/10"
+                className="flex items-center gap-2 font-bold bg-[#0f172a] border border-[#334155]/60 hover:border-accent text-white text-[13px] px-6 py-3.5 rounded-xl transition-all hover:bg-slate-800"
               >
                 Access Platform Demo
               </Link>
             </div>
 
-            <div className="flex items-center gap-6 pt-6 border-t border-white/5 w-full">
+            <div className="flex items-center gap-8 pt-8 border-t border-border-subtle w-full">
               <div>
-                <span className="text-2xl font-extrabold text-white block">99.4%</span>
+                <span className="text-2xl font-black text-white block font-mono">99.4%</span>
                 <span className="text-[10px] text-text-tertiary uppercase font-bold tracking-wider">Model Accuracy</span>
               </div>
-              <div className="w-[1px] h-8 bg-white/5" />
+              <div className="w-[1px] h-8 bg-border-default" />
               <div>
-                <span className="text-2xl font-extrabold text-white block">&lt; 2.5ms</span>
+                <span className="text-2xl font-black text-white block font-mono">&lt; 2.5ms</span>
                 <span className="text-[10px] text-text-tertiary uppercase font-bold tracking-wider">Inference Speed</span>
               </div>
-              <div className="w-[1px] h-8 bg-white/5" />
+              <div className="w-[1px] h-8 bg-border-default" />
               <div>
-                <span className="text-2xl font-extrabold text-white block">Real-Time</span>
-                <span className="text-[10px] text-text-tertiary uppercase font-bold tracking-wider">Packet Sniffing</span>
+                <span className="text-2xl font-black text-[#10b981] block font-mono">Real-Time</span>
+                <span className="text-[10px] text-text-tertiary uppercase font-bold tracking-wider">Intrusion Stream</span>
               </div>
             </div>
           </div>
 
-          {/* Right Hero Column (Interactive Mock Dashboard Preview) */}
+          {/* Right Hero Column */}
           <div className="lg:col-span-6 relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl blur opacity-15 pointer-events-none" />
-            <div className="border border-white/10 rounded-2xl bg-[#090c12] p-6 shadow-2xl relative overflow-hidden space-y-5">
-              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#0ea5e9] to-[#2563eb] rounded-2xl blur opacity-20 pointer-events-none" />
+            <div className="border border-border-strong rounded-2xl bg-[#090e18]/90 backdrop-blur-md p-6 shadow-2xl relative overflow-hidden space-y-5">
+              <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#0ea5e9]/40 to-transparent" />
               
               {/* Header inside mock */}
-              <div className="flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="flex items-center justify-between border-b border-border-default pb-4">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
                   <span className="text-[10px] font-bold tracking-wider text-text-secondary uppercase">Aegis Stream Active</span>
                 </div>
-                <div className="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-[9px] font-semibold text-emerald-400">
-                  <Zap className="w-3 h-3 text-emerald-400" /> Sniffing Live
+                <div className="flex items-center gap-1.5 bg-[#10b981]/10 border border-[#10b981]/20 px-2 py-0.5 rounded text-[9px] font-semibold text-[#10b981]">
+                  <Zap className="w-3 h-3 text-[#10b981]" /> Sniffing Live
                 </div>
               </div>
 
               {/* Grid content */}
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-[#0f131c] border border-white/5 p-3.5 rounded-xl">
+                <div className="bg-[#04060a] border border-border-default p-3.5 rounded-xl">
                   <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Risk Index</span>
-                  <span className="text-xl font-black text-red-500 mt-1 block">8.7</span>
+                  <span className="text-xl font-black text-red-500 mt-1 block font-mono">8.7</span>
                 </div>
-                <div className="bg-[#0f131c] border border-white/5 p-3.5 rounded-xl">
+                <div className="bg-[#04060a] border border-border-default p-3.5 rounded-xl">
                   <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Alerts Today</span>
-                  <span className="text-xl font-black text-orange-400 mt-1 block">42</span>
+                  <span className="text-xl font-black text-orange-400 mt-1 block font-mono">42</span>
                 </div>
-                <div className="bg-[#0f131c] border border-white/5 p-3.5 rounded-xl">
+                <div className="bg-[#04060a] border border-border-default p-3.5 rounded-xl">
                   <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Active Model</span>
-                  <span className="text-[11px] font-bold text-blue-400 mt-2 block truncate">RandomForest_v2</span>
+                  <span className="text-[11px] font-bold text-[#0ea5e9] mt-2 block truncate">RandomForest_v2</span>
                 </div>
               </div>
 
               {/* Feed simulation */}
-              <div className="bg-[#0f131c] border border-white/5 rounded-xl p-4 space-y-3">
+              <div className="bg-[#04060a] border border-border-default rounded-xl p-4 space-y-3">
                 <span className="text-[10px] font-extrabold text-text-secondary uppercase tracking-wider block">Security Incidents Feed</span>
                 {[
                   { type: 'DDoS Volumetric Flow', target: '192.168.1.104', severity: 'Critical', color: 'text-red-400 bg-red-400/10 border-red-400/25' },
                   { type: 'SSH Brute Force Attempt', target: '10.0.4.12', severity: 'High', color: 'text-orange-400 bg-orange-400/10 border-orange-400/25' },
                   { type: 'TCP SYN Port Scan', target: '172.16.89.2', severity: 'Medium', color: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs border-b border-white/5 pb-2.5 last:border-0 last:pb-0">
+                  <div key={idx} className="flex items-center justify-between text-xs border-b border-border-default pb-2.5 last:border-0 last:pb-0">
                     <div className="flex items-center gap-2.5">
                       <AlertTriangle className={`w-3.5 h-3.5 ${idx === 0 ? 'text-red-400' : idx === 1 ? 'text-orange-400' : 'text-yellow-400'}`} />
                       <span className="font-semibold text-white">{item.type}</span>
@@ -206,18 +209,18 @@ export default function Landing() {
       </section>
 
       {/* Educational Section */}
-      <section id="about" className="py-24 px-6 md:px-12 border-b border-white/5 bg-[#090c12]/20">
+      <section id="about" className="py-24 px-6 md:px-12 border-b border-border-subtle bg-[#090e18]/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Security Literacy</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Security Literacy</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">What is AI-Driven Threat Detection?</h2>
-            <p className="text-text-secondary text-sm max-w-xl mx-auto">
+            <p className="text-text-secondary text-sm max-w-xl mx-auto leading-relaxed">
               Traditional rule-based systems are bypassable and complex. Aegis uses intelligent machine learning models to detect unknown anomalous behaviors autonomously.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="border border-white/5 rounded-2xl bg-[#090c12] p-6.5 flex flex-col gap-4 relative">
+            <div className="border border-border-default rounded-2xl bg-[#090e18] p-6.5 flex flex-col gap-4 relative group hover:border-[#ef4444]/35 transition-colors">
               <div className="w-11 h-11 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
                 <AlertTriangle className="w-5.5 h-5.5" />
               </div>
@@ -227,8 +230,8 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="border border-white/5 rounded-2xl bg-[#090c12] p-6.5 flex flex-col gap-4 relative">
-              <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+            <div className="border border-border-default rounded-2xl bg-[#090e18] p-6.5 flex flex-col gap-4 relative group hover:border-accent transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9]">
                 <Brain className="w-5.5 h-5.5" />
               </div>
               <h3 className="font-bold text-white text-base">Intelligent Pattern Analysis</h3>
@@ -237,8 +240,8 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="border border-white/5 rounded-2xl bg-[#090c12] p-6.5 flex flex-col gap-4 relative">
-              <div className="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <div className="border border-border-default rounded-2xl bg-[#090e18] p-6.5 flex flex-col gap-4 relative group hover:border-[#10b981]/35 transition-colors">
+              <div className="w-11 h-11 rounded-xl bg-[#10b981]/10 border border-[#10b981]/20 flex items-center justify-center text-[#10b981]">
                 <Zap className="w-5.5 h-5.5" />
               </div>
               <h3 className="font-bold text-white text-base">Actionable Intelligence</h3>
@@ -251,12 +254,12 @@ export default function Landing() {
       </section>
 
       {/* Feature Matrix / Capabilities */}
-      <section id="features" className="py-24 px-6 md:px-12 border-b border-white/5">
+      <section id="features" className="py-24 px-6 md:px-12 border-b border-border-subtle">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Capabilities</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Capabilities</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Platform Features Matrix</h2>
-            <p className="text-text-secondary text-sm max-w-xl mx-auto">
+            <p className="text-text-secondary text-sm max-w-xl mx-auto leading-relaxed">
               Enterprise-grade tools to preprocess datasets, train classifiers, and monitor incident pipelines.
             </p>
           </div>
@@ -300,17 +303,17 @@ export default function Landing() {
                 benefit: 'Ensure API defense from exploit attempts.'
               }
             ].map((f, i) => (
-              <div key={i} className="border border-white/5 rounded-2xl bg-[#090c12] p-7 flex flex-col justify-between space-y-6">
+              <div key={i} className="border border-border-default rounded-2xl bg-[#090e18] p-7 flex flex-col justify-between space-y-6 hover:border-slate-700 transition-colors">
                 <div className="space-y-4">
-                  <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+                  <div className="w-11 h-11 rounded-xl bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9]">
                     <f.icon className="w-5.5 h-5.5" />
                   </div>
                   <h3 className="font-bold text-white text-[17px]">{f.title}</h3>
                   <p className="text-text-secondary text-xs leading-relaxed">{f.desc}</p>
                 </div>
-                <div className="pt-4 border-t border-white/5 flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span className="text-[11px] font-semibold text-emerald-400">{f.benefit}</span>
+                <div className="pt-4 border-t border-border-default flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-[#10b981] shrink-0" />
+                  <span className="text-[11px] font-semibold text-[#10b981]">{f.benefit}</span>
                 </div>
               </div>
             ))}
@@ -319,15 +322,15 @@ export default function Landing() {
       </section>
 
       {/* How it Works Timeline */}
-      <section id="pipeline" className="py-24 px-6 md:px-12 border-b border-white/5 bg-[#090c12]/20">
+      <section id="pipeline" className="py-24 px-6 md:px-12 border-b border-border-subtle bg-[#090e18]/20">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Workflow</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Workflow</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white">How Aegis Operations Work</h2>
             <p className="text-text-secondary text-sm">From raw network logs to active security monitoring in 6 steps.</p>
           </div>
 
-          <div className="relative border-l border-white/10 pl-8 ml-4 space-y-12">
+          <div className="relative border-l border-border-strong pl-8 ml-4 space-y-12">
             {[
               { icon: Upload, title: '1. Ingest Security Data', desc: 'Drag and drop standard network traffic capture logs (CSVs) up to 5MB in size.' },
               { icon: Layers, title: '2. Preprocess & Scale', desc: 'Select feature scaling (StandardScaler) and missing value imputation strategies.' },
@@ -337,7 +340,7 @@ export default function Landing() {
               { icon: FileText, title: '6. Review Recommendations', desc: 'Open incidents feed to review target addresses, AbuseIPDB metrics, and firewall blocks.' }
             ].map((step, idx) => (
               <div key={idx} className="relative">
-                <div className="absolute -left-[46px] top-0 w-9 h-9 rounded-full bg-[#090c12] border border-white/10 flex items-center justify-center text-blue-400 shadow-md">
+                <div className="absolute -left-[48px] top-0 w-9 h-9 rounded-full bg-[#04060a] border border-border-strong flex items-center justify-center text-[#0ea5e9] shadow-md">
                   <step.icon className="w-4.5 h-4.5" />
                 </div>
                 <h3 className="font-bold text-white text-[15px]">{step.title}</h3>
@@ -349,12 +352,12 @@ export default function Landing() {
       </section>
 
       {/* Interactive Product Preview Section */}
-      <section id="preview" className="py-24 px-6 md:px-12 border-b border-white/5">
+      <section id="preview" className="py-24 px-6 md:px-12 border-b border-border-subtle">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Product Preview</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Product Preview</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white">Interactive Workspace Preview</h2>
-            <p className="text-text-secondary text-sm max-w-xl mx-auto">
+            <p className="text-text-secondary text-sm max-w-xl mx-auto leading-relaxed">
               Explore custom mock interfaces of the Aegis SOC dashboard. Select tabs to preview platform features.
             </p>
           </div>
@@ -371,8 +374,8 @@ export default function Landing() {
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`px-4.5 py-2.5 text-xs font-bold rounded-xl border transition-all ${
                   activeTab === tab.id
-                    ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-lg shadow-blue-500/5'
-                    : 'bg-[#090c12] border-white/5 text-text-secondary hover:text-white hover:border-white/10'
+                    ? 'bg-[#0ea5e9]/10 border-[#0ea5e9]/30 text-[#0ea5e9] shadow-lg shadow-sky-500/5'
+                    : 'bg-[#090e18] border-border-default text-text-secondary hover:text-white hover:border-slate-700'
                 }`}
               >
                 {tab.label}
@@ -381,17 +384,17 @@ export default function Landing() {
           </div>
 
           {/* Interactive Screen Container */}
-          <div className="border border-white/10 bg-[#090c12] rounded-2xl p-6 md:p-8 shadow-2xl min-h-[360px] relative overflow-hidden">
-            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent" />
+          <div className="border border-border-strong bg-[#090e18] rounded-2xl p-6 md:p-8 shadow-2xl min-h-[360px] relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-[#0ea5e9]/30 to-transparent" />
             
             {activeTab === 'dashboard' && (
               <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="flex items-center justify-between border-b border-border-default pb-4">
                   <div>
                     <h4 className="font-extrabold text-white text-[15px]">Security Posture Overview</h4>
                     <span className="text-[10px] text-text-tertiary block mt-0.5">Real-time performance metrics and pipeline state</span>
                   </div>
-                  <span className="text-xs font-bold text-blue-400 font-mono bg-blue-500/5 border border-blue-500/15 px-2.5 py-1 rounded-lg">
+                  <span className="text-xs font-bold text-[#0ea5e9] font-mono bg-[#0ea5e9]/5 border border-[#0ea5e9]/15 px-2.5 py-1 rounded-lg">
                     10.0.0.1 (Active Host)
                   </span>
                 </div>
@@ -402,9 +405,9 @@ export default function Landing() {
                     { label: 'Average Detection Rate', value: '99.42%' },
                     { label: 'Alerts Resolution Time', value: '54 seconds' },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-[#0f131c] border border-white/5 p-4 rounded-xl">
+                    <div key={i} className="bg-[#04060a] border border-border-default p-4 rounded-xl">
                       <span className="text-[10px] text-text-tertiary block font-semibold uppercase tracking-wider">{stat.label}</span>
-                      <span className="text-lg font-black text-white mt-1.5 block">{stat.value}</span>
+                      <span className="text-lg font-black text-white mt-1.5 block font-mono">{stat.value}</span>
                     </div>
                   ))}
                 </div>
@@ -413,7 +416,7 @@ export default function Landing() {
 
             {activeTab === 'threats' && (
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="flex items-center justify-between border-b border-border-default pb-4">
                   <div>
                     <h4 className="font-extrabold text-white text-[15px]">Incident Response Center</h4>
                     <span className="text-[10px] text-text-tertiary block mt-0.5">Audit and resolve active network anomaly incidents</span>
@@ -425,7 +428,7 @@ export default function Landing() {
                     { id: 'T-109', name: 'FTP Brute Force request', ip: '192.168.1.189', time: '8 mins ago', severity: 'High', color: 'text-orange-400 bg-orange-400/10 border-orange-400/25' },
                     { id: 'T-110', name: 'Volumetric Syn Flood', ip: '10.0.0.14', time: '1 hour ago', severity: 'High', color: 'text-orange-400 bg-orange-400/10 border-orange-400/25' }
                   ].map((threat, i) => (
-                    <div key={i} className="flex items-center justify-between p-3.5 bg-[#0f131c] border border-white/5 rounded-xl text-xs">
+                    <div key={i} className="flex items-center justify-between p-3.5 bg-[#04060a] border border-border-default rounded-xl text-xs">
                       <div className="flex items-center gap-3.5">
                         <span className="font-mono text-[10px] text-text-tertiary font-bold">{threat.id}</span>
                         <span className="font-semibold text-white">{threat.name}</span>
@@ -443,14 +446,14 @@ export default function Landing() {
 
             {activeTab === 'datasets' && (
               <div className="space-y-5">
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="flex items-center justify-between border-b border-border-default pb-4">
                   <div>
                     <h4 className="font-extrabold text-white text-[15px]">Dataset Upload Manager</h4>
                     <span className="text-[10px] text-text-tertiary block mt-0.5">Select custom CSV data and compile features</span>
                   </div>
                 </div>
-                <div className="border border-dashed border-white/10 rounded-2xl p-10 text-center flex flex-col items-center justify-center bg-[#0f131c]/50">
-                  <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 mb-4">
+                <div className="border border-dashed border-border-strong rounded-2xl p-10 text-center flex flex-col items-center justify-center bg-[#04060a]/50">
+                  <div className="w-12 h-12 rounded-xl bg-[#0ea5e9]/10 border border-[#0ea5e9]/20 flex items-center justify-center text-[#0ea5e9] mb-4">
                     <Upload className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-semibold text-white">Drag & drop your network capture log here</span>
@@ -463,12 +466,12 @@ export default function Landing() {
       </section>
 
       {/* Scenarios / Use Cases */}
-      <section className="py-24 px-6 md:px-12 border-b border-white/5 bg-[#090c12]/20">
+      <section className="py-24 px-6 md:px-12 border-b border-border-subtle bg-[#090e18]/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Use Cases</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Use Cases</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">Real-World SOC Scenarios</h2>
-            <p className="text-text-secondary text-sm max-w-xl mx-auto">
+            <p className="text-text-secondary text-sm max-w-xl mx-auto leading-relaxed">
               How various user archetypes use the platform to learn and execute threat modeling.
             </p>
           </div>
@@ -491,15 +494,15 @@ export default function Landing() {
                 solution: 'WebSocket alerts trigger instantly on the dashboard feed, detailing MITRE target nodes.',
               }
             ].map((uc, i) => (
-              <div key={i} className="border border-white/5 rounded-2xl bg-[#090c12] p-7 flex flex-col justify-between space-y-6">
+              <div key={i} className="border border-border-default rounded-2xl bg-[#090e18] p-7 flex flex-col justify-between space-y-6 hover:border-slate-700 transition-colors">
                 <h3 className="font-extrabold text-white text-[16px]">{uc.title}</h3>
                 <div className="space-y-4">
                   <div>
                     <span className="text-[10px] font-extrabold text-red-400 uppercase tracking-wider block">The Challenge</span>
                     <p className="text-text-secondary text-xs mt-1 leading-relaxed">{uc.problem}</p>
                   </div>
-                  <div className="pt-4 border-t border-white/5">
-                    <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider block">The Solution</span>
+                  <div className="pt-4 border-t border-border-default">
+                    <span className="text-[10px] font-extrabold text-[#10b981] uppercase tracking-wider block">The Solution</span>
                     <p className="text-text-secondary text-xs mt-1 leading-relaxed">{uc.solution}</p>
                   </div>
                 </div>
@@ -510,10 +513,10 @@ export default function Landing() {
       </section>
 
       {/* Frequently Asked Questions */}
-      <section id="faq" className="py-24 px-6 md:px-12 border-b border-white/5">
+      <section id="faq" className="py-24 px-6 md:px-12 border-b border-border-subtle">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <span className="text-[11px] font-bold text-blue-400 uppercase tracking-wider block">Support FAQ</span>
+            <span className="text-[10px] font-bold text-[#0ea5e9] uppercase tracking-widest block">Support FAQ</span>
             <h2 className="text-3xl font-extrabold tracking-tight text-white">Frequently Asked Questions</h2>
             <p className="text-text-secondary text-sm">Common answers to file formats, machine learning setups, and API capabilities.</p>
           </div>
@@ -541,16 +544,16 @@ export default function Landing() {
                 a: 'Currently, the dataset page processes `.csv` captures. Full packet capture (`.pcap`) ingestion and preprocessing support is coming soon.'
               }
             ].map((faq, idx) => (
-              <div key={idx} className="bg-[#090c12] border border-white/5 rounded-2xl overflow-hidden transition-all duration-200">
+              <div key={idx} className="bg-[#090e18] border border-border-default rounded-2xl overflow-hidden transition-all duration-200">
                 <button
                   onClick={() => toggleFaq(idx)}
-                  className="w-full flex items-center justify-between p-5 text-left text-sm font-bold text-white hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center justify-between p-5 text-left text-sm font-bold text-white hover:bg-slate-800/40 transition-colors"
                 >
                   <span>{faq.q}</span>
                   <ChevronDown className={`w-4 h-4 text-text-tertiary transition-transform duration-200 ${openFaq === idx ? 'rotate-180' : ''}`} />
                 </button>
                 {openFaq === idx && (
-                  <div className="p-5 pt-0 text-xs text-text-secondary leading-relaxed border-t border-white/5 bg-[#0f131c]/25">
+                  <div className="p-5 pt-0 text-xs text-text-secondary leading-relaxed border-t border-border-default bg-[#04060a]/40">
                     {faq.a}
                   </div>
                 )}
@@ -561,7 +564,7 @@ export default function Landing() {
       </section>
 
       {/* Final Call-to-Action */}
-      <section className="py-24 px-6 md:px-12 bg-gradient-to-b from-[#090c12] to-[#07090e] border-b border-white/5 text-center">
+      <section className="py-24 px-6 md:px-12 bg-gradient-to-b from-[#090e18] to-[#04060a] border-b border-border-subtle text-center">
         <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
           <h2 className="text-3xl md:text-[38px] font-black tracking-tight text-white leading-tight">
             Deploy Autonomous AI Intrusion Detection
@@ -572,13 +575,13 @@ export default function Landing() {
           <div className="flex flex-wrap justify-center gap-4.5 mt-4">
             <Link
               to="/register"
-              className="flex items-center gap-2 font-bold bg-blue-600 hover:bg-blue-500 text-white text-[13px] px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-blue-500/15"
+              className="flex items-center gap-2 font-bold bg-[#0ea5e9] hover:bg-[#38bdf8] text-white text-[13px] px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-sky-500/10 hover:shadow-sky-500/20 hover:scale-[1.02] active:scale-[0.98]"
             >
               Get Started Now <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               to="/login"
-              className="flex items-center gap-2 font-bold bg-white/5 border border-white/10 hover:border-white/20 text-white text-[13px] px-6 py-3.5 rounded-xl transition-all"
+              className="flex items-center gap-2 font-bold bg-[#0f172a] border border-[#334155]/60 hover:border-accent text-white text-[13px] px-6 py-3.5 rounded-xl transition-all hover:bg-slate-800"
             >
               Access Platform Demo
             </Link>
@@ -587,10 +590,10 @@ export default function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-6 md:px-12 bg-[#090c12] text-center border-t border-white/5 flex flex-col items-center gap-4">
+      <footer className="py-12 px-6 md:px-12 bg-[#090e18] text-center border-t border-border-default flex flex-col items-center gap-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/25 flex items-center justify-center">
-            <Shield className="w-4.5 h-4.5 text-blue-400" />
+          <div className="w-8 h-8 rounded-lg bg-[#0ea5e9]/10 border border-[#0ea5e9]/25 flex items-center justify-center">
+            <Shield className="w-4.5 h-4.5 text-[#0ea5e9]" />
           </div>
           <span className="font-black text-[15px] tracking-tight text-white">Aegis SOC</span>
         </div>

@@ -409,19 +409,19 @@ export default function Dashboard() {
                   <AreaChart data={liveHistory} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorPackets" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
                       </linearGradient>
                       <linearGradient id="colorThreats" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
                         <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" />
-                    <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} />
-                    <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} />
-                    <RechartsTooltip contentStyle={{ backgroundColor: '#0f1219', border: '1px solid rgba(255,255,255,0.08)' }} labelStyle={{ color: '#fff' }} />
-                    <Area type="monotone" dataKey="packets" stroke="#3b82f6" fillOpacity={1} fill="url(#colorPackets)" name="Packets" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
+                    <XAxis dataKey="time" stroke="rgba(255,255,255,0.15)" fontSize={9} />
+                    <YAxis stroke="rgba(255,255,255,0.15)" fontSize={9} />
+                    <RechartsTooltip contentStyle={{ backgroundColor: '#090e18', border: '1px solid rgba(56,189,248,0.1)' }} labelStyle={{ color: '#fff' }} />
+                    <Area type="monotone" dataKey="packets" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorPackets)" name="Packets" />
                     <Area type="monotone" dataKey="threats" stroke="#ef4444" fillOpacity={1} fill="url(#colorThreats)" name="Threats" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -491,15 +491,15 @@ export default function Dashboard() {
       {/* Incident Detail Drawer panel overlay */}
       {selectedThreat && (
         <div className="fixed inset-0 z-50 flex justify-end animate-overlay" onClick={() => setSelectedThreat(null)}>
-          <div className="w-full max-w-lg bg-[#0f1219] border-l border-white/10 h-full overflow-y-auto animate-slide-in-right shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-lg bg-[#090e18] border-l border-border-strong h-full overflow-y-auto animate-slide-in-right shadow-2xl animate-fade-in" onClick={e => e.stopPropagation()}>
             
             {/* Header */}
-            <div className="sticky top-0 bg-[#0f1219]/90 backdrop-blur-md border-b border-white/10 p-5 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-[#090e18]/90 backdrop-blur-md border-b border-border-default p-5 flex items-center justify-between z-10">
               <div>
                 <h2 className="text-sm font-extrabold text-white uppercase tracking-wider">Incident Details</h2>
                 <span className="text-[10px] text-text-tertiary font-mono-data">{selectedThreat.id}</span>
               </div>
-              <button onClick={() => setSelectedThreat(null)} className="btn btn-ghost btn-sm rounded-lg hover:bg-white/5">
+              <button onClick={() => setSelectedThreat(null)} className="btn btn-ghost btn-sm rounded-lg hover:bg-surface-2">
                 <X className="w-4 h-4" /> Close
               </button>
             </div>
@@ -507,7 +507,7 @@ export default function Dashboard() {
             <div className="p-5 space-y-6">
               
               {/* Classification Summary */}
-              <div className="card p-4 space-y-3 bg-[#151921] border-white/10 shadow-inner">
+              <div className="card p-4 space-y-3 bg-[#0f172a] border-border-default shadow-inner">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold text-text-tertiary uppercase tracking-wider">Risk Matrix Class</span>
                   <Badge variant={severityToBadgeVariant(selectedThreat.severity)}>
@@ -524,19 +524,19 @@ export default function Dashboard() {
               <div className="space-y-2">
                 <h4 className="text-[10px] font-extrabold text-text-tertiary uppercase tracking-wider">Network Log Headers</h4>
                 <div className="grid grid-cols-2 gap-3.5 text-xs text-text-secondary">
-                  <div className="bg-[#151921]/40 border border-white/5 p-3.5 rounded-xl">
+                  <div className="bg-[#0f172a]/60 border border-border-default p-3.5 rounded-xl">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Origin Address</span>
                     <div className="font-mono-data font-bold text-white mt-1">{selectedThreat.src_ip || '—'}</div>
                   </div>
-                  <div className="bg-[#151921]/40 border border-white/5 p-3.5 rounded-xl">
+                  <div className="bg-[#0f172a]/60 border border-border-default p-3.5 rounded-xl">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Destination</span>
                     <div className="font-mono-data font-bold text-white mt-1">{selectedThreat.dst_ip || '—'}</div>
                   </div>
-                  <div className="bg-[#151921]/40 border border-white/5 p-3.5 rounded-xl">
+                  <div className="bg-[#0f172a]/60 border border-border-default p-3.5 rounded-xl">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Port / Protocol</span>
                     <div className="font-mono-data font-bold text-white mt-1">{selectedThreat.dst_port || '—'} / {selectedThreat.protocol || '—'}</div>
                   </div>
-                  <div className="bg-[#151921]/40 border border-white/5 p-3.5 rounded-xl">
+                  <div className="bg-[#0f172a]/60 border border-border-default p-3.5 rounded-xl">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">Inference Speed</span>
                     <div className="font-mono-data font-bold text-white mt-1">{selectedThreat.processing_latency ? `${(selectedThreat.processing_latency * 1000).toFixed(1)} ms` : '—'}</div>
                   </div>
@@ -547,11 +547,11 @@ export default function Dashboard() {
               <div className="space-y-2">
                 <h4 className="text-[10px] font-extrabold text-text-tertiary uppercase tracking-wider">Threat Intel Reputations</h4>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="card bg-[#151921]/40 p-4 text-center border-white/5">
+                  <div className="card bg-[#0f172a]/60 p-4 text-center border-border-default">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">AbuseIPDB Score</span>
                     <div className="text-xl font-black text-orange-400 mt-1.5">{selectedThreat.abuseipdb_score || 0}%</div>
                   </div>
-                  <div className="card bg-[#151921]/40 p-4 text-center border-white/5">
+                  <div className="card bg-[#0f172a]/60 p-4 text-center border-border-default">
                     <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider">VirusTotal Hits</span>
                     <div className="text-xl font-black text-red-500 mt-1.5">{selectedThreat.virustotal_score || 0} / 10</div>
                   </div>
@@ -561,7 +561,7 @@ export default function Dashboard() {
               {/* Action recommendations */}
               <div className="space-y-2">
                 <h4 className="text-[10px] font-extrabold text-text-tertiary uppercase tracking-wider">Mitigation Recommendations</h4>
-                <div className="card p-4 text-xs text-text-secondary leading-relaxed bg-[#151921]/40 border-white/5">
+                <div className="card p-4 text-xs text-text-secondary leading-relaxed bg-[#0f172a]/60 border-border-default">
                   {selectedThreat.recommended_action || 'Inspect the origin address logs, block packet routing at the perimeter firewall, and run localized antivirus/malware scanners on target host nodes.'}
                 </div>
               </div>
@@ -580,8 +580,8 @@ export default function Dashboard() {
                         onClick={() => updateThreatStatusMutation.mutate({ id: selectedThreat.id, status: statusOption })}
                         className={`flex-1 py-2.5 rounded-lg text-xs font-bold border transition-all ${
                           isCurrent
-                            ? 'bg-blue-600 border-blue-600 text-white'
-                            : 'bg-[#151921]/40 border-white/5 text-text-tertiary hover:text-text-secondary hover:border-white/10'
+                            ? 'bg-[#0ea5e9] border-[#0ea5e9] text-white shadow-md shadow-sky-500/10'
+                            : 'bg-[#0f172a]/60 border-border-default text-text-tertiary hover:text-text-secondary hover:border-slate-700'
                         }`}
                       >
                         {statusOption}

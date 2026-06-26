@@ -113,15 +113,20 @@ export default function Datasets() {
 
   const deleteMutation = useMutation({
     mutationFn: datasetService.delete,
-    onSuccess: () => {
+    onSuccess: (_, deletedId) => {
+      // Immediately remove from UI by updating the React Query cache
+      queryClient.setQueryData(['datasets'], (oldDatasets: any[] | undefined) => {
+        if (!oldDatasets) return [];
+        return oldDatasets.filter(d => d.id !== deletedId);
+      });
       queryClient.invalidateQueries({ queryKey: ['datasets'] });
       setDeleteTargetId(null);
       // Clear selected dataset if it was deleted
-      if (selectedDatasetId === deleteTargetId) {
+      if (selectedDatasetId === deletedId) {
         setSelectedDatasetId('');
         localStorage.removeItem('selected_dataset_id');
       }
-      if (selectedProfileDatasetId === deleteTargetId) {
+      if (selectedProfileDatasetId === deletedId) {
         setSelectedProfileDatasetId('');
       }
     },

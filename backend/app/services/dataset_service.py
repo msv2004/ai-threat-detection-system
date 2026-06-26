@@ -102,12 +102,49 @@ class DatasetService:
     def delete_dataset(self, dataset_id: UUID, user_id: int) -> None:
         dataset = self.get_dataset(dataset_id, user_id)
         
-        # Remove from DB
+        # 1. Collect all associated file paths before database deletion
+        files_to_delete = []
+        if dataset.file_path:
+            files_to_delete.append(dataset.file_path)
+            
+        # Processed datasets (parquet files and preprocessor models)
+        try:
+            processed_datasets = dataset.processed_datasets
+            for pd in processed_datasets:
+                for attr in ["train_features_path", "train_labels_path", "test_features_path", "test_labels_path", "preprocessor_path"]:
+                    val = getattr(pd, attr, None)
+                    if val:
+                        files_to_delete.append(val)
+        except Exception:
+            pass
+
+        # Trained models
+        try:
+            trained_models = dataset.trained_models
+            for model in trained_models:
+                if model.file_path:
+                    files_to_delete.append(model.file_path)
+        except Exception:
+            pass
+
+        # Prediction jobs
+        try:
+            prediction_jobs = dataset.prediction_jobs
+            for pj in prediction_jobs:
+                if pj.output_file_path:
+                    files_to_delete.append(pj.output_file_path)
+        except Exception:
+            pass
+
+        # 2. Perform DB deletion first (relying on ON DELETE CASCADE in SQL)
         self.repository.delete(dataset)
 
-        # Remove file from disk
-        if os.path.exists(dataset.file_path):
-            try:
-                os.remove(dataset.file_path)
-            except Exception:
-                pass
+        # 3. Clean up physical files from disk
+        from app.core.logger import logger
+        for file_path in files_to_delete:
+            if file_path and os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception as e:
+                    logger.error(f"Failed to remove file {file_path} during dataset deletion: {e}")
+
