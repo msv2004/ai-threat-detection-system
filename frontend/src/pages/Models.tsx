@@ -12,7 +12,10 @@ import {
   Zap,
   Info,
   AlertTriangle,
-  ArrowRight
+  ArrowRight,
+  Shield,
+  Layers,
+  X
 } from 'lucide-react';
 import { 
   BarChart as RechartsBarChart, 
@@ -23,24 +26,20 @@ import {
   Tooltip, 
   Legend, 
   ResponsiveContainer,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  Radar
 } from 'recharts';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function SkeletonModelRow() {
   return (
     <tr className="animate-pulse">
-      <td className="p-4"><div className="h-3 bg-white/10 rounded w-36" /></td>
-      <td className="p-4"><div className="h-3 bg-white/10 rounded w-16" /></td>
-      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
-      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
-      <td className="p-4"><div className="h-3 bg-white/10 rounded w-14" /></td>
-      <td className="p-4"><div className="h-5 bg-white/10 rounded w-16" /></td>
-      <td className="p-4 text-right"><div className="h-6 w-6 bg-white/10 rounded ml-auto" /></td>
+      <td className="p-4"><div className="h-3.5 bg-surface-3 rounded w-32" /></td>
+      <td className="p-4"><div className="h-3 bg-surface-3 rounded w-12" /></td>
+      <td className="p-4"><div className="h-3 bg-surface-3 rounded w-12" /></td>
+      <td className="p-4"><div className="h-3 bg-surface-3 rounded w-12" /></td>
+      <td className="p-4"><div className="h-3 bg-surface-3 rounded w-12" /></td>
+      <td className="p-4"><div className="h-5.5 bg-surface-3 rounded w-16" /></td>
+      <td className="p-4 text-right"><div className="h-6 w-6 bg-surface-3 rounded ml-auto" /></td>
     </tr>
   );
 }
@@ -70,6 +69,7 @@ export default function Models() {
     mutationFn: modelService.activate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['models'] });
+      queryClient.invalidateQueries({ queryKey: ['detection_status'] });
     },
   });
 
@@ -96,12 +96,12 @@ export default function Models() {
 
   // Format active feature importance data
   const featureImportanceRaw = selectedModel?.feature_importance || {
-    'Source Port': 0.15,
     'Destination Port': 0.22,
+    'Average Packet Size': 0.20,
+    'Total Bytes Forward': 0.18,
+    'Source Port': 0.15,
     'Packet Count': 0.12,
     'Flow Duration': 0.08,
-    'Total Bytes Forward': 0.18,
-    'Average Packet Size': 0.25,
   };
 
   const formattedFeatureImportance = Object.entries(featureImportanceRaw)
@@ -112,47 +112,51 @@ export default function Models() {
     .sort((a, b) => b.importance - a.importance);
 
   return (
-    <div className="space-y-6 font-mono">
+    <div className="space-y-6 text-left font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-        <h1 className="text-2xl font-bold text-text-primary tracking-tight">Model Registry</h1>
-        <p className="text-text-secondary text-sm mt-1">View and activate trained machine learning models for threat detection.</p>
-      </div>
+          <h2 className="text-xl font-bold text-white uppercase tracking-wider">Model Registry</h2>
+          <p className="text-xs text-text-secondary mt-0.5 font-sans">Deploy network classifiers and check features importance weights</p>
+        </div>
         <button
           onClick={() => refetch()}
-          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+          className="btn btn-secondary btn-sm flex items-center gap-1.5 self-start"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Sync Registry
         </button>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 items-start">
         
         {/* Model Lists & Activation (2 columns) */}
         <div className="xl:col-span-2 space-y-6">
           
           {/* Models Registry Table */}
           <div className="card overflow-hidden">
-            <div className="p-4 border-b border-border-subtle">
-              <h3 className="text-sm font-semibold text-text-primary">Registered Inference Models</h3>
+            <div className="p-4 border-b border-border-default flex justify-between items-center bg-surface-1/40">
+              <div>
+                <h3 className="text-xs font-bold text-white uppercase">Inference Classifiers</h3>
+                <p className="text-[10px] text-text-secondary mt-0.5">Trained model variables registry</p>
+              </div>
+              <span className="text-[10px] text-text-tertiary">{models?.length || 0} model(s) registered</span>
             </div>
             
             <div className="overflow-x-auto text-xs">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-surface-2/50 border-b border-border-subtle text-text-tertiary uppercase tracking-wider text-[10px] font-semibold">
-                    <th className="p-4">Model/Algorithm</th>
-                    <th className="p-4">Accuracy</th>
-                    <th className="p-4">F1 Score</th>
-                    <th className="p-4">Precision</th>
-                    <th className="p-4">Recall</th>
+                  <tr className="bg-surface-2/40 border-b border-border-default text-text-tertiary uppercase tracking-wider text-[9px] font-bold">
+                    <th className="p-4">Model & Algorithm</th>
+                    <th className="p-4 font-mono-data">Accuracy</th>
+                    <th className="p-4 font-mono-data">F1 Score</th>
+                    <th className="p-4 font-mono-data">Precision</th>
+                    <th className="p-4 font-mono-data">Recall</th>
                     <th className="p-4">Status</th>
-                    <th className="p-4 text-right">Actions</th>
+                    <th className="p-4 text-right">Wipe</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border-subtle">
+                <tbody className="divide-y divide-border-subtle text-text-secondary font-semibold">
                   {isLoading ? (
                     <>
                       <SkeletonModelRow />
@@ -163,24 +167,21 @@ export default function Models() {
                     <tr>
                       <td colSpan={7} className="p-10 text-center">
                         <div className="flex flex-col items-center gap-3">
-                          <AlertTriangle className="w-6 h-6 text-amber-400" />
-                          <p className="text-sm font-semibold text-text-primary">Could not load models</p>
-                          <p className="text-xs text-text-secondary">Backend may be warming up. Try refreshing.</p>
-                          <button onClick={() => refetch()} className="px-3 py-1.5 bg-surface-2 border border-border-default rounded-lg text-xs font-semibold hover:border-border-strong transition-colors">Retry</button>
+                          <AlertTriangle className="w-5 h-5 text-semantic-warning" />
+                          <span className="text-xs text-text-primary">Failed to load registry</span>
+                          <button onClick={() => refetch()} className="btn btn-secondary btn-sm">Retry</button>
                         </div>
                       </td>
                     </tr>
                   ) : models?.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="p-12 text-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-surface-2 border border-border-subtle flex items-center justify-center">
-                            <Cpu className="w-6 h-6 text-text-tertiary" />
-                          </div>
-                          <p className="text-sm font-semibold text-text-primary">No models trained yet</p>
-                          <p className="text-xs text-text-secondary max-w-xs">Complete a training run to register your first model. Models will appear here once training finishes.</p>
-                          <Link to="/training" className="mt-1 flex items-center gap-1.5 text-xs text-accent hover:underline font-semibold">
-                            Go to Training Console <ArrowRight className="w-3.5 h-3.5" />
+                        <div className="flex flex-col items-center gap-3 text-text-secondary">
+                          <Cpu className="w-8 h-8 text-text-tertiary" />
+                          <span className="text-xs font-bold text-white">No Trained Classifiers Found</span>
+                          <p className="text-[10px] text-text-tertiary max-w-xs">Run a model training job from the AI Console to deploy a threat classifier.</p>
+                          <Link to="/training" className="btn btn-primary btn-sm flex items-center gap-1 mt-1">
+                            Go to Console <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                         </div>
                       </td>
@@ -190,26 +191,26 @@ export default function Models() {
                       <tr 
                         key={m.id}
                         onClick={() => setSelectedModelId(m.id)}
-                        className={`transition-colors cursor-pointer hover:bg-white/[0.01] ${selectedModel?.id === m.id ? 'bg-cyan-500/[0.03]' : ''}`}
+                        className={`transition-colors cursor-pointer hover:bg-surface-2/50 ${selectedModel?.id === m.id ? 'bg-accent/5' : ''}`}
                       >
-                        <td className="p-4 font-bold text-white">
-                          <div className="flex items-center gap-2">
-                            <GitBranch className="w-3.5 h-3.5 text-white/40" />
+                        <td className="p-4">
+                          <div className="flex items-center gap-2.5">
+                            <GitBranch className="w-4 h-4 text-text-tertiary shrink-0" />
                             <div>
-                              <span>{m.algorithm}</span>
-                              <span className="text-[10px] text-white/40 block">Version v{m.version}</span>
+                              <span className="font-bold text-white block">{m.algorithm}</span>
+                              <span className="text-[10px] text-text-tertiary block font-mono-data">v{m.version}</span>
                             </div>
                           </div>
                         </td>
-                        <td className="p-4 font-bold text-white">{((m.accuracy || 0.95) * 100).toFixed(1)}%</td>
-                        <td className="p-4 text-white/70">{((m.f1_score || 0.94) * 100).toFixed(1)}%</td>
-                        <td className="p-4 text-white/70">{((m.precision || 0.95) * 100).toFixed(1)}%</td>
-                        <td className="p-4 text-white/70">{((m.recall || 0.93) * 100).toFixed(1)}%</td>
+                        <td className="p-4 font-bold text-white font-mono-data">{((m.accuracy || 0.95) * 100).toFixed(1)}%</td>
+                        <td className="p-4 font-mono-data">{((m.f1_score || 0.94) * 100).toFixed(1)}%</td>
+                        <td className="p-4 font-mono-data">{((m.precision || 0.95) * 100).toFixed(1)}%</td>
+                        <td className="p-4 font-mono-data">{((m.recall || 0.93) * 100).toFixed(1)}%</td>
                         <td className="p-4">
                           {m.is_active ? (
-                            <span className="inline-flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded text-[9px] font-bold text-emerald-400">
-                              <CheckCircle className="w-2.5 h-2.5" />
-                              ACTIVE MODEL
+                            <span className="inline-flex items-center gap-1 bg-semantic-success/10 border border-semantic-success/20 px-2 py-0.5 rounded text-[8px] font-extrabold text-semantic-success uppercase">
+                              <CheckCircle className="w-3 h-3 text-semantic-success" />
+                              Active Model
                             </span>
                           ) : (
                             <button
@@ -218,9 +219,9 @@ export default function Models() {
                                 e.stopPropagation();
                                 handleActivateModel(m.id);
                               }}
-                              className="px-2 py-0.5 border border-cyan-500/30 hover:border-cyan-500/60 rounded text-[9px] font-bold text-[#06b6d4] hover:bg-cyan-500/10 transition-colors uppercase cursor-pointer"
+                              className="px-2 py-0.5 border border-accent-border/30 hover:border-accent rounded text-[9px] font-bold text-accent hover:bg-accent-subtle/5 transition-all uppercase cursor-pointer"
                             >
-                              Activate
+                              Deploy
                             </button>
                           )}
                         </td>
@@ -228,7 +229,7 @@ export default function Models() {
                           <button
                             disabled={m.is_active || deleteMutation.isPending}
                             onClick={() => deleteMutation.mutate(m.id)}
-                            className="p-1.5 border border-white/10 hover:border-red-500/30 rounded text-white/40 hover:text-red-400 disabled:opacity-30 transition-all cursor-pointer"
+                            className="p-1.5 border border-border-subtle hover:border-semantic-critical/30 rounded-lg text-text-tertiary hover:text-semantic-critical transition-all cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -243,25 +244,27 @@ export default function Models() {
 
           {/* Model Metrics Comparison Chart */}
           {formattedComparison.length > 0 && (
-            <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3">
+            <div className="card p-5 space-y-4">
+              <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+                <BarChart className="w-4 h-4 text-accent" />
                 Algorithm Comparison Metrics
               </h3>
               
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
                   <RechartsBarChart data={formattedComparison}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} />
-                    <YAxis stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} domain={[0.8, 1]} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
+                    <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
+                    <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} domain={[0.8, 1]} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#0a0f1d', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }}
-                      labelStyle={{ fontWeight: 'bold' }}
+                      contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }}
+                      labelStyle={{ color: '#fff', fontSize: '10px' }}
+                      itemStyle={{ fontSize: '10px' }}
                     />
                     <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
                     <Bar dataKey="accuracy" name="Accuracy" fill="#06b6d4" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="f1_score" name="F1 Score" fill="#10b981" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="precision" name="Precision" fill="#fbbf24" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="f1_score" name="F1 Score" fill="#a855f7" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="precision" name="Precision" fill="#3b82f6" radius={[2, 2, 0, 0]} />
                   </RechartsBarChart>
                 </ResponsiveContainer>
               </div>
@@ -271,32 +274,35 @@ export default function Models() {
         </div>
 
         {/* Feature Importance Panel (1 column) */}
-        <div className="xl:col-span-1 space-y-6">
+        <div className="xl:col-span-1 space-y-6 text-left">
           {selectedModel && (
-            <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-              <div className="border-b border-white/5 pb-3">
-                <h3 className="text-xs font-bold text-white tracking-widest uppercase m-0 leading-none">
-                  Feature Importance
-                </h3>
-                <span className="text-[9px] text-white/40 tracking-widest mt-1.5 block">
-                  {selectedModel.algorithm} v{selectedModel.version} DECISION WEIGHTS
-                </span>
+            <div className="card p-5 space-y-4">
+              <div className="border-b border-border-default pb-3 flex justify-between items-center">
+                <div>
+                  <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+                    <Layers className="w-4 h-4 text-accent" />
+                    Feature Weights
+                  </h3>
+                  <span className="text-[9px] text-text-tertiary block mt-0.5 font-mono-data">
+                    {selectedModel.algorithm} v{selectedModel.version}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+              <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1 text-xs">
                 {formattedFeatureImportance.map((item, index) => (
-                  <div key={item.feature} className="space-y-1.5 text-xs">
-                    <div className="flex justify-between font-mono">
-                      <span className="text-white/60 truncate max-w-[200px]" title={item.feature}>
+                  <div key={item.feature} className="space-y-1">
+                    <div className="flex justify-between font-mono-data text-[10.5px]">
+                      <span className="text-text-secondary truncate max-w-[170px]" title={item.feature}>
                         {index + 1}. {item.feature}
                       </span>
-                      <span className="text-white font-bold">{item.importance.toFixed(4)}</span>
+                      <strong className="text-white">{(item.importance * 100).toFixed(2)}%</strong>
                     </div>
                     
                     {/* Visual bar progress */}
-                    <div className="h-1.5 bg-[#070b13] rounded-full overflow-hidden border border-white/5">
+                    <div className="h-1.5 bg-surface-0 rounded-full overflow-hidden border border-border-subtle">
                       <div 
-                        className="h-full bg-cyan-500/70"
+                        className="h-full bg-accent/80 rounded-full"
                         style={{ width: `${item.importance * 100}%` }}
                       />
                     </div>

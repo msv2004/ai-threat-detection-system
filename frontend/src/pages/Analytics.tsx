@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { analyticsService } from '../services/api';
 import { 
-  BarChart, 
   Bar, 
   XAxis, 
   YAxis, 
@@ -29,11 +28,14 @@ import {
   Activity, 
   Cpu, 
   Clock, 
-  ShieldAlert as AlertIcon,
-  RefreshCw
+  RefreshCw,
+  Zap,
+  CheckCircle,
+  AlertTriangle,
+  Shield
 } from 'lucide-react';
 
-const COLORS = ['#ef4444', '#f59e0b', '#fbbf24', '#06b6d4']; // Critical, High, Medium, Low
+const SEVERITY_COLORS = ['#ef4444', '#f97316', '#eab308', '#3b82f6']; // Critical (Red), High (Orange), Medium (Yellow), Low (Blue)
 
 export default function Analytics() {
   const [timeRange, setTimeRange] = useState('this_week');
@@ -111,16 +113,16 @@ export default function Analytics() {
   ];
 
   return (
-    <div className="space-y-6 font-sans">
+    <div className="space-y-6 text-left font-sans">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Security Analytics</h1>
-          <p className="text-text-secondary text-sm mt-1">Observe network traffic trends and model performance metrics.</p>
+          <h2 className="text-xl font-bold text-white uppercase tracking-wider">Security Analytics</h2>
+          <p className="text-xs text-text-secondary mt-0.5 font-sans">Observe threat volume trends and ML pipeline performance stability</p>
         </div>
         <button
           onClick={handleRefreshAll}
-          className="inline-flex items-center gap-2 bg-surface-1 border border-border-subtle hover:border-border-default text-text-secondary hover:text-text-primary px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+          className="btn btn-secondary btn-sm flex items-center gap-1.5 self-start"
         >
           <RefreshCw className="w-3.5 h-3.5" />
           Refresh Stats
@@ -128,46 +130,95 @@ export default function Analytics() {
       </div>
 
       {/* Overview Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="glass-panel p-5 rounded-xl border border-white/5">
-          <span className="text-[10px] text-white/40 uppercase">Predictions run</span>
-          <div className="text-2xl font-bold text-white mt-1">{monitoringData?.predictions_count || 0}</div>
-          <span className="text-[10px] text-white/30 block mt-1">Total inputs evaluated</span>
-        </div>
-        <div className="glass-panel p-5 rounded-xl border border-white/5">
-          <span className="text-[10px] text-white/40 uppercase">Avg Model Latency</span>
-          <div className="text-2xl font-bold text-white mt-1">
-            {monitoringData?.average_processing_latency ? `${monitoringData.average_processing_latency.toFixed(2)} ms` : '0.08 ms'}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Inferences */}
+        <div className="card p-5 flex flex-col justify-between group hover:border-accent-border/30 transition-all">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Predictions run</span>
+              <span className="text-xl font-black text-white block font-mono-data">
+                {monitoringData?.predictions_count?.toLocaleString() || 0}
+              </span>
+            </div>
+            <div className="p-2 rounded bg-surface-2 group-hover:bg-accent/10 transition-colors">
+              <Zap className="w-4.5 h-4.5 text-accent" />
+            </div>
           </div>
-          <span className="text-[10px] text-white/30 block mt-1">Inference step time</span>
+          <span className="text-[10px] text-text-secondary mt-4 block">Total inputs evaluated</span>
         </div>
-        <div className="glass-panel p-5 rounded-xl border border-white/5">
-          <span className="text-[10px] text-white/40 uppercase">Avg Confidence</span>
-          <div className="text-2xl font-bold text-emerald-400 mt-1">
-            {monitoringData?.average_confidence ? `${(monitoringData.average_confidence * 100).toFixed(1)}%` : '98.4%'}
+
+        {/* Avg Latency */}
+        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-success/20 transition-all">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Avg Model Latency</span>
+              <span className="text-xl font-black text-white block font-mono-data">
+                {monitoringData?.average_processing_latency ? `${monitoringData.average_processing_latency.toFixed(2)} ms` : '0.08 ms'}
+              </span>
+            </div>
+            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-success/10 transition-colors">
+              <Clock className="w-4.5 h-4.5 text-semantic-success" />
+            </div>
           </div>
-          <span className="text-[10px] text-white/30 block mt-1">Model classification weight</span>
+          <span className="text-[10px] text-text-secondary mt-4 block">Inference evaluation speed</span>
         </div>
-        <div className="glass-panel p-5 rounded-xl border border-white/5">
-          <span className="text-[10px] text-white/40 uppercase">Active failures</span>
-          <div className="text-2xl font-bold text-red-500 mt-1">{monitoringData?.failure_count || 0}</div>
-          <span className="text-[10px] text-white/30 block mt-1">Unprocessed packet flows</span>
+
+        {/* Avg Confidence */}
+        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-info/20 transition-all">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Avg Confidence</span>
+              <span className="text-xl font-black text-semantic-success block font-mono-data">
+                {monitoringData?.average_confidence ? `${(monitoringData.average_confidence * 100).toFixed(1)}%` : '98.4%'}
+              </span>
+            </div>
+            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-info/10 transition-colors">
+              <CheckCircle className="w-4.5 h-4.5 text-semantic-info" />
+            </div>
+          </div>
+          <span className="text-[10px] text-text-secondary mt-4 block">Model classification weight</span>
+        </div>
+
+        {/* Active Failures */}
+        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-critical/20 transition-all">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Inference failures</span>
+              <span className="text-xl font-black text-semantic-critical block font-mono-data">
+                {monitoringData?.failure_count || 0}
+              </span>
+            </div>
+            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-critical/10 transition-colors">
+              <AlertTriangle className="w-4.5 h-4.5 text-semantic-critical" />
+            </div>
+          </div>
+          <span className="text-[10px] text-text-secondary mt-4 block">Unprocessed packet flows</span>
         </div>
       </div>
 
       {/* Main Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
         {/* Threat Timeline (2 columns) */}
-        <div className="lg:col-span-2 glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <h3 className="text-xs font-bold text-white tracking-widest uppercase m-0 leading-none">Threats Timeline Trends</h3>
-            <div className="flex items-center gap-2">
+        <div className="lg:col-span-2 card p-5 space-y-4 text-left">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border-default pb-3 gap-3">
+            <h3 className="text-xs font-bold text-white uppercase flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4 text-accent" />
+              Timeline Trend Vectors
+            </h3>
+            
+            {/* Filter buttons */}
+            <div className="flex items-center gap-1.5 self-start">
               {['today', 'yesterday', 'this_week', 'this_month'].map((range) => (
                 <button
                   key={range}
                   onClick={() => setTimeRange(range)}
-                  className={`px-2 py-1 border text-[9px] rounded font-bold uppercase transition-colors cursor-pointer ${timeRange === range ? 'bg-[#06b6d4]/10 border-[#06b6d4]/50 text-[#06b6d4]' : 'bg-[#070b13] border-white/5 text-white/50 hover:text-white'}`}
+                  className={`
+                    px-2.5 py-1 border text-[9px] rounded font-bold uppercase transition-all cursor-pointer
+                    ${timeRange === range 
+                      ? 'bg-accent-subtle border-accent/40 text-accent' 
+                      : 'bg-surface-0 border-border-strong text-text-secondary hover:text-white'}
+                  `}
                 >
                   {range.replace('_', ' ')}
                 </button>
@@ -175,38 +226,37 @@ export default function Analytics() {
             </div>
           </div>
 
-          <div className="h-72">
+          <div className="h-72 w-full">
             {isTimelineLoading ? (
               <div className="h-full flex items-center justify-center">
                 <div className="w-full h-full animate-pulse bg-surface-2 rounded-lg" />
               </div>
             ) : isTimelineError ? (
               <div className="flex flex-col items-center justify-center h-full gap-2">
-                <AlertIcon className="w-5 h-5 text-amber-400" />
-                <p className="text-xs text-text-secondary">Could not load timeline data.</p>
-                <button onClick={() => refetchTimeline()} className="text-xs text-accent hover:underline">Retry</button>
+                <AlertTriangle className="w-5 h-5 text-semantic-warning" />
+                <span className="text-xs text-text-secondary">Timeline data unavailable</span>
               </div>
             ) : formattedTimeline.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full gap-2">
-                <Activity className="w-5 h-5 text-text-tertiary" />
-                <p className="text-xs text-text-secondary">No threat data in the selected period.</p>
-                <p className="text-[10px] text-text-tertiary">Run a detection session from the Dashboard to populate this chart.</p>
+              <div className="flex flex-col items-center justify-center h-full gap-2 text-text-secondary text-center">
+                <Activity className="w-6 h-6 text-text-tertiary" />
+                <span className="text-xs font-bold text-white">No Threat Timeline Records</span>
+                <p className="text-[10px] text-text-tertiary">Run active detection captures to stream timeline analytics.</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={formattedTimeline}>
+                <AreaChart data={formattedTimeline} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                   <defs>
-                    <linearGradient id="colorThreats" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2}/>
+                    <linearGradient id="colorAnalyticsThreats" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.15}/>
                       <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="date" stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} />
-                  <YAxis stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#0a0f1d', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
-                  <Area type="monotone" dataKey="threats" name="Total Threat Events" stroke="#ef4444" fillOpacity={1} fill="url(#colorThreats)" />
-                  <Area type="monotone" dataKey="critical" name="Critical Events" stroke="#fbbf24" fillOpacity={0} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
+                  <XAxis dataKey="date" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} />
+                  <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} />
+                  <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} labelStyle={{ color: '#fff', fontSize: '10px' }} itemStyle={{ fontSize: '10px' }} />
+                  <Area type="monotone" dataKey="threats" name="Total Threat Events" stroke="#ef4444" fillOpacity={1} fill="url(#colorAnalyticsThreats)" />
+                  <Area type="monotone" dataKey="critical" name="Critical Incidents" stroke="#eab308" fillOpacity={0} />
                 </AreaChart>
               </ResponsiveContainer>
             )}
@@ -214,25 +264,25 @@ export default function Analytics() {
         </div>
 
         {/* Severity Distribution Donut (1 column) */}
-        <div className="lg:col-span-1 glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-          <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3">
-            Anomalies Severity distribution
+        <div className="lg:col-span-1 card p-5 space-y-4 text-left">
+          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+            <ShieldAlert className="w-4 h-4 text-accent" />
+            Severity Distribution
           </h3>
 
-          <div className="h-64 flex items-center justify-center">
+          <div className="h-72 flex items-center justify-center">
             {isThreatStatsLoading ? (
               <div className="w-40 h-40 rounded-full animate-pulse bg-surface-2" />
             ) : isThreatStatsError ? (
               <div className="flex flex-col items-center gap-2">
-                <AlertIcon className="w-5 h-5 text-amber-400" />
-                <p className="text-xs text-text-secondary">Could not load severity data.</p>
-                <button onClick={() => refetchThreats()} className="text-xs text-accent hover:underline">Retry</button>
+                <AlertTriangle className="w-5 h-5 text-semantic-warning" />
+                <span className="text-xs text-text-secondary font-bold">Severity metrics offline</span>
               </div>
             ) : severityChartData.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 text-center">
-                <ShieldAlert className="w-5 h-5 text-text-tertiary" />
-                <p className="text-xs text-text-secondary">No severity data yet.</p>
-                <p className="text-[10px] text-text-tertiary">Threats will appear here after running detection.</p>
+              <div className="flex flex-col items-center gap-2 text-center text-text-secondary">
+                <ShieldAlert className="w-6 h-6 text-text-tertiary" />
+                <span className="text-xs font-bold text-white">No Severity Data</span>
+                <p className="text-[10px] text-text-tertiary">Anomalies will be grouped after adapter sniffing sweeps.</p>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
@@ -241,17 +291,17 @@ export default function Analytics() {
                     data={severityChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
+                    innerRadius={50}
+                    outerRadius={75}
                     paddingAngle={4}
                     dataKey="value"
                   >
                     {severityChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={SEVERITY_COLORS[index % SEVERITY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#0a0f1d', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
-                  <Legend wrapperStyle={{ fontSize: 10 }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} itemStyle={{ fontSize: '10px' }} />
+                  <Legend wrapperStyle={{ fontSize: 9, color: '#94a3b8' }} />
                 </PieChart>
               </ResponsiveContainer>
             )}
@@ -261,54 +311,56 @@ export default function Analytics() {
       </div>
 
       {/* Latency & Attack Vectors radar chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         
         {/* Radar of Categories */}
-        <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-          <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3">
-            Threat Vectors Classifications
+        <div className="card p-5 space-y-4 text-left">
+          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+            <Shield className="w-4 h-4 text-accent" />
+            Threat Vector Classification
           </h3>
 
           <div className="h-64 flex items-center justify-center">
             {isThreatStatsLoading ? (
               <div className="w-full h-full animate-pulse bg-surface-2 rounded-lg" />
             ) : isThreatStatsError ? (
-              <div className="flex flex-col items-center gap-2">
-                <AlertIcon className="w-5 h-5 text-amber-400" />
-                <p className="text-xs text-text-secondary">Could not load category data.</p>
+              <div className="text-center">
+                <AlertTriangle className="w-5 h-5 text-semantic-warning mx-auto" />
+                <span className="text-xs text-text-secondary mt-2 block">Failed to load classes</span>
               </div>
             ) : categoriesChartData.length === 0 ? (
-              <div className="flex flex-col items-center gap-2 text-center">
-                <TrendingUp className="w-5 h-5 text-text-tertiary" />
-                <p className="text-xs text-text-secondary">No classification logs yet.</p>
+              <div className="flex flex-col items-center gap-2 text-center text-text-secondary">
+                <TrendingUp className="w-6 h-6 text-text-tertiary" />
+                <span className="text-xs font-bold text-white">No Classification Categories</span>
               </div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={categoriesChartData}>
-                  <PolarGrid stroke="rgba(255,255,255,0.05)" />
-                  <PolarAngleAxis dataKey="subject" stroke="rgba(255,255,255,0.4)" fontSize={10} />
-                  <PolarRadiusAxis stroke="rgba(255,255,255,0.2)" fontSize={9} />
-                  <Radar name="Threat Vector volume" dataKey="value" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.25} />
+                  <PolarGrid stroke="rgba(255,255,255,0.03)" />
+                  <PolarAngleAxis dataKey="subject" stroke="rgba(255,255,255,0.3)" fontSize={10} />
+                  <PolarRadiusAxis stroke="rgba(255,255,255,0.1)" fontSize={9} />
+                  <Radar name="Intrusions" dataKey="value" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.2} />
                 </RadarChart>
               </ResponsiveContainer>
             )}
           </div>
         </div>
 
-        {/* Inference steps latency */}
-        <div className="glass-panel p-5 rounded-xl border border-white/5 space-y-4">
-          <h3 className="text-xs font-bold text-white tracking-widest uppercase border-b border-white/5 pb-3">
+        {/* Inference steps latency stability */}
+        <div className="card p-5 space-y-4 text-left">
+          <h3 className="text-xs font-bold text-white uppercase border-b border-border-default pb-3 flex items-center gap-1.5">
+            <Activity className="w-4 h-4 text-accent" />
             Inference Latency Stability
           </h3>
 
-          <div className="h-64">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockLatencyData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis dataKey="log" stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} />
-                <YAxis stroke="rgba(255,255,255,0.4)" fontSize={10} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#0a0f1d', border: '1px solid rgba(255,255,255,0.1)', color: '#fff' }} />
-                <Line type="monotone" dataKey="latency" name="Latency (ms)" stroke="#06b6d4" strokeWidth={2} activeDot={{ r: 6 }} />
+              <LineChart data={mockLatencyData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
+                <XAxis dataKey="log" stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} />
+                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} itemStyle={{ fontSize: '10px' }} />
+                <Line type="monotone" dataKey="latency" name="Inference Speed (ms)" stroke="#06b6d4" strokeWidth={2} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
