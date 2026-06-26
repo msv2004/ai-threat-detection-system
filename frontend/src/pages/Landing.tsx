@@ -4,26 +4,27 @@ import {
   Shield, 
   Brain, 
   Activity, 
-  Terminal, 
-  BarChart3, 
   ArrowRight, 
+  ArrowUpRight,
   CheckCircle, 
   AlertTriangle, 
-  Upload, 
   Cpu, 
   Zap, 
-  Play, 
   ChevronDown, 
   Lock,
   Server,
-  Code,
-  Database
+  Database,
+  Eye,
+  Radar,
+  Star,
+  Menu,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Landing() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'threats' | 'datasets'>('dashboard');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [mobileNav, setMobileNav] = useState(false);
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -48,511 +49,392 @@ export default function Landing() {
     }
   ];
 
-  return (
-    <div className="min-h-screen bg-surface-0 text-text-primary flex flex-col font-sans selection:bg-accent/30 selection:text-white scroll-smooth relative overflow-x-hidden cyber-grid">
-      {/* Glow backgrounds */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[350px] bg-gradient-to-r from-accent/10 via-semantic-ai/5 to-semantic-info/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute top-[800px] -right-1/4 w-[500px] h-[500px] bg-semantic-ai/5 rounded-full blur-[150px] pointer-events-none" />
+  const services = [
+    {
+      icon: Shield,
+      title: "THREAT MONITORING",
+      description: "Continuous AI-powered analysis of network flows, packet headers, and endpoint telemetry to detect intrusion patterns, anomalous behavior, and zero-day attack vectors in real time.",
+      tags: ["Real-Time Alerting", "Threat Analysis", "Security Monitoring"]
+    },
+    {
+      icon: Eye,
+      title: "VULNERABILITY ASSESSMENT",
+      description: "Deep inspection of network topology, protocol weaknesses, and configuration drift to identify exploitable vulnerabilities before adversaries discover them.",
+      tags: ["Risk Identification", "Security Analysis", "Remediation Recommend"]
+    },
+    {
+      icon: Brain,
+      title: "AI MODEL TRAINING",
+      description: "Train, evaluate, and deploy machine learning classifiers on custom network datasets. Supports Random Forest, Decision Tree, Logistic Regression, and Isolation Forest algorithms.",
+      tags: ["Model Registry", "Hyperparameter Tuning", "Feature Importance"]
+    },
+    {
+      icon: Database,
+      title: "DATASET INTELLIGENCE",
+      description: "Upload, preprocess, and profile network capture datasets. Automated feature engineering, missing value imputation, scaling, encoding, and train/test splitting.",
+      tags: ["Data Profiling", "Feature Engineering", "Split Management"]
+    }
+  ];
 
-      {/* Header */}
-      <header className="h-16 border-b border-border-default bg-surface-0/80 backdrop-blur-xl sticky top-0 z-50 px-6 md:px-12 flex items-center justify-between">
-        <div className="flex items-center gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shadow-lg relative group">
-              <Shield className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <span className="font-extrabold text-sm tracking-widest text-white">AEGIS SOC</span>
-              <span className="text-[9px] text-text-tertiary block font-semibold uppercase tracking-wider leading-none mt-0.5">AI Operations</span>
-            </div>
-          </div>
-          <nav className="hidden lg:flex items-center gap-6 text-xs font-bold uppercase tracking-wider text-text-secondary">
-            <a href="#about" className="hover:text-white transition-colors py-1">Overview</a>
-            <a href="#features" className="hover:text-white transition-colors py-1">Capabilities</a>
-            <a href="#pipeline" className="hover:text-white transition-colors py-1">ML Pipeline</a>
-            <a href="#preview" className="hover:text-white transition-colors py-1">SOC Preview</a>
-            <a href="#faq" className="hover:text-white transition-colors py-1">FAQ</a>
+  const stats = [
+    { value: "99.7%", label: "Detection Accuracy" },
+    { value: "<4ms", label: "Response Latency" },
+    { value: "24/7", label: "Autonomous Monitoring" },
+    { value: "50K+", label: "Threats Classified" }
+  ];
+
+  return (
+    <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-gold/30 selection:text-white overflow-x-hidden">
+      
+      {/* ── Navigation ── */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <span className="font-display text-2xl tracking-wider text-gold">{'{ AEGIS }'}</span>
+          </Link>
+
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-10">
+            {['Platform', 'Features', 'Solutions', 'Documentation'].map((item) => (
+              <a 
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="text-xs font-semibold uppercase tracking-[0.15em] text-text-secondary hover:text-white transition-colors duration-200"
+              >
+                {item}
+              </a>
+            ))}
           </nav>
+
+          {/* CTA */}
+          <div className="hidden md:flex items-center gap-4">
+            <Link to="/login" className="text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Link 
+              to="/register" 
+              className="btn btn-gold btn-sm text-xs px-6 py-2.5"
+            >
+              Get Started
+            </Link>
+          </div>
+
+          {/* Mobile menu toggle */}
+          <button onClick={() => setMobileNav(!mobileNav)} className="md:hidden p-2 text-text-secondary">
+            {mobileNav ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
-        <div className="flex items-center gap-4">
-          <Link to="/login" className="text-xs font-bold uppercase tracking-wider text-text-secondary hover:text-white transition-colors">
-            Operator Sign In
-          </Link>
-          <Link
-            to="/register"
-            className="btn btn-primary btn-sm rounded-lg"
-          >
-            Access Platform Free
-          </Link>
-        </div>
+
+        {/* Mobile Nav Dropdown */}
+        <AnimatePresence>
+          {mobileNav && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="md:hidden bg-black/95 border-t border-white/5 overflow-hidden"
+            >
+              <div className="px-6 py-6 space-y-4">
+                {['Platform', 'Features', 'Solutions', 'Documentation'].map((item) => (
+                  <a key={item} href={`#${item.toLowerCase()}`} className="block text-sm font-semibold text-text-secondary hover:text-gold transition-colors">
+                    {item}
+                  </a>
+                ))}
+                <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
+                  <Link to="/login" className="text-sm font-semibold text-text-secondary">Sign In</Link>
+                  <Link to="/register" className="btn btn-gold text-sm w-full">Get Started</Link>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      {/* Hero Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-28 px-6 md:px-12 border-b border-border-default">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center">
-          {/* Left Hero Column */}
-          <div className="lg:col-span-6 flex flex-col items-start text-left space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-subtle border border-accent-border/30 text-[10px] font-bold text-accent uppercase tracking-widest">
-              <Zap className="w-3.5 h-3.5 text-accent animate-pulse" /> 
-              Autonomous Threat Classification SOC
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
-              AI-Driven Intrusion <br />
-              <span className="bg-gradient-to-r from-accent via-semantic-info to-semantic-ai bg-clip-text text-transparent">
-                Detection & Mitigation
-              </span>
-            </h1>
-            
-            <p className="text-sm md:text-base text-text-secondary leading-relaxed max-w-lg">
-              Aggregate volumetric flow packet streams, preprocess datasets with integrated standardizers, train machine learning model classifiers, and investigate malicious anomalies inside one unified SaaS workspace.
-            </p>
-            
-            <div className="flex flex-wrap gap-4 w-full pt-2">
-              <Link
-                to="/register"
-                className="flex items-center gap-2 font-bold bg-accent hover:bg-accent-hover text-[#02040a] text-xs px-5 py-3 rounded-lg transition-all shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/20 active:translate-y-[1px]"
-              >
-                Register Operator Access <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/login"
-                className="flex items-center gap-2 font-bold bg-surface-1 border border-border-strong text-white text-xs px-5 py-3 rounded-lg transition-all hover:bg-surface-2"
-              >
-                Launch Live Demo
-              </Link>
-            </div>
+      {/* ── Hero Section ── */}
+      <section className="landing-hero-bg relative min-h-screen flex items-center justify-center pt-20">
+        {/* Background cyber imagery overlay */}
+        <div className="absolute inset-0 opacity-[0.08]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(212,168,67,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(212,168,67,0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: '60px 60px'
+          }}
+        />
+        {/* Floating code fragments */}
+        <div className="absolute top-[20%] left-[5%] text-[10px] font-mono-data text-white/[0.04] leading-relaxed hidden lg:block">
+          {'if (packet.flags & SYN) {\n  analyze(flow);\n  classify(model);\n}'
+            .split('\n').map((line, i) => <div key={i}>{line}</div>)}
+        </div>
+        <div className="absolute top-[30%] right-[5%] text-[10px] font-mono-data text-white/[0.04] leading-relaxed hidden lg:block">
+          {'0x4500 0x0034 0x1c46\n0x4000 0x4006 0xb1e6\nac10 0a01 ac10 0a02'
+            .split('\n').map((line, i) => <div key={i}>{line}</div>)}
+        </div>
+        
+        <div className="relative z-10 text-center px-6 max-w-5xl mx-auto">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <span className="section-badge text-text-secondary">{'{ NO. #1 AI THREAT DETECTION }'}</span>
+          </motion.div>
 
-            <div className="flex items-center gap-6 pt-8 border-t border-border-default w-full">
-              <div>
-                <span className="text-2xl font-black text-white block font-mono-data">99.4%</span>
-                <span className="text-[9px] text-text-tertiary uppercase font-bold tracking-widest">Classification Accuracy</span>
-              </div>
-              <div className="w-[1px] h-8 bg-border-default" />
-              <div>
-                <span className="text-2xl font-black text-white block font-mono-data">&lt; 2.5ms</span>
-                <span className="text-[9px] text-text-tertiary uppercase font-bold tracking-widest">Inference Step latency</span>
-              </div>
-              <div className="w-[1px] h-8 bg-border-default" />
-              <div>
-                <span className="text-2xl font-black text-semantic-success block font-mono-data">Real-Time</span>
-                <span className="text-[9px] text-text-tertiary uppercase font-bold tracking-widest">Telemetry Stream</span>
-              </div>
+          {/* Main heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="font-display text-[clamp(3rem,8vw,7.5rem)] leading-[0.95] text-gold mt-6 tracking-wide"
+          >
+            ADVANCED<br />
+            CYBER SECURITY
+          </motion.h1>
+
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-text-secondary text-base md:text-lg max-w-2xl mx-auto mt-8 leading-relaxed"
+          >
+            Protect critical systems, sensitive data, and digital operations with proactive 
+            AI-powered cybersecurity solutions tailored for evolving network threats.
+          </motion.p>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10"
+          >
+            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm px-10">
+              Get Protected
+            </Link>
+            <Link to="/login" className="btn btn-gold btn-lg text-sm px-10">
+              Free Assessment
+            </Link>
+          </motion.div>
+
+          {/* Trust indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
+            className="flex items-center justify-center gap-3 mt-12"
+          >
+            <div className="flex -space-x-2">
+              {[0,1,2].map(i => (
+                <div key={i} className="w-9 h-9 rounded-full bg-surface-3 border-2 border-black flex items-center justify-center text-xs font-bold text-text-secondary">
+                  {['SC','AK','JL'][i]}
+                </div>
+              ))}
             </div>
-          </div>
-
-          {/* Right Hero Mockup */}
-          <div className="lg:col-span-6 relative">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-accent to-semantic-ai rounded-2xl blur opacity-15 pointer-events-none" />
-            <div className="border border-border-strong rounded-2xl bg-surface-1 p-5 shadow-2xl relative overflow-hidden space-y-4">
-              <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-              
-              <div className="flex items-center justify-between border-b border-border-default pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-semantic-critical animate-ping" />
-                  <span className="text-[9px] font-bold tracking-wider text-text-secondary uppercase">Ingress Telemetry Stream</span>
-                </div>
-                <div className="flex items-center gap-1 bg-semantic-success/10 border border-semantic-success/20 px-2 py-0.5 rounded text-[9px] font-bold text-semantic-success">
-                  <Activity className="w-3 h-3 text-semantic-success" /> Capture active
-                </div>
-              </div>
-
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-surface-0 border border-border-default p-3 rounded-lg text-left">
-                  <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-widest">Risk Factor</span>
-                  <span className="text-lg font-black text-semantic-critical mt-1 block font-mono-data">9.4</span>
-                </div>
-                <div className="bg-surface-0 border border-border-default p-3 rounded-lg text-left">
-                  <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-widest">Alert Count</span>
-                  <span className="text-lg font-black text-semantic-warning mt-1 block font-mono-data">14</span>
-                </div>
-                <div className="bg-surface-0 border border-border-default p-3 rounded-lg text-left">
-                  <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-widest">Inference engine</span>
-                  <span className="text-[10px] font-bold text-accent mt-2 block truncate font-mono-data">RFC_Active_v1</span>
-                </div>
-              </div>
-
-              <div className="bg-surface-0 border border-border-default rounded-xl p-3 space-y-2">
-                <span className="text-[9px] font-extrabold text-text-secondary uppercase tracking-widest block text-left">Threat Classification Feed</span>
-                {[
-                  { name: 'DDoS Volumetric Spike', dst: '192.168.10.45', sev: 'Critical', style: 'text-semantic-critical bg-semantic-critical/10 border-semantic-critical/20' },
-                  { name: 'SSH Port Scan Sweep', dst: '10.0.1.201', sev: 'High', style: 'text-semantic-investigate bg-semantic-investigate/10 border-semantic-investigate/20' },
-                  { name: 'Anomaly Payload Flag', dst: '172.16.8.9', sev: 'Medium', style: 'text-semantic-warning bg-semantic-warning/10 border-semantic-warning/20' },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs border-b border-border-default pb-2 last:border-0 last:pb-0">
-                    <div className="flex items-center gap-2">
-                      <AlertTriangle className={`w-3.5 h-3.5 ${i === 0 ? 'text-semantic-critical' : i === 1 ? 'text-semantic-investigate' : 'text-semantic-warning'}`} />
-                      <span className="font-semibold text-white">{item.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono-data text-[9px] text-text-tertiary">{item.dst}</span>
-                      <span className={`px-1.5 py-0.5 border rounded text-[8px] font-extrabold uppercase ${item.style}`}>
-                        {item.sev}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="flex items-center gap-1.5">
+              <Star className="w-4 h-4 text-gold fill-gold" />
+              <span className="text-sm text-text-secondary font-medium">4.9/5 Rating Clients</span>
             </div>
-          </div>
+          </motion.div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <div className="w-px h-8 bg-gradient-to-b from-transparent to-gold/30" />
         </div>
       </section>
 
-      {/* Educational Section */}
-      <section id="about" className="py-20 px-6 md:px-12 border-b border-border-default bg-surface-1/10">
-        <div className="max-w-6xl mx-auto text-left">
-          <div className="mb-14 space-y-2">
-            <span className="text-[10px] font-extrabold text-accent uppercase tracking-widest block">AI Threat Diagnostics</span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">What is Intelligent Threat Detection?</h2>
-            <p className="text-text-secondary text-sm max-w-xl leading-relaxed">
-              Static firewall rules and signature blocks are no longer sufficient. Aegis models network volumetric signatures as feature nodes, deploying machine learning algorithms to isolate attacks.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="card p-6 flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-lg bg-semantic-critical/10 border border-semantic-critical/20 flex items-center justify-center text-semantic-critical">
-                <AlertTriangle className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-base">The Perimeter Challenge</h3>
-              <p className="text-text-secondary text-xs leading-relaxed">
-                Zero-day exploitation, stealth scanning, and distributed volume packet flooding bypass traditional block rules. Inspecting millions of log strings manually is mathematically impossible.
-              </p>
+      {/* ── Stats Bar ── */}
+      <section className="bg-[#0a0a0a] border-y border-white/5 py-12">
+        <div className="max-w-6xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="font-display text-4xl md:text-5xl text-gold tracking-wider">{stat.value}</div>
+              <div className="text-xs text-text-tertiary uppercase tracking-[0.15em] mt-2 font-semibold">{stat.label}</div>
             </div>
-
-            <div className="card p-6 flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-lg bg-semantic-ai/10 border border-semantic-ai/20 flex items-center justify-center text-semantic-ai">
-                <Brain className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-base">Continuous ML Learning</h3>
-              <p className="text-text-secondary text-xs leading-relaxed">
-                Aegis models packet variables: flow duration, packet bytes, flag ratios, and latency. The engine trains classifications (Random Forests, Trees, SVMs) to build predictive anomalies bounds.
-              </p>
-            </div>
-
-            <div className="card p-6 flex flex-col gap-4">
-              <div className="w-10 h-10 rounded-lg bg-semantic-success/10 border border-semantic-success/20 flex items-center justify-center text-semantic-success">
-                <CheckCircle className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-base">Mitigation Workflows</h3>
-              <p className="text-text-secondary text-xs leading-relaxed">
-                Anomaly flows are logged and mapped to MITRE ATT&CK vectors (T1043). Security analysts get recommendations, AbuseIPDB reputation scores, and status routing for mitigating risks.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Capabilities Matrix */}
-      <section id="features" className="py-20 px-6 md:px-12 border-b border-border-default">
-        <div className="max-w-6xl mx-auto text-left">
-          <div className="mb-14 space-y-2">
-            <span className="text-[10px] font-extrabold text-accent uppercase tracking-widest block">Capabilities</span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">SOC Platform Matrix</h2>
-            <p className="text-text-secondary text-sm max-w-xl leading-relaxed">
-              Enterprise security features engineered for data analysts, network engineers, and security compliance operators.
-            </p>
+      {/* ── Services Section ── */}
+      <section id="features" className="bg-black py-24">
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <span className="section-badge text-text-tertiary">{'{ OUR CAPABILITIES }'}</span>
+            <h2 className="font-display text-[clamp(2rem,5vw,4.5rem)] text-white mt-4 tracking-wider leading-tight">
+              AI-POWERED SECURITY<br />SOLUTIONS AVAILABLE
+            </h2>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                icon: Database,
-                title: 'Data Ingestion & Splits',
-                desc: 'Ingest security logs and network flow CSV files. Perform label encoding, remove null values, scale metrics, and compile training splits.',
-              },
-              {
-                icon: Brain,
-                title: 'Training Console',
-                desc: 'Select preprocessing pipeline configurations. Adjust classifiers (Decision Trees, Random Forests, SVMs) and monitor live metrics.',
-              },
-              {
-                icon: Cpu,
-                title: 'Model Hot-Swaps',
-                desc: 'Evaluate versioned models, review accuracy levels, inspect individual decision weights, and activate optimal classifiers.',
-              },
-              {
-                icon: Activity,
-                title: 'Telemetry Sniffers',
-                desc: 'Simulate capture sweeps. Read network adapters or replay PCAP dump flows, evaluating stream telemetry with low latencies.',
-              },
-              {
-                icon: Shield,
-                title: 'MITRE Incident Mapping',
-                desc: 'Group detections into incident registries mapped to standard techniques. Investigate origin vector structures and VT hits.',
-              },
-              {
-                icon: BarChart3,
-                title: 'Intel Analytics',
-                desc: 'Generate incident growth charts, vector severity donuts, classification precision radars, and latency stability lines.',
-              },
-            ].map((cap, i) => (
-              <div key={i} className="card p-6 space-y-3">
-                <div className="w-9 h-9 rounded bg-surface-2 border border-border-default flex items-center justify-center text-accent">
-                  <cap.icon className="w-5.5 h-5.5" />
-                </div>
-                <h4 className="font-bold text-white text-sm">{cap.title}</h4>
-                <p className="text-text-secondary text-xs leading-relaxed">{cap.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Interactive Mockup Previews */}
-      <section id="preview" className="py-20 px-6 md:px-12 border-b border-border-default bg-surface-1/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10 space-y-2">
-            <span className="text-[10px] font-extrabold text-[#a855f7] uppercase tracking-widest block">Operational Console</span>
-            <h2 className="text-3xl font-extrabold text-white">Interactive Console Previews</h2>
-            <p className="text-text-secondary text-xs max-w-md mx-auto leading-relaxed">
-              Explore how Aegis parses dataset flows, compiles models, and aggregates incident timelines.
-            </p>
-          </div>
-
-          {/* Selector Tabs */}
-          <div className="flex items-center justify-center gap-2 mb-8 bg-surface-1 border border-border-default p-1 rounded-xl max-w-md mx-auto">
-            {(['dashboard', 'threats', 'datasets'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`
-                  flex-1 text-center py-2 text-xs font-bold rounded-lg uppercase tracking-wider transition-all cursor-pointer
-                  ${activeTab === tab ? 'bg-accent/10 border border-accent/20 text-accent' : 'text-text-secondary hover:text-white'}
-                `}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          {/* Tab Previews Container */}
-          <div className="border border-border-strong rounded-2xl bg-surface-1 p-6 max-w-4xl mx-auto shadow-2xl relative">
-            <AnimatePresence mode="wait">
-              {activeTab === 'dashboard' && (
-                <motion.div
-                  key="dashboard"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4 text-left"
-                >
-                  <div className="flex items-center justify-between border-b border-border-default pb-3">
-                    <span className="text-xs font-bold text-white uppercase font-mono-data">Dashboard Real-Time Monitoring</span>
-                    <span className="text-[9px] font-bold text-semantic-success uppercase bg-semantic-success/10 border border-semantic-success/20 px-2 py-0.5 rounded">CONNECTED</span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-surface-0 border border-border-default p-4 rounded-xl text-left">
-                      <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-wider">Active Adapter</span>
-                      <span className="text-sm font-bold text-white block mt-1 font-mono-data">Wi-Fi (Live)</span>
-                    </div>
-                    <div className="bg-surface-0 border border-border-default p-4 rounded-xl text-left">
-                      <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-wider">Telemetry Latency</span>
-                      <span className="text-sm font-bold text-white block mt-1 font-mono-data">0.08 ms</span>
-                    </div>
-                    <div className="bg-surface-0 border border-border-default p-4 rounded-xl text-left">
-                      <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-wider">Average accuracy</span>
-                      <span className="text-sm font-bold text-white block mt-1 font-mono-data">99.4%</span>
-                    </div>
-                    <div className="bg-surface-0 border border-border-default p-4 rounded-xl text-left">
-                      <span className="text-[8px] text-text-tertiary block font-bold uppercase tracking-wider">Model Status</span>
-                      <span className="text-sm font-bold text-semantic-success block mt-1 font-mono-data">ACTIVE</span>
-                    </div>
-                  </div>
-                  <div className="bg-surface-0 border border-border-default p-4 rounded-xl h-36 flex items-center justify-center">
-                    <div className="text-center space-y-1">
-                      <Activity className="w-6 h-6 text-accent animate-pulse mx-auto" />
-                      <span className="text-[10px] text-text-secondary block font-mono-data">Rendering Ingress Telemetry Chart Rates...</span>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'threats' && (
-                <motion.div
-                  key="threats"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4 text-left"
-                >
-                  <div className="flex items-center justify-between border-b border-border-default pb-3">
-                    <span className="text-xs font-bold text-white uppercase font-mono-data">Threat Registry Database Logs</span>
-                    <span className="text-[9px] font-bold text-semantic-critical uppercase bg-semantic-critical/10 border border-semantic-critical/20 px-2 py-0.5 rounded">ATTACK ACTIVE</span>
-                  </div>
-                  <div className="overflow-x-auto text-[11px] font-mono-data">
-                    <table className="w-full text-left">
-                      <thead>
-                        <tr className="border-b border-border-default text-text-tertiary font-bold">
-                          <th className="pb-2">SEVERITY</th>
-                          <th className="pb-2">CLASSIFICATION</th>
-                          <th className="pb-2">SOURCE VECTOR</th>
-                          <th className="pb-2">MITRE ATT&CK</th>
-                          <th className="pb-2">VT HIT</th>
-                        </tr>
-                      </thead>
-                      <tbody className="text-text-secondary divide-y divide-border-default">
-                        <tr>
-                          <td className="py-2 text-semantic-critical font-bold">CRITICAL</td>
-                          <td className="py-2 text-white font-bold">DDoS Volumetric Flow</td>
-                          <td className="py-2">192.168.1.112 → 10.0.0.8</td>
-                          <td className="py-2 text-accent">T1498 (Flooding)</td>
-                          <td className="py-2 font-bold text-semantic-critical">9/10</td>
-                        </tr>
-                        <tr>
-                          <td className="py-2 text-semantic-investigate font-bold">HIGH</td>
-                          <td className="py-2 text-white font-bold">SSH Login Brute Force</td>
-                          <td className="py-2">10.0.4.15 → 10.0.0.22</td>
-                          <td className="py-2 text-accent">T1110 (Brute Force)</td>
-                          <td className="py-2 font-bold text-semantic-warning font-mono-data">3/10</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </motion.div>
-              )}
-
-              {activeTab === 'datasets' && (
-                <motion.div
-                  key="datasets"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-4 text-left"
-                >
-                  <div className="flex items-center justify-between border-b border-border-default pb-3">
-                    <span className="text-xs font-bold text-white uppercase font-mono-data">Dataset Ingestion & Splits</span>
-                    <span className="text-[9px] font-bold text-semantic-info uppercase bg-semantic-info/10 border border-semantic-info/20 px-2 py-0.5 rounded font-mono-data">VITE COMPILER</span>
-                  </div>
-                  <div className="border border-dashed border-border-strong bg-surface-0 rounded-xl p-6 text-center">
-                    <Upload className="w-6 h-6 text-text-tertiary mx-auto mb-2" />
-                    <span className="text-[11px] text-text-secondary font-bold block">Drag & drop your network flow CSV file here</span>
-                    <span className="text-[9px] text-text-tertiary mt-1 block">Maximum size limit 5MB (Ingestion parser resolves row scaling)</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </section>
-
-      {/* Technology Stack / Deployment section */}
-      <section id="pipeline" className="py-20 px-6 md:px-12 border-b border-border-default">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12 space-y-2">
-            <span className="text-[10px] font-bold text-accent uppercase tracking-widest block">Deploy Architecture</span>
-            <h2 className="text-3xl font-extrabold text-white">Platform Stack & Pipeline</h2>
-            <p className="text-text-secondary text-xs max-w-sm mx-auto leading-relaxed">
-              Built on containerized FastAPI backends, Alembic database logs, and React query hooks.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div className="bg-surface-1 border border-border-default rounded-xl p-5 space-y-2">
-              <Server className="w-6 h-6 text-[#38bdf8] mx-auto" />
-              <h5 className="font-bold text-white text-xs">FastAPI Service</h5>
-              <span className="text-[10px] text-text-tertiary block font-mono-data">Python API Router</span>
-            </div>
-            <div className="bg-surface-1 border border-border-default rounded-xl p-5 space-y-2">
-              <Brain className="w-6 h-6 text-semantic-ai mx-auto" />
-              <h5 className="font-bold text-white text-xs">Scikit-Learn ML</h5>
-              <span className="text-[10px] text-text-tertiary block font-mono-data">Classifier Pipeline</span>
-            </div>
-            <div className="bg-surface-1 border border-border-default rounded-xl p-5 space-y-2">
-              <Code className="w-6 h-6 text-[#818cf8] mx-auto" />
-              <h5 className="font-bold text-white text-xs">Vite / React 19</h5>
-              <span className="text-[10px] text-text-tertiary block font-mono-data">Client Application</span>
-            </div>
-            <div className="bg-surface-1 border border-border-default rounded-xl p-5 space-y-2">
-              <Database className="w-6 h-6 text-semantic-success mx-auto" />
-              <h5 className="font-bold text-white text-xs">PostgreSQL logs</h5>
-              <span className="text-[10px] text-text-tertiary block font-mono-data">Alembic DB migrations</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
-      <section id="faq" className="py-20 px-6 md:px-12 border-b border-border-default bg-surface-1/10">
-        <div className="max-w-4xl mx-auto text-left">
-          <div className="text-center mb-14 space-y-2">
-            <span className="text-[10px] font-bold text-accent uppercase tracking-widest block">Operator Help</span>
-            <h2 className="text-3xl font-extrabold text-white">Frequently Asked Questions</h2>
-            <p className="text-text-secondary text-sm leading-relaxed max-w-sm mx-auto">
-              Got questions about datasets, live sniffer captures, or model weights? Check answers below.
-            </p>
-          </div>
-
+          {/* Service Cards */}
           <div className="space-y-4">
-            {faqData.map((item, i) => (
-              <div key={i} className="bg-surface-1 border border-border-default rounded-xl overflow-hidden transition-all duration-200">
-                <button
-                  onClick={() => toggleFaq(i)}
-                  className="w-full px-5 py-4 flex items-center justify-between text-left cursor-pointer"
+            {services.map((service, index) => {
+              const Icon = service.icon;
+              return (
+                <motion.div
+                  key={service.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="landing-card group p-8 md:p-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
                 >
-                  <span className="font-bold text-white text-xs md:text-sm">{item.q}</span>
-                  <ChevronDown className={`w-4 h-4 text-text-tertiary transition-transform duration-200 shrink-0 ${openFaq === i ? 'rotate-180 text-white' : ''}`} />
+                  <div className="flex items-start gap-6 flex-1">
+                    {/* Icon */}
+                    <div className="w-14 h-14 rounded-lg bg-gold/5 border border-gold/15 flex items-center justify-center shrink-0 group-hover:bg-gold/10 transition-colors">
+                      <Icon className="w-7 h-7 text-gold" />
+                    </div>
+                    {/* Content */}
+                    <div className="flex-1">
+                      <h3 className="font-display text-xl md:text-2xl text-white tracking-wider mb-3">{service.title}</h3>
+                      <p className="text-sm text-text-secondary leading-relaxed max-w-2xl mb-4">{service.description}</p>
+                      <div className="flex flex-wrap gap-4">
+                        {service.tags.map(tag => (
+                          <span key={tag} className="flex items-center gap-2 text-xs text-text-secondary">
+                            <span className="w-1.5 h-1.5 bg-gold rounded-sm" />
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Arrow */}
+                  <div className="w-12 h-12 rounded-full border border-gold/30 flex items-center justify-center group-hover:bg-gold/10 group-hover:border-gold/60 transition-all shrink-0">
+                    <ArrowUpRight className="w-5 h-5 text-gold" />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section id="solutions" className="bg-[#050505] py-24 border-t border-white/5">
+        <div className="max-w-6xl mx-auto px-6 lg:px-12">
+          <div className="text-center mb-16">
+            <span className="section-badge text-text-tertiary">{'{ HOW IT WORKS }'}</span>
+            <h2 className="font-display text-[clamp(2rem,5vw,4rem)] text-white mt-4 tracking-wider">
+              END-TO-END AI PIPELINE
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {[
+              { step: '01', title: 'INGEST', desc: 'Upload network capture CSV datasets or connect live packet sniffing adapters.', icon: Database },
+              { step: '02', title: 'PREPROCESS', desc: 'Clean, encode, scale, and split data with automated feature engineering.', icon: Cpu },
+              { step: '03', title: 'TRAIN', desc: 'Select classifiers, tune hyperparameters, and compile ML models on your data.', icon: Brain },
+              { step: '04', title: 'DETECT', desc: 'Deploy models for real-time traffic classification and threat alerting.', icon: Radar },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <motion.div
+                  key={item.step}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.12 }}
+                  className="landing-card p-8 text-center group"
+                >
+                  <div className="font-display text-5xl text-gold/20 group-hover:text-gold/40 transition-colors">{item.step}</div>
+                  <div className="w-12 h-12 mx-auto mt-4 rounded-lg bg-gold/5 border border-gold/10 flex items-center justify-center group-hover:bg-gold/10 transition-colors">
+                    <Icon className="w-6 h-6 text-gold" />
+                  </div>
+                  <h3 className="font-display text-xl text-white tracking-wider mt-4">{item.title}</h3>
+                  <p className="text-xs text-text-tertiary mt-3 leading-relaxed">{item.desc}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── FAQ Section ── */}
+      <section id="documentation" className="bg-black py-24 border-t border-white/5">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <span className="section-badge text-text-tertiary">{'{ FAQ }'}</span>
+            <h2 className="font-display text-[clamp(2rem,5vw,3.5rem)] text-white mt-4 tracking-wider">
+              COMMON QUESTIONS
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqData.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={false}
+                className="landing-card"
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full flex items-center justify-between p-6 text-left"
+                >
+                  <span className="text-sm font-semibold text-white pr-4">{faq.q}</span>
+                  <ChevronDown className={`w-4 h-4 text-gold shrink-0 transition-transform duration-300 ${openFaq === index ? 'rotate-180' : ''}`} />
                 </button>
-                
-                <AnimatePresence initial={false}>
-                  {openFaq === i && (
+                <AnimatePresence>
+                  {openFaq === index && (
                     <motion.div
-                      initial={{ height: 0 }}
-                      animate={{ height: 'auto' }}
-                      exit={{ height: 0 }}
-                      transition={{ duration: 0.2 }}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="px-5 pb-5 text-xs text-text-secondary leading-relaxed border-t border-border-subtle pt-3">
-                        {item.a}
+                      <div className="px-6 pb-6 text-sm text-text-secondary leading-relaxed border-t border-white/5 pt-4">
+                        {faq.a}
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Call To Action */}
-      <section className="py-20 px-6 md:px-12 text-center bg-gradient-to-b from-surface-0 to-surface-1">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-3xl font-black text-white sm:text-4xl">Ready to Secure Your Ingress Nodes?</h2>
-          <p className="text-text-secondary text-sm leading-relaxed max-w-md mx-auto">
-            Upload CSV packet flows, compile custom Random Forest classifiers, and monitor threat incidents in real time today.
+      {/* ── CTA Section ── */}
+      <section className="bg-[#050505] py-24 border-t border-white/5">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <span className="section-badge text-text-tertiary">{'{ GET STARTED }'}</span>
+          <h2 className="font-display text-[clamp(2rem,5vw,4rem)] text-white mt-4 tracking-wider">
+            SECURE YOUR NETWORK TODAY
+          </h2>
+          <p className="text-text-secondary mt-4 max-w-xl mx-auto">
+            Deploy Aegis AI SOC in minutes. Upload your first dataset, train a classifier, and start detecting threats autonomously.
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              to="/register"
-              className="btn btn-primary"
-            >
-              Launch Aegis Console
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+            <Link to="/register" className="btn btn-gold-filled btn-lg text-sm px-12">
+              Start Free
             </Link>
-            <a
-              href="https://github.com"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-secondary"
-            >
-              View Github Repository
-            </a>
+            <Link to="/login" className="btn btn-gold btn-lg text-sm px-12">
+              Sign In
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 md:px-12 border-t border-border-default bg-surface-0 text-text-tertiary text-xs">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+      {/* ── Footer ── */}
+      <footer className="bg-black border-t border-white/5 py-12">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
-            <Shield className="w-4.5 h-4.5 text-accent" />
-            <span className="font-extrabold text-[11px] text-white tracking-widest">AEGIS SECURITY SYSTEMS</span>
+            <span className="font-display text-xl text-gold tracking-wider">{'{ AEGIS }'}</span>
+            <span className="text-xs text-text-tertiary">AI Threat Detection Platform</span>
           </div>
-          <div>
-            <span>© {new Date().getFullYear()} Aegis SOC. Licensed under enterprise compliance protocols.</span>
+          <div className="flex items-center gap-8">
+            {['Privacy', 'Terms', 'Security', 'Status'].map(link => (
+              <a key={link} href="#" className="text-xs text-text-tertiary hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">
+                {link}
+              </a>
+            ))}
+          </div>
+          <div className="text-xs text-text-tertiary">
+            © {new Date().getFullYear()} Aegis SOC. All rights reserved.
           </div>
         </div>
       </footer>

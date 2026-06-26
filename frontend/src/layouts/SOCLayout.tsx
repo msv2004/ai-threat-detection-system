@@ -18,24 +18,25 @@ import {
   Menu,
   X,
   Shield,
-  ChevronRight,
   Bell,
   Search,
   User,
-  Wifi,
-  WifiOff,
   PanelLeftClose,
   PanelLeft,
   Activity,
-  AlertTriangle
+  AlertTriangle,
+  Clock,
+  Sun,
+  Moon,
+  Monitor
 } from 'lucide-react';
 
 const NAV_SECTIONS = [
   {
     label: 'Overview',
     items: [
-      { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-      { name: 'Threat Feed', path: '/threats', icon: ShieldAlert },
+      { name: 'SOC Overview', path: '/dashboard', icon: LayoutDashboard, badge: 'live' as const },
+      { name: 'Threat Monitoring', path: '/threats', icon: ShieldAlert, badge: 'count' as const, count: 8 },
     ],
   },
   {
@@ -55,19 +56,19 @@ const NAV_SECTIONS = [
   {
     label: 'Administration',
     items: [
-      { name: 'Settings & API', path: '/settings', icon: Settings },
+      { name: 'Settings', path: '/settings', icon: Settings },
     ],
   },
 ];
 
 const PAGE_TITLES: Record<string, { title: string; description: string }> = {
-  '/dashboard': { title: 'Security Dashboard', description: 'Autonomous threat classification, volumetric analytics, and intrusion diagnostics.' },
-  '/threats': { title: 'Threat Registry & Feed', description: 'Real-time network log streams, anomaly detections, and VT reputations.' },
-  '/datasets': { title: 'Data Ingestion & Splits', description: 'Upload network capture CSV sheets and configure preprocessing scalers.' },
-  '/training': { title: 'AI Training Console', description: 'Train decision tree, random forest, and SVM classifiers on split nodes.' },
-  '/models': { title: 'Model Registry & Importance', description: 'Manage deployed model configurations and inspect feature weight ratios.' },
-  '/analytics': { title: 'Performance Analytics', description: 'Track threat growth vectors, classification speeds, and latency stability.' },
-  '/settings': { title: 'Console Configuration', description: 'Configure security profiles, sound threshold preferences, and API credentials.' },
+  '/dashboard': { title: 'SOC Overview', description: 'Security Operations Center Dashboard' },
+  '/threats': { title: 'Threat Monitoring', description: 'Real-time network threat detection and classification' },
+  '/datasets': { title: 'Data Ingestion', description: 'Upload and preprocess network capture datasets' },
+  '/training': { title: 'AI Training Console', description: 'Train and deploy ML classifiers' },
+  '/models': { title: 'Model Registry', description: 'Manage deployed model configurations' },
+  '/analytics': { title: 'Analytics Monitor', description: 'Performance metrics and threat analytics' },
+  '/settings': { title: 'SOC Control Center', description: 'Configure detections, retention, and integrations' },
 };
 
 export default function SOCLayout() {
@@ -77,6 +78,7 @@ export default function SOCLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -97,6 +99,12 @@ export default function SOCLayout() {
     setUserMenuOpen(false);
   }, [location.pathname]);
 
+  // Clock
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
   const handleLogout = () => {
     clearAuth();
     navigate('/login');
@@ -106,39 +114,45 @@ export default function SOCLayout() {
   const unreadAlerts = alerts?.length || 0;
   const activeStats = wsStats || sessionStatus;
   const isSniffing = activeStats?.status === 'running';
+  const timeStr = currentTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
   return (
     <div className="min-h-screen flex bg-surface-0 text-text-primary overflow-hidden">
-      {/* ── Mobile Layout Overlay ── */}
+      {/* ── Mobile Overlay ── */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/80 z-40 md:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/80 z-40 md:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* ── Side Navigation bar ── */}
+      {/* ── Sidebar ── */}
       <aside
         className={`
           fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-1 border-r border-border-default
           transition-all duration-300 ease-in-out md:relative md:translate-x-0
-          ${sidebarCollapsed ? 'w-[72px]' : 'w-64'}
+          ${sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
-        {/* Sidebar Header Brand */}
-        <div className={`h-16 flex items-center border-b border-border-default px-4 justify-between`}>
+        {/* Brand Header */}
+        <div className="h-16 flex items-center border-b border-border-default px-4 justify-between">
           <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
               <Shield className="w-5 h-5 text-accent" />
             </div>
             {!sidebarCollapsed && (
-              <div className="flex flex-col">
-                <span className="font-extrabold text-sm tracking-widest text-white">AEGIS SOC</span>
-                <span className="text-[9px] text-accent font-semibold tracking-wider uppercase leading-none mt-0.5">AI Cyber Defense</span>
-              </div>
+              <span className="font-extrabold text-[15px] tracking-wide text-white">Aegis SOC</span>
             )}
           </Link>
+          {!sidebarCollapsed && (
+            <button
+              onClick={() => setSidebarCollapsed(true)}
+              className="hidden md:block p-1 rounded hover:bg-surface-2 text-text-tertiary transition-colors"
+            >
+              <PanelLeftClose className="w-4 h-4" />
+            </button>
+          )}
           <button
             onClick={() => setMobileMenuOpen(false)}
             className="md:hidden p-1.5 rounded-lg hover:bg-surface-2 text-text-secondary"
@@ -147,88 +161,123 @@ export default function SOCLayout() {
           </button>
         </div>
 
-        {/* Sidebar Links */}
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-6">
+        {/* SOC Status Bar */}
+        {!sidebarCollapsed && (
+          <div className="px-4 py-3 border-b border-border-default">
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-semantic-success pulse-emerald' : 'bg-semantic-critical pulse-red'}`} />
+              <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${isConnected ? 'text-semantic-success' : 'text-semantic-critical'}`}>
+                {isConnected ? 'SOC Online' : 'SOC Offline'}
+              </span>
+            </div>
+            {/* Mini metrics */}
+            <div className="grid grid-cols-3 gap-1.5">
+              {[
+                { label: 'CPU', value: isSniffing ? '41%' : '--' },
+                { label: 'EPS', value: isSniffing ? `${activeStats?.flow_count || 0}` : '--' },
+                { label: 'MTTD', value: isSniffing ? '4m' : '--' },
+              ].map(m => (
+                <div key={m.label} className="bg-surface-2 rounded px-2 py-1.5 text-center">
+                  <div className="text-[11px] font-bold text-white font-mono-data">{m.value}</div>
+                  <div className="text-[8px] text-text-tertiary uppercase tracking-wider font-bold mt-0.5">{m.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Nav Links */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
           {NAV_SECTIONS.map((section) => (
-            <div key={section.label} className="space-y-1">
+            <div key={section.label} className="space-y-0.5">
               {!sidebarCollapsed && (
-                <div className="px-3 mb-2 text-[10px] font-extrabold text-text-tertiary uppercase tracking-widest">
+                <div className="px-3 mb-2 text-[9px] font-extrabold text-text-tertiary uppercase tracking-[0.2em]">
                   {section.label}
                 </div>
               )}
-              <div className="space-y-0.5">
-                {section.items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = location.pathname === item.path;
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      title={sidebarCollapsed ? item.name : undefined}
-                      className={`
-                        flex items-center gap-3 rounded-lg text-xs font-semibold transition-all duration-200
-                        ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3.5 py-2.5'}
-                        ${isActive
-                          ? 'bg-accent-subtle text-accent border border-accent-border/30'
-                          : 'text-text-secondary border border-transparent hover:text-text-primary hover:bg-surface-2'
-                        }
-                      `}
-                    >
-                      <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive ? 'text-accent' : ''}`} />
-                      {!sidebarCollapsed && <span>{item.name}</span>}
-                    </Link>
-                  );
-                })}
-              </div>
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.path;
+                return (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    title={sidebarCollapsed ? item.name : undefined}
+                    className={`
+                      flex items-center gap-3 rounded-lg text-[13px] font-medium transition-all duration-200 relative
+                      ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3.5 py-2.5'}
+                      ${isActive
+                        ? 'text-accent bg-accent/5'
+                        : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
+                      }
+                    `}
+                  >
+                    {/* Active left border */}
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-accent rounded-r-full" />
+                    )}
+                    <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className="flex-1">{item.name}</span>
+                        {/* Badges */}
+                        {'badge' in item && item.badge === 'live' && (
+                          <span className="text-[9px] font-bold uppercase tracking-wider bg-semantic-success/15 text-semantic-success px-1.5 py-0.5 rounded">
+                            Live
+                          </span>
+                        )}
+                        {'badge' in item && item.badge === 'count' && 'count' in item && (
+                          <span className="text-[10px] font-bold bg-semantic-critical text-white w-5 h-5 rounded-full flex items-center justify-center">
+                            {item.count}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           ))}
         </nav>
 
-        {/* Sidebar bottom connection card */}
-        <div className="p-3 border-t border-border-default space-y-2">
-          {/* Active status pulse display */}
-          <div className={`flex items-center gap-2.5 px-3 py-2 rounded-lg bg-surface-2/40 border border-border-subtle ${sidebarCollapsed ? 'justify-center' : ''}`}>
-            {isConnected ? (
-              <div className="w-2.5 h-2.5 rounded-full bg-semantic-success pulse-emerald" />
-            ) : (
-              <div className="w-2.5 h-2.5 rounded-full bg-semantic-critical pulse-red" />
-            )}
-            {!sidebarCollapsed && (
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${isConnected ? 'text-semantic-success' : 'text-semantic-critical'}`}>
-                {isConnected ? 'SOC Online' : 'SOC Offline'}
-              </span>
-            )}
-          </div>
-
-          {/* Under attack alarm banner */}
+        {/* Bottom section */}
+        <div className="p-3 border-t border-border-default space-y-1">
+          {/* Under attack alert */}
           {isUnderAttack && !sidebarCollapsed && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-semantic-critical/10 border border-semantic-critical/20 rounded-lg animate-pulse">
+            <div className="flex items-center gap-2 px-3 py-2 bg-semantic-critical/10 border border-semantic-critical/20 rounded-lg animate-pulse mb-2">
               <AlertTriangle className="w-3.5 h-3.5 text-semantic-critical shrink-0" />
-              <span className="text-[9px] font-bold text-semantic-critical uppercase tracking-wider">Active Attack Hit</span>
+              <span className="text-[9px] font-bold text-semantic-critical uppercase tracking-wider">Active Threat</span>
             </div>
           )}
 
-          {/* Collapse sidebar button */}
+          {/* Logout */}
           <button
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="hidden md:flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-text-tertiary hover:text-text-secondary hover:bg-surface-2 transition-all w-full text-left font-semibold text-xs border border-transparent"
+            onClick={handleLogout}
+            className={`
+              flex items-center gap-3 rounded-lg text-[13px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-all w-full
+              ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3.5 py-2.5'}
+            `}
           >
-            {sidebarCollapsed ? (
-              <PanelLeft className="w-4 h-4 mx-auto text-text-secondary" />
-            ) : (
-              <>
-                <PanelLeftClose className="w-4 h-4 text-text-secondary" />
-                <span>Minimize Sidebar</span>
-              </>
-            )}
+            <LogOut className="w-[18px] h-[18px] shrink-0" />
+            {!sidebarCollapsed && <span>Logout</span>}
           </button>
+
+          {/* Expand button when collapsed */}
+          {sidebarCollapsed && (
+            <button
+              onClick={() => setSidebarCollapsed(false)}
+              className="w-full flex justify-center py-2 text-text-tertiary hover:text-text-secondary transition-colors"
+            >
+              <PanelLeft className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </aside>
 
-      {/* ── Main Panel View Layout ── */}
+      {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
-        {/* Top Header Controls bar */}
-        <header className="h-16 flex items-center justify-between px-6 bg-surface-1 border-b border-border-default z-20 shrink-0">
+        {/* Top Header Bar */}
+        <header className="h-14 flex items-center justify-between px-6 bg-surface-1 border-b border-border-default z-20 shrink-0">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -237,62 +286,82 @@ export default function SOCLayout() {
               <Menu className="w-5 h-5" />
             </button>
 
-            {/* Title / Description */}
-            <div className="hidden sm:block text-left">
-              <h1 className="text-sm font-bold text-white tracking-wide uppercase leading-tight">{currentPage.title}</h1>
-              <p className="text-[10px] text-text-secondary leading-tight mt-0.5">{currentPage.description}</p>
-            </div>
-            <span className="sm:hidden font-bold text-xs text-white uppercase">{currentPage.title.split(' ')[0]}</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Live capture stats indicator */}
-            {isSniffing && activeStats && (
-              <div className="hidden lg:flex items-center gap-3 px-3 py-1 bg-semantic-success/5 border border-semantic-success/20 rounded-md text-[10px] font-mono-data">
-                <Activity className="w-3.5 h-3.5 text-semantic-success animate-pulse" />
-                <span className="text-text-secondary">Captured: <strong className="text-white">{activeStats.packet_count || 0}</strong></span>
-                <span className="text-text-secondary">Flows: <strong className="text-white">{activeStats.flow_count || 0}</strong></span>
-                <span className="text-text-secondary">Threats: <strong className="text-semantic-critical">{activeStats.threat_count || 0}</strong></span>
-              </div>
-            )}
-
-            {/* Global Search box */}
+            {/* Search */}
             <div className={`
-              hidden md:flex items-center gap-2.5 bg-surface-0 border rounded-lg px-3 py-1.5 w-52 transition-all duration-200
-              ${searchFocused ? 'border-accent w-64 shadow-[0_0_12px_rgba(6,182,212,0.1)]' : 'border-border-strong'}
+              hidden md:flex items-center gap-2.5 bg-surface-0 border rounded-lg px-3 py-1.5 transition-all duration-200
+              ${searchFocused ? 'border-accent w-72 shadow-[0_0_12px_rgba(0,212,255,0.08)]' : 'border-border-strong w-56'}
             `}>
               <Search className="w-4 h-4 text-text-tertiary" />
               <input
                 type="text"
-                placeholder="Search metrics, logs..."
+                placeholder="Search..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
-                className="bg-transparent text-xs text-white placeholder-text-tertiary outline-none flex-1 font-mono-data"
+                className="bg-transparent text-xs text-white placeholder-text-tertiary outline-none flex-1"
               />
+              <kbd className="hidden lg:inline-flex items-center gap-0.5 text-[10px] text-text-tertiary bg-surface-2 px-1.5 py-0.5 rounded border border-border-default font-mono-data">
+                ⌘K
+              </kbd>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {/* Live ticker */}
+            {isSniffing && activeStats && (
+              <div className="hidden lg:flex items-center gap-2 bg-surface-0 border border-semantic-critical/20 rounded-lg px-3 py-1.5 max-w-md overflow-hidden">
+                <div className="w-2 h-2 rounded-full bg-semantic-critical pulse-red shrink-0" />
+                <div className="overflow-hidden whitespace-nowrap">
+                  <span className="text-[11px] font-mono-data text-text-secondary ticker-scroll inline-block">
+                    LIVE: Packets={activeStats.packet_count || 0} • Flows={activeStats.flow_count || 0} • Threats={activeStats.threat_count || 0} • Engine active on adapter
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Uptime badge */}
+            <div className="hidden lg:flex items-center gap-1.5 bg-semantic-success/8 border border-semantic-success/15 rounded-lg px-3 py-1.5">
+              <Activity className="w-3.5 h-3.5 text-semantic-success" />
+              <span className="text-[11px] font-bold font-mono-data text-semantic-success">99.982%</span>
+            </div>
+
+            {/* Clock */}
+            <div className="hidden lg:flex items-center gap-1.5 text-text-tertiary">
+              <Clock className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-mono-data">{timeStr}</span>
+            </div>
+
+            {/* Theme toggles */}
+            <div className="hidden lg:flex items-center gap-1 border-l border-border-default pl-3 ml-1">
+              <button className="p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"><Sun className="w-3.5 h-3.5" /></button>
+              <button className="p-1.5 rounded hover:bg-surface-2 text-accent transition-colors"><Moon className="w-3.5 h-3.5" /></button>
+              <button className="p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"><Monitor className="w-3.5 h-3.5" /></button>
             </div>
 
             {/* Notification Bell */}
-            <button className="relative p-2 rounded-lg hover:bg-surface-2 text-text-secondary transition-colors cursor-pointer border border-transparent">
+            <button className="relative p-2 rounded-lg hover:bg-surface-2 text-text-secondary transition-colors border border-transparent">
               <Bell className="w-4.5 h-4.5" />
               {unreadAlerts > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 bg-semantic-critical text-[#02040a] text-[9px] font-extrabold rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
-                  {unreadAlerts}
+                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-semantic-critical text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-lg shadow-red-500/20">
+                  {unreadAlerts > 9 ? '9+' : unreadAlerts}
                 </span>
               )}
             </button>
 
-            {/* Profile Dropdown */}
+            {/* User Profile */}
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 p-1 pl-2 rounded-lg hover:bg-surface-2 transition-all border border-transparent cursor-pointer"
+                className="flex items-center gap-2.5 p-1 pl-2 rounded-lg hover:bg-surface-2 transition-all border border-transparent cursor-pointer"
               >
-                <div className="w-7 h-7 rounded-full bg-accent-subtle border border-accent/20 flex items-center justify-center shadow-sm">
-                  <User className="w-4 h-4 text-accent" />
+                <div className="w-8 h-8 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-xs font-bold text-accent uppercase">
+                  {user?.email?.[0] || 'U'}
                 </div>
-                <span className="hidden md:block text-xs font-bold text-text-secondary max-w-[120px] truncate">
-                  {user?.email?.split('@')[0] || 'Operator'}
-                </span>
+                <div className="hidden md:block text-left">
+                  <div className="text-xs font-bold text-white leading-tight truncate max-w-[100px]">
+                    {user?.email?.split('@')[0] || 'Operator'}
+                  </div>
+                  <div className="text-[9px] text-text-tertiary leading-tight">SOC Manager</div>
+                </div>
               </button>
 
               {userMenuOpen && (
@@ -309,14 +378,14 @@ export default function SOCLayout() {
                       onClick={() => setUserMenuOpen(false)}
                     >
                       <Settings className="w-4 h-4 text-text-tertiary" />
-                      Configure Settings
+                      Settings
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 px-4 py-2.5 text-semantic-critical hover:bg-semantic-critical/5 transition-all w-full text-left border-t border-border-default mt-1"
                     >
                       <LogOut className="w-4 h-4 shrink-0" />
-                      Terminated Session
+                      Logout
                     </button>
                   </div>
                 </>
@@ -325,12 +394,12 @@ export default function SOCLayout() {
           </div>
         </header>
 
-        {/* Backend banners */}
+        {/* Backend Banner */}
         <BackendBanner />
 
-        {/* Dynamic Outlet Page Loader */}
+        {/* Page Content */}
         <div className="flex-1 overflow-y-auto p-6 md:p-8">
-          <div className="max-w-[1400px] mx-auto animate-fade-in">
+          <div className="max-w-[1440px] mx-auto animate-fade-in">
             <Outlet />
           </div>
         </div>

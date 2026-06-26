@@ -5,7 +5,7 @@ import * as zod from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { authService } from '../services/api';
-import { Shield, Loader, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { Shield, Loader, AlertTriangle, Eye, EyeOff, Lock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const loginSchema = zod.object({
@@ -46,119 +46,125 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4 cyber-grid relative overflow-hidden">
-      {/* Decorative cyber grid scanline */}
-      <div className="scanline" />
-      <div className="absolute inset-0 bg-gradient-to-tr from-accent/5 via-transparent to-semantic-ai/5 pointer-events-none" />
+    <div className="min-h-screen bg-surface-0 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background gradients */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-accent/5 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-semantic-ai/3 rounded-full blur-[100px]" />
+      </div>
 
-      <motion.div 
-        initial={{ opacity: 0, y: 15 }}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="w-full max-w-md bg-surface-1 border border-border-strong rounded-2xl p-8 shadow-2xl relative z-10"
+        transition={{ duration: 0.5 }}
+        className="relative z-10 w-full max-w-md"
       >
-        <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
-        
         {/* Brand */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-12 h-12 rounded-xl bg-accent-subtle border border-accent-border/30 flex items-center justify-center mb-3">
-            <Shield className="w-6 h-6 text-accent" />
-          </div>
-          <h1 className="text-xl font-bold tracking-widest text-white uppercase">Aegis SOC Portal</h1>
-          <span className="text-[9px] text-text-tertiary tracking-widest font-mono-data uppercase mt-1">SECURE PORTAL ACCESS</span>
+        <div className="text-center mb-8">
+          <Link to="/" className="inline-flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center">
+              <Shield className="w-7 h-7 text-accent" />
+            </div>
+          </Link>
+          <h1 className="text-2xl font-bold text-white">Welcome Back</h1>
+          <p className="text-sm text-text-secondary mt-1">Sign in to your security operations console</p>
         </div>
 
-        {/* Error messaging */}
-        {errorMsg && (
-          <div className="mb-6 p-3.5 bg-semantic-critical/10 border border-semantic-critical/20 rounded-lg flex items-start gap-2.5">
-            <AlertTriangle className="w-4.5 h-4.5 text-semantic-critical shrink-0 mt-0.5" />
-            <div className="text-xs text-semantic-critical font-mono-data leading-relaxed">{errorMsg}</div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 text-left text-xs font-semibold">
-          {/* Email field */}
-          <div className="space-y-1.5">
-            <label className="block font-mono-data text-text-secondary uppercase tracking-wider text-[10px]">SECURE EMAIL ADDRESS</label>
-            <input
-              type="email"
-              {...register('email')}
-              placeholder="operator@aegis.local"
-              defaultValue={localStorage.getItem('aegis_remembered_email') || ''}
-              className={`
-                input rounded-lg font-mono-data
-                ${errors.email ? 'border-semantic-critical/50' : 'border-border-strong'}
-              `}
-            />
-            {errors.email && (
-              <span className="text-[10px] text-semantic-critical font-mono-data mt-1 block">{errors.email.message}</span>
+        {/* Form Card */}
+        <div className="card-static p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+            {/* Error */}
+            {errorMsg && (
+              <div className="flex items-start gap-2 p-3 bg-semantic-critical/8 border border-semantic-critical/20 rounded-lg">
+                <AlertTriangle className="w-4 h-4 text-semantic-critical shrink-0 mt-0.5" />
+                <span className="text-xs text-semantic-critical">{errorMsg}</span>
+              </div>
             )}
-          </div>
 
-          {/* Password field */}
-          <div className="space-y-1.5">
-            <label className="block font-mono-data text-text-secondary uppercase tracking-wider text-[10px]">OPERATOR PASSPHRASE</label>
-            <div className="relative">
+            {/* Email */}
+            <div>
+              <label className="block text-xs text-text-secondary mb-2 font-medium">Email Address</label>
               <input
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
-                placeholder="••••••••"
-                className={`
-                  input rounded-lg font-mono-data pr-10
-                  ${errors.password ? 'border-semantic-critical/50' : 'border-border-strong'}
-                `}
+                {...register('email')}
+                type="email"
+                placeholder="operator@aegis-soc.io"
+                className="input"
+                autoComplete="email"
+                defaultValue={localStorage.getItem('aegis_remembered_email') || ''}
               />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors"
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              {errors.email && <span className="text-[11px] text-semantic-critical mt-1 block">{errors.email.message}</span>}
             </div>
-            {errors.password && (
-              <span className="text-[10px] text-semantic-critical font-mono-data mt-1 block">{errors.password.message}</span>
-            )}
-          </div>
 
-          {/* Remember me & forgot password */}
-          <div className="flex items-center justify-between text-xs pt-1">
-            <label className="flex items-center gap-2 text-text-secondary cursor-pointer">
+            {/* Password */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-text-secondary font-medium">Password</label>
+                <Link to="/forgot-password" className="text-[11px] text-accent hover:text-accent-hover transition-colors font-medium">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <input
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  className="input pr-10"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-tertiary hover:text-text-secondary transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              {errors.password && <span className="text-[11px] text-semantic-critical mt-1 block">{errors.password.message}</span>}
+            </div>
+
+            {/* Remember Me */}
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
+                id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-3.5 h-3.5 rounded bg-surface-0 border border-border-strong text-accent accent-accent"
+                className="w-4 h-4 rounded border-border-strong bg-surface-0 text-accent accent-accent"
               />
-              <span>Remember Email</span>
-            </label>
-            <Link to="/forgot-password" className="text-accent hover:underline font-bold transition-all">
-              Forgot Secret?
-            </Link>
+              <label htmlFor="remember" className="text-xs text-text-secondary cursor-pointer">Remember this device</label>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary w-full btn-lg text-sm font-bold"
+            >
+              {loading ? (
+                <Loader className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Lock className="w-4 h-4" />
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Register link */}
+          <div className="text-center mt-6 pt-5 border-t border-border-default">
+            <span className="text-xs text-text-secondary">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-accent hover:text-accent-hover font-bold transition-colors">
+                Create Account
+              </Link>
+            </span>
           </div>
+        </div>
 
-          {/* Submit */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn btn-primary py-3 font-mono-data text-xs uppercase tracking-widest flex items-center justify-center gap-2 mt-2"
-          >
-            {loading ? (
-              <>
-                <Loader className="w-3.5 h-3.5 animate-spin" />
-                Validating Security Hash...
-              </>
-            ) : (
-              'Authenticate Operator'
-            )}
-          </button>
-        </form>
-
-        <div className="mt-8 text-center text-xs text-text-secondary border-t border-border-default pt-6">
-          <span>Need new operator credentials?</span>{' '}
-          <Link to="/register" className="text-accent font-bold hover:underline transition-all">
-            Register Account
-          </Link>
+        {/* Footer */}
+        <div className="text-center mt-6">
+          <span className="text-[10px] text-text-tertiary">Protected by Aegis SOC • End-to-end encrypted</span>
         </div>
       </motion.div>
     </div>

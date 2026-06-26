@@ -215,8 +215,8 @@ export default function Datasets() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white uppercase tracking-wider">Data Ingestion</h2>
-          <p className="text-xs text-text-secondary mt-0.5 font-sans">Upload raw capture flow sheets and scale training nodes</p>
+          <h2 className="text-2xl font-bold text-white">Data Ingestion</h2>
+          <p className="text-sm text-text-secondary mt-0.5">Upload and preprocess network capture datasets</p>
         </div>
         <button
           onClick={() => { refetchDatasets(); refetchJobs(); }}
