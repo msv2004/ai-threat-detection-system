@@ -4,6 +4,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+# Rate limiting
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from starlette.responses import JSONResponse
+
+# Security and size limit middleware
+from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.middleware.request_size_limit import RequestSizeLimitMiddleware
+
 from app.config import settings
 from app.database.session import SessionLocal
 from app.models.role import Role
@@ -103,8 +114,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Initialize Limiter
+import os
+limiter = Limiter(key_func=get_remote_address, storage_uri=os.getenv("REDIS_URL", "memory://"))
+app.state.limiter = limiter
+
 # Add Middleware
 app.add_middleware(RequestIDMiddleware)
+app.add_middleware(SecurityHeadersMiddleware)
+app.add_middleware(RequestSizeLimitMiddleware, max_size=5 * 1024 * 1024)  # 5 MiB
+app.add_middleware(SlowAPIMiddleware)  # Apply rate limiting globally
 
 # Set all CORS enabled origins
 app.add_middleware(
@@ -120,6 +139,7 @@ app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
+app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"}))
 
 # Include Routers
 app.include_router(auth_router, prefix=settings.API_V1_STR)

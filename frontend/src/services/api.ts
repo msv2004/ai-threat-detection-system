@@ -13,9 +13,7 @@ let refreshQueue: Array<(token: string) => void> = [];
 
 async function apiFetch(path: string, options: FetchOptions = {}): Promise<any> {
   const { skipAuth, ...init } = options;
-  const url = path.startsWith('/auth') && !path.startsWith('/auth/me')
-    ? `${BASE_URL}${path}` 
-    : `${API_PREFIX}${path}`;
+  const url = `${API_PREFIX}${path}`;
 
   // Add Auth headers if not skipped
   const headers = new Headers(init.headers || {});
@@ -38,7 +36,7 @@ async function apiFetch(path: string, options: FetchOptions = {}): Promise<any> 
     if (refreshToken && !isRefreshing) {
       isRefreshing = true;
       try {
-        const refreshResponse = await fetch(`${BASE_URL}/auth/refresh`, {
+        const refreshResponse = await fetch(`${API_PREFIX}/auth/refresh`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -49,7 +47,7 @@ async function apiFetch(path: string, options: FetchOptions = {}): Promise<any> 
         if (refreshResponse.ok) {
           const newTokens = await refreshResponse.json();
           // Find user profile
-          const profileResponse = await fetch(`${BASE_URL}/auth/me`, {
+          const profileResponse = await fetch(`${API_PREFIX}/auth/me`, {
             headers: {
               'Authorization': `Bearer ${newTokens.access_token}`,
             }
