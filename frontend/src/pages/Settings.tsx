@@ -108,8 +108,8 @@ export default function SettingsPage() {
             { label: 'TOKEN SCOPE', value: 'Least privilege' },
             { label: 'RETENTION', value: `${logRetention}d` },
           ].map(stat => (
-            <div key={stat.label} className="bg-surface-1 border border-border-default rounded-lg px-4 py-2 text-center">
-              <div className="text-[9px] text-text-tertiary uppercase tracking-wider font-bold">{stat.label}</div>
+            <div key={stat.label} className="bg-white/[0.02] border border-white/[0.06] rounded-xl px-4 py-2 text-center">
+              <div className="text-[9px] text-text-secondary uppercase tracking-wider font-bold">{stat.label}</div>
               <div className="text-sm font-bold text-white mt-0.5 font-mono-data">{stat.value}</div>
             </div>
           ))}
@@ -117,17 +117,17 @@ export default function SettingsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-border-default pb-px">
+      <div className="flex items-center gap-1 border-b border-white/[0.06] pb-px">
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all border-b-2 ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition-all border-b-2 ${
                 activeTab === tab.id
                   ? 'text-accent border-accent bg-accent/5'
-                  : 'text-text-secondary border-transparent hover:text-text-primary hover:bg-surface-2'
+                  : 'text-text-secondary border-transparent hover:text-text-primary hover:bg-white/[0.04]'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -159,10 +159,10 @@ export default function SettingsPage() {
                         <button
                           key={t}
                           onClick={() => setTheme(t)}
-                          className={`py-2.5 rounded-lg text-xs font-semibold capitalize transition-all ${
+                          className={`py-2.5 rounded-xl text-xs font-semibold capitalize transition-all ${
                             theme === t
-                              ? 'bg-accent text-surface-0'
-                              : 'bg-surface-2 text-text-secondary border border-border-default hover:border-border-strong'
+                              ? 'bg-accent text-white font-bold'
+                              : 'bg-white/[0.02] text-text-secondary border border-white/[0.08] hover:border-white/20'
                           }`}
                         >
                           {t}
@@ -177,7 +177,7 @@ export default function SettingsPage() {
                     <select
                       value={timezone}
                       onChange={(e) => setTimezone(e.target.value)}
-                      className="input"
+                      className="input rounded-xl"
                     >
                       <option value="UTC">UTC</option>
                       <option value="America/New_York">Eastern (ET)</option>
@@ -194,7 +194,7 @@ export default function SettingsPage() {
                     <select
                       value={logRetention}
                       onChange={(e) => setLogRetention(e.target.value)}
-                      className="input"
+                      className="input rounded-xl"
                     >
                       <option value="30">30 days</option>
                       <option value="90">90 days</option>
@@ -209,7 +209,7 @@ export default function SettingsPage() {
                     <select
                       value={exportFormat}
                       onChange={(e) => setExportFormat(e.target.value)}
-                      className="input"
+                      className="input rounded-xl"
                     >
                       <option value="json">JSON bundle</option>
                       <option value="csv">CSV export</option>
@@ -230,12 +230,12 @@ export default function SettingsPage() {
                   <div>
                     <label className="block text-xs text-text-secondary mb-2 font-medium">API Key</label>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 bg-surface-0 border border-border-strong rounded-lg px-4 py-2.5 font-mono-data text-sm text-text-secondary">
+                      <div className="flex-1 bg-black/30 border border-white/[0.08] rounded-xl px-4 py-2.5 font-mono-data text-sm text-text-secondary">
                         {apiKeyVisible ? mockApiKey : '•'.repeat(40)}
                       </div>
                       <button
                         onClick={() => setApiKeyVisible(!apiKeyVisible)}
-                        className="btn btn-ghost btn-sm"
+                        className="btn btn-ghost btn-sm rounded-xl"
                       >
                         {apiKeyVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
@@ -251,18 +251,18 @@ export default function SettingsPage() {
                   {/* Backend connectivity */}
                   <div>
                     <label className="block text-xs text-text-secondary mb-2 font-medium">Backend Endpoint</label>
-                    <div className="flex items-center gap-3 p-3 bg-surface-0 rounded-lg border border-border-default">
+                    <div className="flex items-center gap-3 p-3 bg-black/30 rounded-xl border border-white/[0.06]">
                       <div className={`w-2.5 h-2.5 rounded-full ${isHealthError ? 'bg-semantic-critical pulse-red' : 'bg-semantic-success pulse-emerald'}`} />
                       <span className="font-mono-data text-xs text-text-secondary flex-1">{apiUrl}</span>
                       {isHealthLoading ? (
-                        <RefreshCw className="w-3.5 h-3.5 text-text-tertiary animate-spin" />
+                        <RefreshCw className="w-3.5 h-3.5 text-text-secondary animate-spin" />
                       ) : isHealthError ? (
                         <span className="text-[10px] text-semantic-critical font-bold">Unreachable</span>
                       ) : (
                         <span className="text-[10px] text-semantic-success font-bold">Connected</span>
                       )}
-                      <button onClick={() => refetchHealth()} className="p-1 hover:bg-surface-2 rounded transition-colors">
-                        <RefreshCw className="w-3.5 h-3.5 text-text-tertiary" />
+                      <button onClick={() => refetchHealth()} className="p-1.5 hover:bg-white/[0.05] rounded-xl transition-colors">
+                        <RefreshCw className="w-3.5 h-3.5 text-text-secondary" />
                       </button>
                     </div>
                   </div>
@@ -278,13 +278,13 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-text-secondary mb-2 font-medium">Email</label>
-                    <div className="bg-surface-0 border border-border-default rounded-lg px-4 py-2.5 text-sm text-text-secondary font-mono-data">
+                    <div className="bg-black/30 border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-text-secondary font-mono-data">
                       {user?.email || 'Not set'}
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs text-text-secondary mb-2 font-medium">Role</label>
-                    <div className="bg-surface-0 border border-border-default rounded-lg px-4 py-2.5 text-sm text-text-secondary">
+                    <div className="bg-black/30 border border-white/[0.08] rounded-xl px-4 py-2.5 text-sm text-text-secondary">
                       {user?.role?.name || 'Security Analyst'}
                     </div>
                   </div>
@@ -307,19 +307,19 @@ export default function SettingsPage() {
                       type="range" min="0" max="100"
                       value={notificationVolume}
                       onChange={(e) => setNotificationVolume(parseInt(e.target.value))}
-                      className="flex-1 h-1.5 bg-surface-0 rounded-lg cursor-pointer accent-accent"
+                      className="flex-1 h-1.5 bg-white/[0.05] rounded-xl cursor-pointer accent-accent"
                     />
                     <span className="text-sm font-mono-data text-white w-12 text-right">{notificationVolume}%</span>
                   </div>
                 </div>
-                <div className="flex items-center justify-between p-4 bg-surface-2 rounded-lg border border-border-default">
+                <div className="flex items-center justify-between p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
                   <div>
                     <div className="text-sm font-semibold text-white">Sound Alerts</div>
-                    <div className="text-[11px] text-text-tertiary mt-0.5">Play audio notification on critical threat detection</div>
+                    <div className="text-[11px] text-text-secondary mt-0.5 font-medium">Play audio notification on critical threat detection</div>
                   </div>
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className={`w-11 h-6 rounded-full transition-all ${soundEnabled ? 'bg-accent' : 'bg-surface-4'}`}
+                    className={`w-11 h-6 rounded-full transition-all ${soundEnabled ? 'bg-accent' : 'bg-white/[0.05]'}`}
                   >
                     <div className={`w-5 h-5 rounded-full bg-white shadow transition-transform ${soundEnabled ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
                   </button>
@@ -352,7 +352,7 @@ export default function SettingsPage() {
         {/* Right Sidebar */}
         <div className="space-y-6">
           {/* Retention Health */}
-          <div className="card-static p-5">
+          <div className="card-static p-6">
             <div className="flex items-center gap-2 mb-4">
               <Database className="w-4 h-4 text-accent" />
               <h3 className="text-base text-white heading-display tracking-wider">Retention Health</h3>
@@ -364,7 +364,7 @@ export default function SettingsPage() {
                     <span className="text-xs text-text-secondary">{item.label}</span>
                     <span className="text-xs font-bold font-mono-data text-white">{item.value}%</span>
                   </div>
-                  <div className="w-full h-2 bg-surface-0 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-white/[0.05] rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
                       style={{ width: `${item.value}%`, backgroundColor: item.color }}
@@ -376,7 +376,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Audit Activity */}
-          <div className="card-static p-5">
+          <div className="card-static p-6">
             <h3 className="text-base text-white mb-4 heading-display tracking-wider">Audit Activity</h3>
             <div className="space-y-3">
               {[
@@ -385,9 +385,9 @@ export default function SettingsPage() {
                 { event: 'Report export granted', by: 'Senior Analyst', time: '42m ago' },
                 { event: 'Session revoked', by: 'Junior Analyst', time: '1h ago' },
               ].map((log, i) => (
-                <div key={i} className="border-b border-border-subtle pb-3 last:border-0 last:pb-0">
+                <div key={i} className="border-b border-white/[0.06] pb-3 last:border-0 last:pb-0">
                   <div className="text-xs font-bold text-white">{log.event}</div>
-                  <div className="text-[10px] text-text-tertiary mt-0.5">{log.by} • {log.time}</div>
+                  <div className="text-[10px] text-text-secondary/40 mt-0.5">{log.by} • {log.time}</div>
                 </div>
               ))}
             </div>

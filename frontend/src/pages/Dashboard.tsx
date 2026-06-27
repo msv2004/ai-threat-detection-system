@@ -247,13 +247,13 @@ export default function Dashboard() {
       {/* Active Threats + Attack Map Row */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Active Threats */}
-        <div className="lg:col-span-2 card-static p-5">
+        <div className="lg:col-span-2 card-static p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-accent" />
               <h3 className="text-base text-white heading-display tracking-wider">Active Threats</h3>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-semantic-critical bg-semantic-critical/10 px-2 py-0.5 rounded">Live</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-semantic-critical bg-semantic-critical/10 px-2.5 py-0.5 rounded-lg border border-semantic-critical/15">Live</span>
           </div>
 
           <div className="space-y-2">
@@ -268,7 +268,7 @@ export default function Dashboard() {
                 <div
                   key={threat.id}
                   onClick={() => setSelectedThreat(threat)}
-                  className="flex items-center justify-between p-3 rounded-lg bg-surface-2/40 border border-border-subtle hover:border-border-default cursor-pointer transition-all group"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:border-accent/20 cursor-pointer transition-all group hover:-translate-y-[1px]"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 rounded-full shrink-0 ${
@@ -301,27 +301,27 @@ export default function Dashboard() {
         </div>
 
         {/* Live Attack Map */}
-        <div className="lg:col-span-3 card-static p-5">
+        <div className="lg:col-span-3 card-static p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-accent" />
                 <h3 className="text-base text-white heading-display tracking-wider">Live Attack Map</h3>
               </div>
-              <p className="text-[11px] text-text-tertiary mt-0.5">Global intrusion telemetry, command paths, and sinkhole pulses</p>
+              <p className="text-[11px] text-text-secondary mt-0.5">Global intrusion telemetry, command paths, and sinkhole pulses</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-mono-data text-accent bg-accent/10 px-2 py-0.5 rounded border border-accent/15">
+              <span className="text-[10px] font-mono-data text-accent bg-accent/10 px-2.5 py-0.5 rounded-lg border border-accent/15">
                 <Shield className="w-3 h-3 inline mr-1" />8 vectors
               </span>
-              <span className="text-[10px] font-mono-data text-semantic-critical bg-semantic-critical/10 px-2 py-0.5 rounded border border-semantic-critical/15">
+              <span className="text-[10px] font-mono-data text-semantic-critical bg-semantic-critical/10 px-2.5 py-0.5 rounded-lg border border-semantic-critical/15">
                 <Activity className="w-3 h-3 inline mr-1" />Live telemetry
               </span>
             </div>
           </div>
 
           {/* SVG World Map */}
-          <div className="relative bg-surface-0 rounded-lg border border-border-subtle p-4 h-[280px] overflow-hidden">
+          <div className="relative bg-black/30 rounded-xl border border-white/[0.06] p-4 h-[280px] overflow-hidden">
             <svg viewBox="0 0 800 400" className="w-full h-full opacity-30">
               {/* Simplified continent outlines */}
               <path d="M150,120 Q180,100 220,110 T280,105 Q300,95 340,100 T380,90 L370,130 Q350,140 330,135 T290,140 Q260,150 230,145 T180,140 Z" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-accent/40" />
@@ -351,7 +351,7 @@ export default function Dashboard() {
       {/* Charts Row - matching sample2.png */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Threat Activity (24h) */}
-        <div className="card-static p-5">
+        <div className="card-static p-6">
           <div className="flex items-center gap-2 mb-4">
             <Activity className="w-4 h-4 text-accent" />
             <h3 className="text-base text-white heading-display tracking-wider">Threat Activity (24h)</h3>
@@ -383,7 +383,7 @@ export default function Dashboard() {
         </div>
 
         {/* Severity Distribution */}
-        <div className="card-static p-5">
+        <div className="card-static p-6">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-4 h-4 text-accent" />
             <h3 className="text-base text-white heading-display tracking-wider">Severity Distribution</h3>
@@ -422,12 +422,12 @@ export default function Dashboard() {
       {/* Bottom Row: Security Posture + Attack Types + Log Stream */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {/* Security Posture Radar */}
-        <div className="card-static p-5">
+        <div className="card-static p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-base text-white heading-display tracking-wider">Security Posture</h3>
             <div className="flex items-baseline gap-1">
               <span className="text-2xl font-bold text-accent font-mono-data">78.5</span>
-              <span className="text-xs text-text-tertiary">/100</span>
+              <span className="text-xs text-white/30">/100</span>
             </div>
           </div>
           <ResponsiveContainer width="100%" height={200}>
@@ -440,7 +440,7 @@ export default function Dashboard() {
         </div>
 
         {/* Attack Types Bar Chart */}
-        <div className="card-static p-5">
+        <div className="card-static p-6">
           <div className="flex items-center gap-2 mb-4">
             <Zap className="w-4 h-4 text-accent" />
             <h3 className="text-base text-white heading-display tracking-wider">Attack Types</h3>
@@ -459,7 +459,7 @@ export default function Dashboard() {
         </div>
 
         {/* Live Log Stream */}
-        <div className="card-static p-5">
+        <div className="card-static p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <TerminalIcon className="w-4 h-4 text-accent" />
@@ -467,10 +467,10 @@ export default function Dashboard() {
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-semantic-success pulse-emerald" />
-              <span className="text-[10px] text-text-tertiary font-medium">Streaming</span>
+              <span className="text-[10px] text-text-secondary font-medium">Streaming</span>
             </div>
           </div>
-          <div className="bg-surface-0 rounded-lg border border-border-subtle p-3 h-[220px] overflow-y-auto font-mono-data text-[10px] space-y-1.5">
+          <div className="bg-black/30 rounded-xl border border-white/[0.06] p-4 h-[220px] overflow-y-auto font-mono-data text-[10px] space-y-1.5">
             {logStream.map((log, i) => {
               const time = new Date(Date.now() - (logStream.length - i) * 60000).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
               const isWarn = log.startsWith('WARN');
@@ -491,14 +491,14 @@ export default function Dashboard() {
       </div>
 
       {/* Capture Control Panel */}
-      <div className="card-static p-5">
+      <div className="card-static p-6">
         <div className="flex items-center gap-2 mb-4">
           <Radio className="w-4 h-4 text-accent" />
           <h3 className="text-base text-white heading-display tracking-wider">Network Capture Engine</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
           <div>
-            <label className="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1.5 font-bold">Interface</label>
+            <label className="block text-[10px] text-text-secondary uppercase tracking-wider mb-2 font-semibold">Interface</label>
             <input
               value={captureInterface}
               onChange={(e) => setCaptureInterface(e.target.value)}
@@ -507,7 +507,7 @@ export default function Dashboard() {
             />
           </div>
           <div>
-            <label className="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1.5 font-bold">Mode</label>
+            <label className="block text-[10px] text-text-secondary uppercase tracking-wider mb-2 font-semibold">Mode</label>
             <select
               value={captureMode}
               onChange={(e) => setCaptureMode(e.target.value as 'live' | 'offline')}
@@ -519,7 +519,7 @@ export default function Dashboard() {
           </div>
           {captureMode === 'offline' && (
             <div>
-              <label className="block text-[10px] text-text-tertiary uppercase tracking-wider mb-1.5 font-bold">PCAP Path</label>
+              <label className="block text-[10px] text-text-secondary uppercase tracking-wider mb-2 font-semibold">PCAP Path</label>
               <input
                 value={pcapFilePath}
                 onChange={(e) => setPcapFilePath(e.target.value)}
@@ -561,7 +561,7 @@ export default function Dashboard() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1 border-l border-border-default z-50 overflow-y-auto p-6 space-y-5"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1/90 backdrop-blur-xl border-l border-white/[0.06] z-50 overflow-y-auto p-6 space-y-5"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-base text-white heading-display tracking-wider">Threat Investigation</h3>
@@ -571,22 +571,22 @@ export default function Dashboard() {
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                  <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Source IP</div>
-                  <div className="text-sm font-mono-data text-accent font-bold">{selectedThreat.source_ip}</div>
+                <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                  <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Source IP</div>
+                  <div className="text-sm font-mono-data text-accent font-semibold">{selectedThreat.source_ip}</div>
                 </div>
-                <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                  <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Destination</div>
-                  <div className="text-sm font-mono-data text-white font-bold">{selectedThreat.destination_ip}:{selectedThreat.destination_port}</div>
+                <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                  <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Destination</div>
+                  <div className="text-sm font-mono-data text-white font-semibold">{selectedThreat.destination_ip}:{selectedThreat.destination_port}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Severity</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Severity</div>
                     <span className={`badge-${selectedThreat.severity}`}>{selectedThreat.severity}</span>
                   </div>
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Confidence</div>
-                    <div className="text-sm font-mono-data text-white font-bold">{(selectedThreat.confidence * 100).toFixed(1)}%</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Confidence</div>
+                    <div className="text-sm font-mono-data text-white font-semibold">{(selectedThreat.confidence * 100).toFixed(1)}%</div>
                   </div>
                 </div>
 

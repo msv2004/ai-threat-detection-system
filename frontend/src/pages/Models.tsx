@@ -135,12 +135,12 @@ export default function Models() {
           
           {/* Models Registry Table */}
           <div className="card overflow-hidden">
-            <div className="p-4 border-b border-border-default flex justify-between items-center bg-surface-1/40">
+            <div className="p-5 border-b border-white/[0.06] flex justify-between items-center bg-white/[0.01]">
               <div>
                 <h3 className="text-base text-white heading-display tracking-wider">Inference Classifiers</h3>
                 <p className="text-[10px] text-text-secondary mt-0.5">Trained model variables registry</p>
               </div>
-              <span className="text-[10px] text-text-tertiary">{models?.length || 0} model(s) registered</span>
+              <span className="text-[10px] text-text-secondary/40">{models?.length || 0} model(s) registered</span>
             </div>
             
             <div className="overflow-x-auto text-xs">
@@ -219,7 +219,7 @@ export default function Models() {
                                 e.stopPropagation();
                                 handleActivateModel(m.id);
                               }}
-                              className="px-2 py-0.5 border border-accent-border/30 hover:border-accent rounded text-[9px] font-bold text-accent hover:bg-accent-subtle/5 transition-all uppercase cursor-pointer"
+                              className="px-3 py-1 border border-accent/30 hover:border-accent rounded-xl text-[9px] font-bold text-accent hover:bg-accent/10 transition-all uppercase cursor-pointer"
                             >
                               Deploy
                             </button>
@@ -229,7 +229,7 @@ export default function Models() {
                           <button
                             disabled={m.is_active || deleteMutation.isPending}
                             onClick={() => deleteMutation.mutate(m.id)}
-                            className="p-1.5 border border-border-subtle hover:border-semantic-critical/30 rounded-lg text-text-tertiary hover:text-semantic-critical transition-all cursor-pointer"
+                            className="p-2 border border-white/[0.06] hover:border-semantic-critical/30 rounded-xl text-text-secondary hover:text-semantic-critical hover:bg-semantic-critical/5 transition-all cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -244,8 +244,8 @@ export default function Models() {
 
           {/* Model Metrics Comparison Chart */}
           {formattedComparison.length > 0 && (
-            <div className="card p-5 space-y-4">
-              <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
+            <div className="card p-6 space-y-4">
+              <h3 className="text-base text-white border-b border-white/[0.06] pb-3 flex items-center gap-1.5 heading-display tracking-wider">
                 <BarChart className="w-4 h-4 text-accent" />
                 Algorithm Comparison Metrics
               </h3>
@@ -257,14 +257,14 @@ export default function Models() {
                     <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} />
                     <YAxis stroke="rgba(255,255,255,0.3)" fontSize={10} tickLine={false} domain={[0.8, 1]} />
                     <Tooltip 
-                      contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }}
+                      contentStyle={{ backgroundColor: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 12 }}
                       labelStyle={{ color: '#fff', fontSize: '10px' }}
                       itemStyle={{ fontSize: '10px' }}
                     />
                     <Legend wrapperStyle={{ fontSize: 10, paddingTop: 10 }} />
-                    <Bar dataKey="accuracy" name="Accuracy" fill="#06b6d4" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="f1_score" name="F1 Score" fill="#a855f7" radius={[2, 2, 0, 0]} />
-                    <Bar dataKey="precision" name="Precision" fill="#3b82f6" radius={[2, 2, 0, 0]} />
+                    <Bar dataKey="accuracy" name="Accuracy" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="f1_score" name="F1 Score" fill="#a855f7" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="precision" name="Precision" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                   </RechartsBarChart>
                 </ResponsiveContainer>
               </div>
@@ -276,14 +276,14 @@ export default function Models() {
         {/* Feature Importance Panel (1 column) */}
         <div className="xl:col-span-1 space-y-6 text-left">
           {selectedModel && (
-            <div className="card p-5 space-y-4">
-              <div className="border-b border-border-default pb-3 flex justify-between items-center">
+            <div className="card p-6 space-y-4">
+              <div className="border-b border-white/[0.06] pb-3 flex justify-between items-center">
                 <div>
                   <h3 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
                     <Layers className="w-4 h-4 text-accent" />
                     Feature Weights
                   </h3>
-                  <span className="text-[9px] text-text-tertiary block mt-0.5 font-mono-data">
+                  <span className="text-[9px] text-text-secondary block mt-0.5 font-mono-data">
                     {selectedModel.algorithm} v{selectedModel.version}
                   </span>
                 </div>
@@ -300,7 +300,7 @@ export default function Models() {
                     </div>
                     
                     {/* Visual bar progress */}
-                    <div className="h-1.5 bg-surface-0 rounded-full overflow-hidden border border-border-subtle">
+                    <div className="h-1.5 bg-white/[0.05] rounded-full overflow-hidden border border-white/[0.05]">
                       <div 
                         className="h-full bg-accent/80 rounded-full"
                         style={{ width: `${item.importance * 100}%` }}

@@ -161,23 +161,23 @@ export default function Threats() {
         <div className="xl:col-span-3">
           <div className="card-static overflow-hidden">
             {/* Table Header with Search + Filters */}
-            <div className="p-5 border-b border-border-default">
+            <div className="p-6 border-b border-white/[0.06]">
               <div className="flex items-center gap-2 mb-4">
                 <ShieldAlert className="w-4 h-4 text-accent" />
                 <h3 className="text-base text-white heading-display tracking-wider">Vulnerabilities</h3>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1 flex items-center gap-2 bg-surface-0 border border-border-strong rounded-lg px-3 py-2">
-                  <Search className="w-4 h-4 text-text-tertiary" />
+                <div className="flex-1 flex items-center gap-2 bg-white/[0.03] border border-white/[0.10] rounded-xl px-4 py-2.5">
+                  <Search className="w-4 h-4 text-text-secondary" />
                   <input
                     type="text"
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                    className="bg-transparent text-sm text-white placeholder-text-tertiary outline-none flex-1"
+                    className="bg-transparent text-sm text-white placeholder-white/20 outline-none flex-1 font-medium"
                   />
                   {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} className="text-text-tertiary hover:text-text-secondary">
+                    <button onClick={() => setSearchTerm('')} className="text-text-secondary hover:text-text-primary">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -313,10 +313,10 @@ export default function Threats() {
                     <button
                       key={page}
                       onClick={() => handlePageChange(page)}
-                      className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                      className={`w-8 h-8 rounded-xl text-xs font-bold transition-all ${
                         currentPage === page 
-                          ? 'bg-accent text-surface-0' 
-                          : 'text-text-secondary hover:bg-surface-2'
+                          ? 'bg-accent text-white' 
+                          : 'text-text-secondary hover:bg-white/[0.05]'
                       }`}
                     >
                       {page}
@@ -345,10 +345,10 @@ export default function Threats() {
           ].map(item => {
             const Icon = item.icon;
             return (
-              <div key={item.label} className="card-static p-5 text-center">
+              <div key={item.label} className="card-static p-6 text-center hover:-translate-y-1 hover:border-white/10 transition-all duration-200">
                 <Icon className={`w-8 h-8 mx-auto text-${item.color} mb-2`} />
                 <div className={`text-3xl font-bold text-${item.color} font-mono-data`}>{item.count}</div>
-                <div className="text-xs text-text-tertiary mt-1 font-medium">{item.label}</div>
+                <div className="text-xs text-text-secondary mt-1.5 font-medium">{item.label}</div>
               </div>
             );
           })}
@@ -365,42 +365,42 @@ export default function Threats() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1 border-l border-border-default z-50 overflow-y-auto p-6 space-y-5"
+              className="fixed top-0 right-0 bottom-0 w-full max-w-md bg-surface-1/90 backdrop-blur-xl border-l border-white/[0.06] z-50 overflow-y-auto p-6 space-y-5"
             >
               <div className="flex items-center justify-between">
                 <h3 className="text-base text-white heading-display tracking-wider">Threat Details</h3>
-                <button onClick={() => setSelectedThreat(null)} className="p-1.5 rounded-lg hover:bg-surface-2 text-text-secondary">
+                <button onClick={() => setSelectedThreat(null)} className="p-1.5 rounded-lg hover:bg-white/[0.06] text-text-secondary">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               <div className="space-y-4">
-                <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                  <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Attack Category</div>
+                <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                  <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Attack Category</div>
                   <div className="text-sm font-bold text-white">{selectedThreat.attack_category || selectedThreat.attack_type}</div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Source IP</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Source IP</div>
                     <div className="text-sm font-mono-data text-accent">{selectedThreat.source_ip || selectedThreat.src_ip}</div>
                   </div>
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Destination</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Destination</div>
                     <div className="text-sm font-mono-data text-white">{selectedThreat.destination_ip}:{selectedThreat.destination_port}</div>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Severity</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Severity</div>
                     <span className={getSeverityBadge(selectedThreat.severity)}>{selectedThreat.severity}</span>
                   </div>
-                  <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                    <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">CVSS Score</div>
+                  <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                    <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">CVSS Score</div>
                     <div className="text-lg font-bold font-mono-data text-white">{(selectedThreat.confidence * 10).toFixed(1)}</div>
                   </div>
                 </div>
-                <div className="p-4 bg-surface-2 rounded-lg border border-border-default">
-                  <div className="text-[10px] text-text-tertiary uppercase tracking-wider mb-1">Detection Time</div>
+                <div className="p-4 bg-white/[0.02] rounded-xl border border-white/[0.05]">
+                  <div className="text-[10px] text-text-secondary uppercase tracking-wider mb-1">Detection Time</div>
                   <div className="text-sm text-text-secondary">
                     {selectedThreat.created_at ? formatDistanceToNow(new Date(selectedThreat.created_at), { addSuffix: true }) : 'Unknown'}
                   </div>

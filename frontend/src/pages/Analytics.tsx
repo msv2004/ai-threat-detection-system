@@ -132,15 +132,15 @@ export default function Analytics() {
       {/* Overview Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Inferences */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-accent-border/30 transition-all">
+        <div className="card p-6 flex flex-col justify-between group hover:border-accent/30 transition-all">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Predictions run</span>
+              <span className="text-[9px] font-extrabold text-text-secondary uppercase tracking-widest block">Predictions run</span>
               <span className="text-xl font-black text-white block font-mono-data">
                 {monitoringData?.predictions_count?.toLocaleString() || 0}
               </span>
             </div>
-            <div className="p-2 rounded bg-surface-2 group-hover:bg-accent/10 transition-colors">
+            <div className="p-2.5 rounded-xl bg-white/[0.04] group-hover:bg-accent/10 transition-colors">
               <Zap className="w-4.5 h-4.5 text-accent" />
             </div>
           </div>
@@ -148,15 +148,15 @@ export default function Analytics() {
         </div>
 
         {/* Avg Latency */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-success/20 transition-all">
+        <div className="card p-6 flex flex-col justify-between group hover:border-semantic-success/20 transition-all">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Avg Model Latency</span>
+              <span className="text-[9px] font-extrabold text-text-secondary uppercase tracking-widest block">Avg Model Latency</span>
               <span className="text-xl font-black text-white block font-mono-data">
                 {monitoringData?.average_processing_latency ? `${monitoringData.average_processing_latency.toFixed(2)} ms` : '0.08 ms'}
               </span>
             </div>
-            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-success/10 transition-colors">
+            <div className="p-2.5 rounded-xl bg-white/[0.04] group-hover:bg-semantic-success/10 transition-colors">
               <Clock className="w-4.5 h-4.5 text-semantic-success" />
             </div>
           </div>
@@ -164,15 +164,15 @@ export default function Analytics() {
         </div>
 
         {/* Avg Confidence */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-info/20 transition-all">
+        <div className="card p-6 flex flex-col justify-between group hover:border-semantic-info/20 transition-all">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Avg Confidence</span>
+              <span className="text-[9px] font-extrabold text-text-secondary uppercase tracking-widest block">Avg Confidence</span>
               <span className="text-xl font-black text-semantic-success block font-mono-data">
                 {monitoringData?.average_confidence ? `${(monitoringData.average_confidence * 100).toFixed(1)}%` : '98.4%'}
               </span>
             </div>
-            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-info/10 transition-colors">
+            <div className="p-2.5 rounded-xl bg-white/[0.04] group-hover:bg-semantic-info/10 transition-colors">
               <CheckCircle className="w-4.5 h-4.5 text-semantic-info" />
             </div>
           </div>
@@ -180,15 +180,15 @@ export default function Analytics() {
         </div>
 
         {/* Active Failures */}
-        <div className="card p-5 flex flex-col justify-between group hover:border-semantic-critical/20 transition-all">
+        <div className="card p-6 flex flex-col justify-between group hover:border-semantic-critical/20 transition-all">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
-              <span className="text-[9px] font-extrabold text-text-tertiary uppercase tracking-widest block">Inference failures</span>
+              <span className="text-[9px] font-extrabold text-text-secondary uppercase tracking-widest block">Inference failures</span>
               <span className="text-xl font-black text-semantic-critical block font-mono-data">
                 {monitoringData?.failure_count || 0}
               </span>
             </div>
-            <div className="p-2 rounded bg-surface-2 group-hover:bg-semantic-critical/10 transition-colors">
+            <div className="p-2.5 rounded-xl bg-white/[0.04] group-hover:bg-semantic-critical/10 transition-colors">
               <AlertTriangle className="w-4.5 h-4.5 text-semantic-critical" />
             </div>
           </div>
@@ -200,8 +200,8 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
         {/* Threat Timeline (2 columns) */}
-        <div className="lg:col-span-2 card p-5 space-y-4 text-left">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-border-default pb-3 gap-3">
+        <div className="lg:col-span-2 card p-6 space-y-4 text-left">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/[0.06] pb-3 gap-3">
             <h3 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
               <TrendingUp className="w-4 h-4 text-accent" />
               Timeline Trend Vectors
@@ -214,10 +214,10 @@ export default function Analytics() {
                   key={range}
                   onClick={() => setTimeRange(range)}
                   className={`
-                    px-2.5 py-1 border text-[9px] rounded font-bold uppercase transition-all cursor-pointer
+                    px-3 py-1.5 border text-[9px] rounded-xl font-bold uppercase tracking-wider transition-all cursor-pointer
                     ${timeRange === range 
-                      ? 'bg-accent-subtle border-accent/40 text-accent' 
-                      : 'bg-surface-0 border-border-strong text-text-secondary hover:text-white'}
+                      ? 'bg-accent/10 border-accent/40 text-white' 
+                      : 'bg-white/[0.01] border-white/[0.08] text-text-secondary hover:text-white'}
                   `}
                 >
                   {range.replace('_', ' ')}
@@ -254,7 +254,7 @@ export default function Analytics() {
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
                   <XAxis dataKey="date" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} />
                   <YAxis stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} />
-                  <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} labelStyle={{ color: '#fff', fontSize: '10px' }} itemStyle={{ fontSize: '10px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 12 }} labelStyle={{ color: '#fff', fontSize: '10px' }} itemStyle={{ fontSize: '10px' }} />
                   <Area type="monotone" dataKey="threats" name="Total Threat Events" stroke="#ef4444" fillOpacity={1} fill="url(#colorAnalyticsThreats)" />
                   <Area type="monotone" dataKey="critical" name="Critical Incidents" stroke="#eab308" fillOpacity={0} />
                 </AreaChart>
@@ -264,8 +264,8 @@ export default function Analytics() {
         </div>
 
         {/* Severity Distribution Donut (1 column) */}
-        <div className="lg:col-span-1 card p-5 space-y-4 text-left">
-          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
+        <div className="lg:col-span-1 card p-6 space-y-4 text-left">
+          <h3 className="text-base text-white border-b border-white/[0.06] pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <ShieldAlert className="w-4 h-4 text-accent" />
             Severity Distribution
           </h3>
@@ -300,7 +300,7 @@ export default function Analytics() {
                       <Cell key={`cell-${index}`} fill={SEVERITY_COLORS[index % SEVERITY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} itemStyle={{ fontSize: '10px' }} />
+                  <Tooltip contentStyle={{ backgroundColor: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 12 }} itemStyle={{ fontSize: '10px' }} />
                   <Legend wrapperStyle={{ fontSize: 9, color: '#94a3b8' }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -314,8 +314,8 @@ export default function Analytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         
         {/* Radar of Categories */}
-        <div className="card p-5 space-y-4 text-left">
-          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
+        <div className="card p-6 space-y-4 text-left">
+          <h3 className="text-base text-white border-b border-white/[0.06] pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <Shield className="w-4 h-4 text-accent" />
             Threat Vector Classification
           </h3>
@@ -339,7 +339,7 @@ export default function Analytics() {
                   <PolarGrid stroke="rgba(255,255,255,0.03)" />
                   <PolarAngleAxis dataKey="subject" stroke="rgba(255,255,255,0.3)" fontSize={10} />
                   <PolarRadiusAxis stroke="rgba(255,255,255,0.1)" fontSize={9} />
-                  <Radar name="Intrusions" dataKey="value" stroke="#06b6d4" fill="#06b6d4" fillOpacity={0.2} />
+                  <Radar name="Intrusions" dataKey="value" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} />
                 </RadarChart>
               </ResponsiveContainer>
             )}
@@ -347,8 +347,8 @@ export default function Analytics() {
         </div>
 
         {/* Inference steps latency stability */}
-        <div className="card p-5 space-y-4 text-left">
-          <h3 className="text-base text-white border-b border-border-default pb-3 flex items-center gap-1.5 heading-display tracking-wider">
+        <div className="card p-6 space-y-4 text-left">
+          <h3 className="text-base text-white border-b border-white/[0.06] pb-3 flex items-center gap-1.5 heading-display tracking-wider">
             <Activity className="w-4 h-4 text-accent" />
             Inference Latency Stability
           </h3>
@@ -359,8 +359,8 @@ export default function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" />
                 <XAxis dataKey="log" stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} />
                 <YAxis stroke="rgba(255,255,255,0.3)" fontSize={9} tickLine={false} />
-                <Tooltip contentStyle={{ backgroundColor: '#070b13', border: '1px solid rgba(59,130,246,0.1)' }} itemStyle={{ fontSize: '10px' }} />
-                <Line type="monotone" dataKey="latency" name="Inference Speed (ms)" stroke="#06b6d4" strokeWidth={2} activeDot={{ r: 5 }} />
+                <Tooltip contentStyle={{ backgroundColor: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 12 }} itemStyle={{ fontSize: '10px' }} />
+                <Line type="monotone" dataKey="latency" name="Inference Speed (ms)" stroke="#6366f1" strokeWidth={2} activeDot={{ r: 5 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

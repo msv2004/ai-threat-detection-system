@@ -211,7 +211,7 @@ export default function Training() {
                   value={selectedJobId}
                   onChange={(e) => setSelectedJobId(e.target.value)}
                   required
-                  className="input rounded-lg"
+                  className="input rounded-xl"
                 >
                   <option value="">-- Choose Compiled Dataset --</option>
                   {completedPrepJobs.map((job) => (
@@ -237,7 +237,7 @@ export default function Training() {
                   onChange={(e) => setModelName(e.target.value)}
                   placeholder={`${algorithm.replace(/\s+/g, '_')}_v1`}
                   maxLength={100}
-                  className="input rounded-lg"
+                  className="input rounded-xl"
                 />
               </div>
 
@@ -255,10 +255,10 @@ export default function Training() {
                       key={algo.name}
                       onClick={() => setAlgorithm(algo.name)}
                       className={`
-                        p-3 rounded-lg border cursor-pointer transition-all flex items-start gap-3
+                        p-3.5 rounded-xl border cursor-pointer transition-all flex items-start gap-3
                         ${algorithm === algo.name 
-                          ? 'bg-accent-subtle border-accent/40 text-accent' 
-                          : 'bg-surface-0/40 border-border-default text-text-secondary hover:text-white hover:border-slate-600'}
+                          ? 'bg-accent/5 border-accent/40 text-accent' 
+                          : 'bg-white/[0.01] border-white/[0.08] text-text-secondary hover:text-white hover:border-white/20'}
                       `}
                     >
                       <algo.icon className="w-4 h-4 mt-0.5 shrink-0" />
@@ -288,7 +288,7 @@ export default function Training() {
                       step="10"
                       value={estimators}
                       onChange={(e) => setEstimators(parseInt(e.target.value))}
-                      className="w-full h-1 bg-surface-0 rounded-lg cursor-pointer accent-accent"
+                      className="w-full h-1 bg-white/[0.05] rounded-xl cursor-pointer accent-accent"
                     />
                   </div>
                 )}
@@ -304,7 +304,7 @@ export default function Training() {
                     max="20"
                     value={maxDepth}
                     onChange={(e) => setMaxDepth(parseInt(e.target.value))}
-                    className="w-full h-1 bg-surface-0 rounded-lg cursor-pointer accent-accent"
+                    className="w-full h-1 bg-white/[0.05] rounded-xl cursor-pointer accent-accent"
                   />
                 </div>
               </div>
@@ -345,20 +345,20 @@ export default function Training() {
               </div>
               
               <div className="grid grid-cols-4 gap-4 text-center shrink-0 font-mono-data text-[11px]">
-                <div className="bg-surface-1 border border-border-default px-2 py-1 rounded">
-                  <span className="text-[8px] text-text-tertiary block font-bold">ACC</span>
+                <div className="bg-black/30 border border-white/[0.06] px-2.5 py-1.5 rounded-xl">
+                  <span className="text-[8px] text-text-secondary block font-bold">ACC</span>
                   <strong className="text-white">{(bestModel.accuracy * 100).toFixed(1)}%</strong>
                 </div>
-                <div className="bg-surface-1 border border-border-default px-2 py-1 rounded">
-                  <span className="text-[8px] text-text-tertiary block font-bold">F1</span>
+                <div className="bg-black/30 border border-white/[0.06] px-2.5 py-1.5 rounded-xl">
+                  <span className="text-[8px] text-text-secondary block font-bold">F1</span>
                   <strong className="text-white">{(bestModel.f1_score * 100).toFixed(1)}%</strong>
                 </div>
-                <div className="bg-surface-1 border border-border-default px-2 py-1 rounded">
-                  <span className="text-[8px] text-text-tertiary block font-bold">PREC</span>
+                <div className="bg-black/30 border border-white/[0.06] px-2.5 py-1.5 rounded-xl">
+                  <span className="text-[8px] text-text-secondary block font-bold">PREC</span>
                   <strong className="text-white">{(bestModel.precision * 100).toFixed(1)}%</strong>
                 </div>
-                <div className="bg-surface-1 border border-border-default px-2 py-1 rounded">
-                  <span className="text-[8px] text-text-tertiary block font-bold">REC</span>
+                <div className="bg-black/30 border border-white/[0.06] px-2.5 py-1.5 rounded-xl">
+                  <span className="text-[8px] text-text-secondary block font-bold">REC</span>
                   <strong className="text-white">{(bestModel.recall * 100).toFixed(1)}%</strong>
                 </div>
               </div>
@@ -368,24 +368,24 @@ export default function Training() {
           {/* Active Logs Terminal Console */}
           {activeRunningJob && (
             <div className="card p-5 space-y-4 text-left border-accent-border/30 shadow-[0_0_15px_rgba(6,182,212,0.03)]">
-              <div className="flex items-center justify-between border-b border-border-default pb-3">
+             <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
                 <h4 className="text-base text-white flex items-center gap-1.5 heading-display tracking-wider">
                   <TerminalIcon className="w-4 h-4 text-accent animate-pulse" />
                   Live Pipeline Logs
                 </h4>
                 <div className="flex items-center gap-2">
-                  <Clock className="w-3.5 h-3.5 text-text-tertiary" />
-                  <span className="text-[10px] text-text-tertiary font-mono-data font-bold">EST COMPILATION: ~12 SEC</span>
+                  <Clock className="w-3.5 h-3.5 text-text-secondary" />
+                  <span className="text-[10px] text-text-secondary font-mono-data font-bold">EST COMPILATION: ~12 SEC</span>
                 </div>
               </div>
 
               {/* Progress bar */}
-              <div className="space-y-1">
-                <div className="flex justify-between text-[9px] font-mono-data font-bold text-text-tertiary">
+              <div className="space-y-1.5">
+                <div className="flex justify-between text-[9px] font-mono-data font-bold text-text-secondary">
                   <span>OPTIMIZING WEIGHT VECTORS...</span>
                   <span className="text-accent">{trainingProgress}%</span>
                 </div>
-                <div className="w-full bg-surface-0 rounded-full h-1.5 overflow-hidden">
+                <div className="w-full bg-white/[0.05] rounded-full h-1.5 overflow-hidden">
                   <div 
                     className="progress-animated h-full rounded-full transition-all duration-300"
                     style={{ width: `${trainingProgress}%` }}
@@ -394,7 +394,7 @@ export default function Training() {
               </div>
 
               {/* Logs terminal output */}
-              <div className="bg-surface-0 border border-border-strong rounded-xl p-4 h-48 overflow-y-auto font-mono-data text-[10px] text-text-secondary space-y-1.5 scrollbar-thin">
+              <div className="bg-black/30 border border-white/[0.06] rounded-xl p-4 h-48 overflow-y-auto font-mono-data text-[10px] text-text-secondary space-y-1.5 scrollbar-thin">
                 {terminalLogs.map((log, i) => (
                   <div key={i} className="leading-relaxed">
                     <span className="text-accent">{log.slice(0, 10)}</span>
@@ -407,8 +407,8 @@ export default function Training() {
           )}
 
           {/* Training Logs timeline history */}
-          <div className="card overflow-hidden">
-            <div className="p-4 border-b border-border-default bg-surface-1/40">
+           <div className="card overflow-hidden">
+            <div className="p-5 border-b border-white/[0.06] bg-white/[0.01]">
               <h3 className="text-base text-white heading-display tracking-wider">Compilation Job History</h3>
             </div>
             
@@ -435,11 +435,11 @@ export default function Training() {
                   <div key={job.id} className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="space-y-1.5">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className={`px-2 py-0.5 border rounded-md text-[8px] font-extrabold uppercase ${getStatusBadge(job.status)}`}>
+                        <span className={`px-2.5 py-0.5 border rounded-lg text-[8px] font-extrabold uppercase ${getStatusBadge(job.status)}`}>
                           {job.status}
                         </span>
                         <span className="text-white font-bold">{job.algorithm}</span>
-                        <span className="text-text-tertiary font-mono-data text-[9px]">ID: {job.id.substring(0, 8)}...</span>
+                        <span className="text-text-secondary font-mono-data text-[9px]">ID: {job.id.substring(0, 8)}...</span>
                       </div>
                       
                       <div className="flex items-center gap-4 text-[10px] text-text-tertiary font-mono-data">
