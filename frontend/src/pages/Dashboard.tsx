@@ -360,23 +360,23 @@ export default function Dashboard() {
             <AreaChart data={liveHistory.length > 0 ? liveHistory : threatActivityData}>
               <defs>
                 <linearGradient id="threatGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#00d4ff" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#00d4ff" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(99,102,241,0.05)" />
               <XAxis dataKey={liveHistory.length > 0 ? 'time' : 'hour'} stroke="#556677" tick={{ fontSize: 10 }} />
               <YAxis stroke="#556677" tick={{ fontSize: 10 }} />
               <RechartsTooltip
-                contentStyle={{ background: '#0c1222', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, fontSize: 11 }}
+                contentStyle={{ background: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 8, fontSize: 11 }}
               />
               <Area
                 type="monotone"
                 dataKey={liveHistory.length > 0 ? 'threats' : 'threats'}
-                stroke="#00d4ff"
+                stroke="#6366f1"
                 strokeWidth={2}
                 fill="url(#threatGrad)"
-                dot={{ r: 3, fill: '#00d4ff' }}
+                dot={{ r: 3, fill: '#6366f1' }}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -404,7 +404,7 @@ export default function Dashboard() {
                 ))}
               </Pie>
               <RechartsTooltip
-                contentStyle={{ background: '#0c1222', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, fontSize: 11 }}
+                contentStyle={{ background: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 8, fontSize: 11 }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -432,9 +432,9 @@ export default function Dashboard() {
           </div>
           <ResponsiveContainer width="100%" height={200}>
             <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-              <PolarGrid stroke="rgba(0,212,255,0.08)" />
+              <PolarGrid stroke="rgba(99,102,241,0.08)" />
               <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10, fill: '#8899a6' }} />
-              <Radar dataKey="A" stroke="#00d4ff" fill="#00d4ff" fillOpacity={0.15} strokeWidth={2} />
+              <Radar dataKey="A" stroke="#6366f1" fill="#6366f1" fillOpacity={0.15} strokeWidth={2} />
             </RadarChart>
           </ResponsiveContainer>
         </div>
@@ -447,13 +447,13 @@ export default function Dashboard() {
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={attackTypeData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,212,255,0.05)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(99,102,241,0.05)" />
               <XAxis dataKey="name" stroke="#556677" tick={{ fontSize: 9 }} />
               <YAxis stroke="#556677" tick={{ fontSize: 10 }} />
               <RechartsTooltip
-                contentStyle={{ background: '#0c1222', border: '1px solid rgba(0,212,255,0.15)', borderRadius: 8, fontSize: 11 }}
+                contentStyle={{ background: '#0a0a1a', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 8, fontSize: 11 }}
               />
-              <Bar dataKey="count" fill="#00d4ff" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" fill="#6366f1" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

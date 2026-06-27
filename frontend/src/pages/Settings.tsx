@@ -89,7 +89,7 @@ export default function SettingsPage() {
   ];
 
   const retentionHealth = [
-    { label: 'Hot telemetry', value: 72, color: '#00d4ff' },
+    { label: 'Hot telemetry', value: 72, color: '#6366f1' },
     { label: 'Archived evidence', value: 44, color: '#00e676' },
     { label: 'Cold storage', value: 28, color: '#f97316' },
   ];

@@ -41,7 +41,7 @@ export function CardContent({ children, className = '', ...props }: React.HTMLAt
 
 export function CardFooter({ children, className = '', ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={`p-5 border-t border-border-subtle bg-surface-1/50 rounded-b-xl flex items-center justify-between gap-4 ${className}`} {...props}>
+    <div className={`p-5 border-t border-border-subtle bg-white/[0.02] rounded-b-[15px] flex items-center justify-between gap-4 ${className}`} {...props}>
       {children}
     </div>
   );
@@ -50,7 +50,7 @@ export function CardFooter({ children, className = '', ...props }: React.HTMLAtt
 const variantStyles: Record<CardVariant, string> = {
   default: 'card',
   elevated: 'card-elevated',
-  outlined: 'border border-border-strong rounded-xl bg-transparent',
+  outlined: 'border border-border-strong rounded-2xl bg-transparent',
   interactive: 'card cursor-pointer hover:border-accent/40 active:translate-y-[1px]',
 };
 

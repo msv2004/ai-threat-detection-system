@@ -5,6 +5,7 @@ import { useSocketStore } from '../stores/socketStore';
 import { useQuery } from '@tanstack/react-query';
 import { detectionService } from '../services/api';
 import Onboarding from '../components/Onboarding';
+import Tooltip from '../components/ui/Tooltip';
 import BackendBanner from '../components/ui/BackendBanner';
 import {
   LayoutDashboard,
@@ -130,40 +131,41 @@ export default function SOCLayout() {
       {/* ── Sidebar ── */}
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex flex-col bg-surface-1 border-r border-border-default
+          fixed inset-y-0 left-0 z-50 flex flex-col
+          bg-white/[0.03] backdrop-blur-xl border-r border-white/[0.06]
           transition-all duration-300 ease-in-out md:relative md:translate-x-0
           ${sidebarCollapsed ? 'w-[72px]' : 'w-[260px]'}
           ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
       >
         {/* Brand Header */}
-        <div className="h-20 flex items-center border-b border-border-default px-4 justify-between shrink-0">
+        <div className="h-[72px] flex items-center border-b border-white/[0.06] px-5 justify-between shrink-0">
           <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <div className="w-9 h-9 rounded-lg bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-accent" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(0, 212, 255, 0.05)"/>
+                <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(99, 102, 241, 0.05)"/>
                 <path d="M12 11V7" stroke="currentColor" strokeWidth="2"/>
                 <circle cx="12" cy="15" r="1" fill="currentColor"/>
               </svg>
             </div>
             {!sidebarCollapsed && (
               <div className="flex flex-col">
-                <span className="font-extrabold text-sm tracking-widest text-white uppercase leading-none font-display">AEGIS</span>
-                <span className="text-[8px] text-accent font-mono-data tracking-wider uppercase leading-none mt-0.5">SOC-MSV</span>
+                <span className="font-bold text-[15px] tracking-tight text-white leading-none">Aegis</span>
+                <span className="text-[10px] text-accent font-mono-data tracking-wider uppercase leading-none mt-1">SOC-MSV</span>
               </div>
             )}
           </Link>
           {!sidebarCollapsed && (
             <button
               onClick={() => setSidebarCollapsed(true)}
-              className="hidden md:block p-1.5 rounded hover:bg-surface-2 text-text-tertiary transition-colors"
+              className="hidden md:block p-1.5 rounded-lg hover:bg-white/[0.06] text-white/30 hover:text-white/60 transition-colors"
             >
               <PanelLeftClose className="w-4 h-4" />
             </button>
           )}
           <button
             onClick={() => setMobileMenuOpen(false)}
-            className="md:hidden p-1.5 rounded-lg hover:bg-surface-2 text-text-secondary"
+            className="md:hidden p-1.5 rounded-lg hover:bg-white/[0.06] text-white/50"
           >
             <X className="w-5 h-5" />
           </button>
@@ -171,23 +173,23 @@ export default function SOCLayout() {
 
         {/* SOC Status Bar */}
         {!sidebarCollapsed && (
-          <div className="px-4 py-3 border-b border-border-default">
-            <div className="flex items-center gap-2 mb-2.5">
+          <div className="px-5 py-4 border-b border-white/[0.06]">
+            <div className="flex items-center gap-2 mb-3">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-semantic-success pulse-emerald' : 'bg-semantic-critical pulse-red'}`} />
-              <span className={`text-[10px] font-bold uppercase tracking-[0.15em] ${isConnected ? 'text-semantic-success' : 'text-semantic-critical'}`}>
+              <span className={`text-[10px] font-semibold uppercase tracking-[0.12em] ${isConnected ? 'text-semantic-success' : 'text-semantic-critical'}`}>
                 {isConnected ? 'SOC Online' : 'SOC Offline'}
               </span>
             </div>
             {/* Mini metrics */}
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-2">
               {[
                 { label: 'CPU', value: isSniffing ? '41%' : '--' },
                 { label: 'EPS', value: isSniffing ? `${activeStats?.flow_count || 0}` : '--' },
                 { label: 'MTTD', value: isSniffing ? '4m' : '--' },
               ].map(m => (
-                <div key={m.label} className="bg-surface-2 rounded px-2 py-1.5 text-center">
-                  <div className="text-[11px] font-bold text-white font-mono-data">{m.value}</div>
-                  <div className="text-[8px] text-text-tertiary uppercase tracking-wider font-bold mt-0.5">{m.label}</div>
+                <div key={m.label} className="bg-white/[0.04] rounded-lg px-2.5 py-2 text-center">
+                  <div className="text-[11px] font-semibold text-white font-mono-data">{m.value}</div>
+                  <div className="text-[8px] text-white/30 uppercase tracking-wider font-medium mt-0.5">{m.label}</div>
                 </div>
               ))}
             </div>
@@ -195,11 +197,11 @@ export default function SOCLayout() {
         )}
 
         {/* Nav Links */}
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+        <nav className="flex-1 overflow-y-auto py-5 px-3 space-y-6">
           {NAV_SECTIONS.map((section) => (
-            <div key={section.label} className="space-y-0.5">
+            <div key={section.label} className="space-y-1">
               {!sidebarCollapsed && (
-                <div className="px-3 mb-2 text-[9px] font-extrabold text-text-tertiary uppercase tracking-[0.2em]">
+                <div className="px-4 mb-2.5 text-[10px] font-semibold text-white/25 uppercase tracking-[0.15em]">
                   {section.label}
                 </div>
               )}
@@ -207,41 +209,57 @@ export default function SOCLayout() {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    title={sidebarCollapsed ? item.name : undefined}
-                    className={`
-                      flex items-center gap-3 rounded-lg text-[13px] font-medium transition-all duration-200 relative
-                      ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3.5 py-2.5'}
-                      ${isActive
-                        ? 'text-accent bg-accent/5'
-                        : 'text-text-secondary hover:text-text-primary hover:bg-surface-2'
-                      }
-                    `}
-                  >
-                    {/* Active left border */}
-                    {isActive && (
-                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-accent rounded-r-full" />
-                    )}
-                    <Icon className={`w-[18px] h-[18px] shrink-0 ${isActive ? 'text-accent' : ''}`} />
-                    {!sidebarCollapsed && (
-                      <>
-                        <span className="flex-1">{item.name}</span>
-                        {/* Badges */}
-                        {'badge' in item && item.badge === 'live' && (
-                          <span className="text-[9px] font-bold uppercase tracking-wider bg-semantic-success/15 text-semantic-success px-1.5 py-0.5 rounded">
-                            Live
-                          </span>
-                        )}
-                        {'badge' in item && item.badge === 'count' && 'count' in item && (
-                          <span className="text-[10px] font-bold bg-semantic-critical text-white w-5 h-5 rounded-full flex items-center justify-center">
-                            {item.count}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </Link>
+                  sidebarCollapsed ? (
+                    <Tooltip content={item.name} position="right">
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        className={`
+                          flex items-center justify-center rounded-xl text-sm font-medium transition-all duration-200 relative
+                          p-3
+                          ${isActive
+                            ? 'text-white bg-white/[0.08] border-l-[3px] border-accent'
+                            : 'text-white/40 hover:text-white/80 hover:bg-white/[0.05]'}
+                        `}
+                      >
+                        <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                      </Link>
+                    </Tooltip>
+                  ) : (
+                    <Link
+                      key={item.path}
+                      to={item.path}
+                      className={`
+                        flex items-center gap-3.5 rounded-xl text-sm font-medium transition-all duration-200 relative
+                        px-4 py-3
+                        ${isActive
+                          ? 'text-white bg-white/[0.08]'
+                          : 'text-white/40 hover:text-white/80 hover:bg-white/[0.05]'}
+                      `}
+                    >
+                      {/* Active left border (enhanced) */}
+                      {isActive && (
+                        <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-accent rounded-r-full" />
+                      )}
+                      <Icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-accent' : ''}`} />
+                      {!sidebarCollapsed && (
+                        <>
+                          <span className="flex-1">{item.name}</span>
+                          {/* Badges */}
+                          {'badge' in item && item.badge === 'live' && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider bg-semantic-success/15 text-semantic-success px-1.5 py-0.5 rounded">
+                              Live
+                            </span>
+                          )}
+                          {'badge' in item && item.badge === 'count' && 'count' in item && (
+                            <span className="text-[10px] font-bold bg-semantic-critical text-white w-5 h-5 rounded-full flex items-center justify-center">
+                              {item.count}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </Link>
+                  )
                 );
               })}
             </div>
@@ -249,12 +267,12 @@ export default function SOCLayout() {
         </nav>
 
         {/* Bottom section */}
-        <div className="p-3 border-t border-border-default space-y-1">
+        <div className="p-4 border-t border-white/[0.06] space-y-1.5">
           {/* Under attack alert */}
           {isUnderAttack && !sidebarCollapsed && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-semantic-critical/10 border border-semantic-critical/20 rounded-lg animate-pulse mb-2">
-              <AlertTriangle className="w-3.5 h-3.5 text-semantic-critical shrink-0" />
-              <span className="text-[9px] font-bold text-semantic-critical uppercase tracking-wider">Active Threat</span>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-semantic-critical/10 border border-semantic-critical/20 rounded-xl animate-pulse mb-2">
+              <AlertTriangle className="w-4 h-4 text-semantic-critical shrink-0" />
+              <span className="text-[10px] font-semibold text-semantic-critical uppercase tracking-wider">Active Threat</span>
             </div>
           )}
 
@@ -262,11 +280,11 @@ export default function SOCLayout() {
           <button
             onClick={handleLogout}
             className={`
-              flex items-center gap-3 rounded-lg text-[13px] font-medium text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-all w-full
-              ${sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3.5 py-2.5'}
+              flex items-center gap-3.5 rounded-xl text-sm font-medium text-white/40 hover:text-white/80 hover:bg-white/[0.05] transition-all w-full
+              ${sidebarCollapsed ? 'justify-center p-3' : 'px-4 py-3'}
             `}
           >
-            <LogOut className="w-[18px] h-[18px] shrink-0" />
+            <LogOut className="w-5 h-5 shrink-0" />
             {!sidebarCollapsed && <span>Logout</span>}
           </button>
 
@@ -274,7 +292,7 @@ export default function SOCLayout() {
           {sidebarCollapsed && (
             <button
               onClick={() => setSidebarCollapsed(false)}
-              className="w-full flex justify-center py-2 text-text-tertiary hover:text-text-secondary transition-colors"
+              className="w-full flex justify-center py-2.5 text-white/25 hover:text-white/50 transition-colors"
             >
               <PanelLeft className="w-4 h-4" />
             </button>
@@ -285,7 +303,7 @@ export default function SOCLayout() {
       {/* ── Main Content ── */}
       <main className="flex-1 flex flex-col min-h-screen overflow-hidden">
         {/* Top Header Bar */}
-        <header className="h-20 flex items-center justify-between px-8 bg-surface-1 border-b border-border-default z-20 shrink-0">
+        <header className="h-[72px] flex items-center justify-between px-8 bg-white/[0.02] backdrop-blur-xl border-b border-white/[0.06] z-20 shrink-0">
           <div className="flex items-center gap-6">
             <button
               onClick={() => setMobileMenuOpen(true)}
@@ -298,7 +316,7 @@ export default function SOCLayout() {
             <div className="flex md:hidden items-center gap-2">
               <div className="w-8 h-8 rounded bg-accent/10 border border-accent/20 flex items-center justify-center">
                 <svg className="w-4.5 h-4.5 text-accent" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(0, 212, 255, 0.05)"/>
+                  <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="rgba(99, 102, 241, 0.05)"/>
                 </svg>
               </div>
               <span className="font-display font-bold text-xs tracking-wider text-white">AEGIS</span>
@@ -424,13 +442,13 @@ export default function SOCLayout() {
             <Outlet />
           </div>
           {/* Footer */}
-          <footer className="mt-8 border-t border-border-default pt-6 text-xs text-text-tertiary">
+          <footer className="mt-10 border-t border-white/[0.06] pt-6 text-xs text-white/25">
             <div className="max-w-[1600px] xl:max-w-[1800px] w-full mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
               <div>© 2026 Aegis SOC-MSV. All rights reserved.</div>
               <div className="flex gap-6">
-                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Privacy Policy</a>
-                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Terms of Service</a>
-                <a href="#" className="hover:text-text-secondary transition-colors uppercase tracking-wider font-medium">Documentation</a>
+                <a href="#" className="hover:text-white/50 transition-colors tracking-wider font-medium">Privacy</a>
+                <a href="#" className="hover:text-white/50 transition-colors tracking-wider font-medium">Terms</a>
+                <a href="#" className="hover:text-white/50 transition-colors tracking-wider font-medium">Docs</a>
               </div>
             </div>
           </footer>

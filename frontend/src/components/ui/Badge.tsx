@@ -59,7 +59,7 @@ export function statusToBadgeVariant(status?: string): BadgeVariant {
 
 export default function Badge({ variant = 'default', children, dot, className = '' }: BadgeProps) {
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold rounded-md border ${variantStyles[variant]} ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold rounded-lg border ${variantStyles[variant]} ${className}`}>
       {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColors[variant]}`} />}
       {children}
     </span>
