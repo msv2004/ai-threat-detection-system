@@ -1,4 +1,5 @@
 import os
+os.environ["TESTING"] = "True"
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -7,6 +8,10 @@ from app.database.session import get_db
 from app.database.base_models import Base
 from app.models.role import Role
 from app.repositories.user_repository import UserRepository
+from app.core.limiter import limiter
+
+# Disable rate limiting for all unit tests to prevent 429 failures in rapid test executions
+limiter.enabled = False
 
 # SQLite file-backed database configuration for shared testing
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test_project.db"
