@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/threat_detection"
 
+    # CORS Allowed Origins (comma-separated string)
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:8000"
+
     # Logging
     LOG_FORMAT: str = "CONSOLE"
 

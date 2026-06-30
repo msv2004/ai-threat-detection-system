@@ -65,3 +65,37 @@ class RoleChecker:
                 detail="You do not have permission to access this resource."
             )
         return current_user
+
+
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/login", auto_error=False)
+
+def get_current_user_optional(
+    db: Session = Depends(get_db),
+    token: str | None = Depends(oauth2_scheme_optional)
+) -> User | None:
+    """
+    Optional dependency validator that attempts to resolve the currently logged-in user.
+    Does not raise an exception if credentials are missing or invalid; instead, returns None.
+    """
+    if not token:
+        return None
+        
+    decoded = decode_token(token)
+    if not decoded or decoded.get("type") != "access":
+        return None
+        
+    user_id_str: str | None = decoded.get("sub")
+    if user_id_str is None:
+        return None
+        
+    try:
+        user_id = int(user_id_str)
+    except ValueError:
+        return None
+        
+    user_repo = UserRepository(db)
+    user = user_repo.get_by_id(user_id)
+    if not user or not user.is_active:
+        return None
+        
+    return user

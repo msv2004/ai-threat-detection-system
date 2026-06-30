@@ -96,7 +96,8 @@ export const useSocketStore = create<SocketState>((set, get) => {
         ? import.meta.env.VITE_API_URL.replace(/^http/, 'ws')
         : `${wsProtocol}//${window.location.hostname}:8000`;
 
-      const wsUrl = `${wsHost}/ws/alerts`;
+      const token = localStorage.getItem('access_token');
+      const wsUrl = `${wsHost}/ws/alerts${token ? `?token=${token}` : ''}`;
       console.log('Connecting to WebSocket:', wsUrl);
 
       const ws = new WebSocket(wsUrl);

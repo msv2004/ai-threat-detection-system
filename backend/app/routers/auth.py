@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.database.session import get_db
@@ -7,11 +7,13 @@ from app.services.auth_service import AuthService
 from app.schemas.user import UserCreate, UserResponse, UserLogin, Token, TokenRefreshRequest
 from app.auth.dependencies import get_current_user
 from app.models.user import User
+from app.core.limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(schema: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def register(request: Request, schema: UserCreate, db: Session = Depends(get_db)):
     """
     Registers a new user account.
     """
@@ -20,7 +22,8 @@ def register(schema: UserCreate, db: Session = Depends(get_db)):
     return auth_service.register(schema)
 
 @router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@limiter.limit("10/minute")
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """
     Authenticates a user and returns JWT Access and Refresh Tokens.
     Accepts Standard OAuth2 form data (username is user email).

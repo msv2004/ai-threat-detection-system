@@ -19,13 +19,17 @@ class DatasetService:
         self.repository = repository
 
     def upload_dataset(self, file: UploadFile, user_id: int, background_tasks: BackgroundTasks) -> Dataset:
+        # Sanitize filename to prevent path traversal
+        filename = os.path.basename(file.filename)
+        filename = filename.replace("..", "").replace("/", "").replace("\\", "")
+
         # 1. Validation: Check Extension
-        ext = os.path.splitext(file.filename)[1].lower()
+        ext = os.path.splitext(filename)[1].lower()
         if ext not in ALLOWED_EXTENSIONS:
             raise ValidationError(f"Invalid file extension. Allowed: {ALLOWED_EXTENSIONS}")
 
         # 2. Validation: Duplicate filename
-        if self.repository.get_by_filename_and_user(file.filename, user_id):
+        if self.repository.get_by_filename_and_user(filename, user_id):
             raise ValidationError("A dataset with this filename already exists for this user.")
 
         # Determine Dataset Type
@@ -35,7 +39,7 @@ class DatasetService:
         # Using user_id and filename to avoid global collisions
         user_dir = os.path.join(DATASETS_DIR, str(user_id))
         os.makedirs(user_dir, exist_ok=True)
-        file_path = os.path.join(user_dir, file.filename)
+        file_path = os.path.join(user_dir, filename)
 
         # 3. Save File and Check Size
         size_bytes = 0
@@ -54,7 +58,7 @@ class DatasetService:
 
         # 4. Create DB Record
         dataset = Dataset(
-            filename=file.filename,
+            filename=filename,
             dataset_type=dataset_type,
             size_bytes=size_bytes,
             file_path=file_path,

@@ -6,11 +6,10 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Rate limiting
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from starlette.responses import JSONResponse
+from app.core.limiter import limiter
 
 # Security and size limit middleware
 from app.middleware.security_headers import SecurityHeadersMiddleware
@@ -101,6 +100,12 @@ async def lifespan(app: FastAPI):
     # Startup logic
     setup_logging()
     logger.info("Starting up application...")
+    
+    # Prevent running in production (non-SQLite) with insecure default SECRET_KEY
+    if settings.SECRET_KEY == "supersecretkeyhere" and not settings.DATABASE_URL.startswith("sqlite"):
+        logger.critical("Insecure default SECRET_KEY is not allowed on a production database connection!")
+        raise ValueError("Insecure default SECRET_KEY is not allowed on a production database connection!")
+        
     seed_roles()
     setup_event_listeners()
     
@@ -115,8 +120,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Initialize Limiter
-limiter = Limiter(key_func=get_remote_address, storage_uri=os.getenv("REDIS_URL", "memory://"))
+# Set central limiter on app state
 app.state.limiter = limiter
 
 # Add Middleware
@@ -125,11 +129,14 @@ app.add_middleware(SecurityHeadersMiddleware)
 app.add_middleware(RequestSizeLimitMiddleware, max_size=5 * 1024 * 1024)  # 5 MiB
 app.add_middleware(SlowAPIMiddleware)  # Apply rate limiting globally
 
-# Set all CORS enabled origins
+# Set all CORS enabled origins from config
+origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
+allow_credentials = False if "*" in origins else True
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, this should be restricted
-    allow_credentials=True,
+    allow_origins=origins,
+    allow_credentials=allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -153,11 +160,23 @@ app.include_router(health_router)  # /health prefix routes (not prefixed with /a
 from app.detection.routers import router as detection_router  # noqa: E402
 app.include_router(detection_router, prefix=f"{settings.API_V1_STR}/detection")
 
-from fastapi import WebSocket, WebSocketDisconnect  # noqa: E402
+from fastapi import WebSocket, WebSocketDisconnect, Query, status  # noqa: E402
 from app.websocket.manager import websocket_manager  # noqa: E402
+from app.auth.jwt import decode_token  # noqa: E402
 
 @app.websocket("/ws/alerts")
-async def websocket_alerts_endpoint(websocket: WebSocket):
+async def websocket_alerts_endpoint(websocket: WebSocket, token: str | None = Query(None)):
+    if not token:
+        await websocket.accept()
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Token missing")
+        return
+        
+    decoded = decode_token(token)
+    if not decoded or decoded.get("type") != "access":
+        await websocket.accept()
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid token")
+        return
+        
     await websocket_manager.connect(websocket)
     try:
         while True:

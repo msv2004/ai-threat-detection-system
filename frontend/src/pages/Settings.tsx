@@ -73,7 +73,7 @@ export default function SettingsPage() {
   const { data: healthData, isLoading: isHealthLoading, isError: isHealthError, refetch: refetchHealth } = useQuery({
     queryKey: ['health_check'],
     queryFn: async () => {
-      const res = await fetch(`${apiUrl}/api/v1/health`);
+      const res = await fetch(`${apiUrl}/health`);
       if (!res.ok) throw new Error('Backend unreachable');
       return res.json();
     },
